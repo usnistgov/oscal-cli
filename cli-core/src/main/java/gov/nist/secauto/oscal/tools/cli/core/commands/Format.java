@@ -23,33 +23,45 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
 
-import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
+package gov.nist.secauto.oscal.tools.cli.core.commands;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-public class CatalogCommand extends AbstractParentCommand {
-  private static final String COMMAND = "catalog";
+public enum Format {
+  XML(gov.nist.secauto.metaschema.binding.Format.XML,".xml"),
+  JSON(gov.nist.secauto.metaschema.binding.Format.JSON,".json"),
+  YAML(gov.nist.secauto.metaschema.binding.Format.YAML,".yml");
 
-  public CatalogCommand() {
-    super();
-    addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
-    addCommandHandler(new ConvertSubcommand());
+  private static final Map<gov.nist.secauto.metaschema.binding.Format, Format> bindingFormatToFormatMap;
+  static {
+    Map<gov.nist.secauto.metaschema.binding.Format, Format> map = new HashMap<>();
+    for (Format format : Format.values()) {
+      map.put(format.getBindingFormat(), format);
+    }
+    bindingFormatToFormatMap = Collections.unmodifiableMap(map);
   }
 
-  @Override
-  public String getName() {
-    return COMMAND;
+  public static Format lookup(gov.nist.secauto.metaschema.binding.Format format) {
+    return bindingFormatToFormatMap.get(format);
   }
 
-  @Override
-  public String getDescription() {
-    return "Perform an operation on an OSCAL Catalog";
+  private final String defaultExtension;
+  private final gov.nist.secauto.metaschema.binding.Format bindingFormat;
+
+  private Format(gov.nist.secauto.metaschema.binding.Format bindingFormat, String defaultExtension) {
+    this.bindingFormat = bindingFormat;
+    this.defaultExtension = defaultExtension;
+  }
+
+  public gov.nist.secauto.metaschema.binding.Format getBindingFormat() {
+    return bindingFormat;
+  }
+
+  public String getDefaultExtension() {
+    return defaultExtension;
   }
 
 }

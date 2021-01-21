@@ -23,33 +23,18 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
 
-import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
+package gov.nist.secauto.oscal.tools.cli.framework.command;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
+public interface ExtraArgument {
+  String getName();
 
-public class CatalogCommand extends AbstractParentCommand {
-  private static final String COMMAND = "catalog";
+  boolean isRequired();
 
-  public CatalogCommand() {
-    super();
-    addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
-    addCommandHandler(new ConvertSubcommand());
-  }
-
-  @Override
-  public String getName() {
-    return COMMAND;
-  }
-
-  @Override
-  public String getDescription() {
-    return "Perform an operation on an OSCAL Catalog";
-  }
-
+  /**
+   * The allowed number of arguments of this type.
+   * 
+   * @return a positive integer value
+   */
+  int getNumber();
 }

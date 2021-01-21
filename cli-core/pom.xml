@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
-		<artifactId>root</artifactId>
+		<artifactId>cli-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
@@ -19,18 +20,23 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>cli-framework</artifactId>
-			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.oscal</groupId>
+			<artifactId>liboscal-java</artifactId>
 		</dependency>
 		<dependency>
 			<!-- For console log color -->
 			<groupId>org.fusesource.jansi</groupId>
 			<artifactId>jansi</artifactId>
-			<version>1.11</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>9.8.0-11</version>
 		</dependency>
 	</dependencies>
 
@@ -45,6 +51,9 @@
 				<directory>src/main/resources</directory>
 			</resource>
 			<resource>
+				<directory>${project.build.directory}/download</directory>
+			</resource>
+			<resource>
 				<directory>src/main/distro</directory>
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}/generated-distro</targetPath>
@@ -52,10 +61,51 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.10</version>
+				<configuration>
+					<programs>
+						<program>
+							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
+							<id>app</id>
+						</program>
+					</programs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>exec-oscal-cli</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<configuration>
+					<skipCache>true</skipCache>
+					<overwrite>false</overwrite>
+				</configuration>
+				<executions>
+					<execution>
+						<id>download-oscal-catalog-xml-schema</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/usnistgov/OSCAL/raw/${oscal.commit}/xml/schema/oscal_catalog_schema.xsd</url>
+							<outputDirectory>${project.build.directory}/download/schema/xml</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
-				<!-- TODO: Update to 3.0.2 once the m2e bug is fixed -->
 				<configuration>
 					<archive>
 						<manifest>

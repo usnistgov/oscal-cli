@@ -23,33 +23,57 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.framework.command;
 
+import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class CatalogCommand extends AbstractParentCommand {
-  private static final String COMMAND = "catalog";
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-  public CatalogCommand() {
-    super();
-    addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
-    addCommandHandler(new ConvertSubcommand());
+public abstract class AbstractParentCommand extends AbstractCommand implements CommandCollection {
+  private static final Logger log = LogManager.getLogger(AbstractParentCommand.class);
+
+  private final Map<String, Command> commandToSubcommandHandlerMap = new LinkedHashMap<>();
+
+  public void addCommandHandler(Command handler) {
+    String commandName = handler.getName();
+    this.commandToSubcommandHandlerMap.put(commandName, handler);
   }
 
   @Override
-  public String getName() {
-    return COMMAND;
+  public Command getCommandByName(String name) {
+    return commandToSubcommandHandlerMap.get(name);
   }
 
   @Override
-  public String getDescription() {
-    return "Perform an operation on an OSCAL Catalog";
+  public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(processor.getExec());
+
+    for (Command handler : context.getCallingCommands()) {
+      builder.append(' ');
+      builder.append(handler.getName());
+    }
+
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("oscal [-h | --help] <command> [<args>]", context.getOptions());
+    if (!commandToSubcommandHandlerMap.isEmpty()) {
+      System.out.println();
+      System.out.println("The following are available sub-commands:");
+      for (Command handler : commandToSubcommandHandlerMap.values()) {
+        System.out.printf("   %-12.12s %-60.60s%n", handler.getName(), handler.getDescription());
+      }
+      System.out.println();
+      System.out.println("'oscal <command> --help' will show help on that specific command.");
+    }
+    return ExitCode.OK.toExitStatus();
   }
 
+  
 }

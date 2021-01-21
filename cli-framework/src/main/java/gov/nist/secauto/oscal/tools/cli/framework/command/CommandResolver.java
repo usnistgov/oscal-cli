@@ -23,33 +23,41 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.framework.command;
 
-import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
+import java.util.Queue;
+import java.util.Stack;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
+public class CommandResolver {
 
-public class CatalogCommand extends AbstractParentCommand {
-  private static final String COMMAND = "catalog";
+  
+  public static Stack<Command> resolveCommand(Queue<String> args, CommandCollection collection) {
+    Stack<Command> callingCommands = new Stack<>();
 
-  public CatalogCommand() {
-    super();
-    addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
-    addCommandHandler(new ConvertSubcommand());
+    
+    resolveCommand(args, callingCommands, collection);
+
+    return callingCommands;
   }
 
-  @Override
-  public String getName() {
-    return COMMAND;
-  }
+  protected static void resolveCommand(Queue<String> args, Stack<Command> callingCommands, CommandCollection collection) {
+    String commandName =  args.peek();
+    if (commandName == null) {
+      return;
+    }
 
-  @Override
-  public String getDescription() {
-    return "Perform an operation on an OSCAL Catalog";
+    Command command = collection.getCommandByName(commandName);
+    if (command == null) {
+      return;
+    }
+
+    // remove the arg from the queue
+    args.poll();
+    callingCommands.push(command);
+
+    if (!args.isEmpty()) {
+      resolveCommand(args, callingCommands, command);
+    }
   }
 
 }
