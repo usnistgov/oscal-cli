@@ -33,7 +33,7 @@
 
 		<dependency.jline.version>3.14.0</dependency.jline.version>
 		<dependency.liboscal-java.version>0.0.1-SNAPSHOT</dependency.liboscal-java.version>
-		<dependency.log4j2.version>2.12.1</dependency.log4j2.version>
+		<dependency.log4j2.version>2.14.0</dependency.log4j2.version>
 		
 		<dependency.commons-cli.version>1.4</dependency.commons-cli.version>
 		<dependency.commons-io.version>2.6</dependency.commons-io.version>
