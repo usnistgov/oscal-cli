@@ -1,1 +1,7 @@
 .pmd
+.pmdruleset.xml
+.project
+.settings/
+.checkstyle
+.classpath
+target/
