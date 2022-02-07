@@ -31,32 +31,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Format {
-  XML(gov.nist.secauto.metaschema.binding.Format.XML,".xml"),
-  JSON(gov.nist.secauto.metaschema.binding.Format.JSON,".json"),
-  YAML(gov.nist.secauto.metaschema.binding.Format.YAML,".yml");
+  XML(gov.nist.secauto.metaschema.binding.io.Format.XML,".xml"),
+  JSON(gov.nist.secauto.metaschema.binding.io.Format.JSON,".json"),
+  YAML(gov.nist.secauto.metaschema.binding.io.Format.YAML,".yml");
 
-  private static final Map<gov.nist.secauto.metaschema.binding.Format, Format> bindingFormatToFormatMap;
+  private static final Map<gov.nist.secauto.metaschema.binding.io.Format, Format> bindingFormatToFormatMap;
   static {
-    Map<gov.nist.secauto.metaschema.binding.Format, Format> map = new HashMap<>();
+    Map<gov.nist.secauto.metaschema.binding.io.Format, Format> map = new HashMap<>();
     for (Format format : Format.values()) {
       map.put(format.getBindingFormat(), format);
     }
     bindingFormatToFormatMap = Collections.unmodifiableMap(map);
   }
 
-  public static Format lookup(gov.nist.secauto.metaschema.binding.Format format) {
+  public static Format lookup(gov.nist.secauto.metaschema.binding.io.Format format) {
     return bindingFormatToFormatMap.get(format);
   }
 
   private final String defaultExtension;
-  private final gov.nist.secauto.metaschema.binding.Format bindingFormat;
+  private final gov.nist.secauto.metaschema.binding.io.Format bindingFormat;
 
-  private Format(gov.nist.secauto.metaschema.binding.Format bindingFormat, String defaultExtension) {
+  private Format(gov.nist.secauto.metaschema.binding.io.Format bindingFormat, String defaultExtension) {
     this.bindingFormat = bindingFormat;
     this.defaultExtension = defaultExtension;
   }
 
-  public gov.nist.secauto.metaschema.binding.Format getBindingFormat() {
+  public gov.nist.secauto.metaschema.binding.io.Format getBindingFormat() {
     return bindingFormat;
   }
 

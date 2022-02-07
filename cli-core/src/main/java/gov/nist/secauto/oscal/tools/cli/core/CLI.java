@@ -26,8 +26,13 @@
 
 package gov.nist.secauto.oscal.tools.cli.core;
 
+import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.AssessmentPlanCommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.AssessmentResultsCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.catalog.CatalogCommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition.ComponentDefinitionCommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.poam.PlanOfActionsAndMilestonesCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.profile.ProfileCommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.ssp.SystemSecurityPlanCommand;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 
 import java.io.IOException;
@@ -45,6 +50,11 @@ public class CLI {
     this.cliProcessor = new CLIProcessor("oscal-cli", new Version());
     cliProcessor.addCommandHandler(new CatalogCommand());
     cliProcessor.addCommandHandler(new ProfileCommand());
+    cliProcessor.addCommandHandler(new ComponentDefinitionCommand());
+    cliProcessor.addCommandHandler(new SystemSecurityPlanCommand());
+    cliProcessor.addCommandHandler(new AssessmentPlanCommand());
+    cliProcessor.addCommandHandler(new AssessmentResultsCommand());
+    cliProcessor.addCommandHandler(new PlanOfActionsAndMilestonesCommand());
   }
 
   private void parse(String[] args) {

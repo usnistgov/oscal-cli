@@ -49,12 +49,13 @@ public class MessageExitStatus extends AbstractExitStatus {
     }
   }
 
+  @Override
   public String getMessage() {
     String message = lookupMessageForCode(getExitCode());
     return String.format(message, messageArguments.toArray());
   }
 
-  private String lookupMessageForCode(ExitCode exitCode) {
+  private String lookupMessageForCode(@SuppressWarnings("unused") ExitCode ignoredExitCode) {
     // TODO: add message bundle support
     StringBuilder builder = new StringBuilder();
 //    builder.append(getExitCode()).append(":");

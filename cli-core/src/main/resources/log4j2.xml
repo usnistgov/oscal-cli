@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Configuration>
-<Configuration>
+<Configuration verbose="true">
 	<Appenders>
-		<Console name="console-stdout" target="SYSTEM_OUT">
-			<PatternLayout pattern="%m%n" />
+		<Console name="console-stdout-trace" target="SYSTEM_OUT" immediateFlush="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />
+			<ThresholdFilter level="INFO" onMatch="DENY" onMismatch="ACCEPT" />
+		</Console>
+		<Console name="console-stdout" target="SYSTEM_OUT" immediateFlush="true">
+			<PatternLayout pattern="%m%n" charset="UTF-8" />
 			<Filters>
-				<ThresholdFilter level="ERR" onMatch="DENY"
-					onMismatch="NEUTRAL" />
-				<ThresholdFilter level="INFO" onMatch="ACCEPT"
-					onMismatch="DENY" />
+				<ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT" />
+				<ThresholdFilter level="DEBUG" onMatch="DENY" onMismatch="NEUTRAL" />
+				<ThresholdFilter level="TRACE" onMatch="DENY" onMismatch="NEUTRAL" />
 			</Filters>
 		</Console>
-		<Console name="console-stdout-trace" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
-			<ThresholdFilter level="INFO" onMatch="DENY"
-				onMismatch="ACCEPT" />
-		</Console>
-		<Console name="console-stderr" target="SYSTEM_ERR">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
-			<ThresholdFilter level="ERR" onMatch="ACCEPT" />
+		<Console name="console-stderr" target="SYSTEM_ERR" immediateFlush="true">
+<!--			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />-->
+			<PatternLayout pattern="%m%n" charset="UTF-8" />
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
 		</Console>
 	</Appenders>
 	<Loggers>
 		<Root level="INFO">
-			<AppenderRef ref="console-stdout" />
 			<AppenderRef ref="console-stdout-trace" />
+			<AppenderRef ref="console-stdout" />
 			<AppenderRef ref="console-stderr" />
 		</Root>
 	</Loggers>

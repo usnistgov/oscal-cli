@@ -23,12 +23,14 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
-import gov.nist.secauto.oscal.java.objects.Profile;
+import gov.nist.secauto.oscal.lib.model.Profile;
 import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
 
-public class ConvertSubcommand extends AbstractConvertSubcommand {
+public class ConvertSubcommand
+    extends AbstractConvertSubcommand {
   @Override
   public String getDescription() {
     return "Convert a specified OSCAL Profile to a different format";

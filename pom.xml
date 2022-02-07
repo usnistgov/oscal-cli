@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>17</version>
+		<version>20-SNAPSHOT</version>
 	</parent>
 
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
@@ -31,10 +29,10 @@
 
 		<oscal.commit>master</oscal.commit>
 
-		<dependency.jline.version>3.14.0</dependency.jline.version>
-		<dependency.liboscal-java.version>0.0.1-SNAPSHOT</dependency.liboscal-java.version>
-		<dependency.log4j2.version>2.14.0</dependency.log4j2.version>
-		
+		<dependency.jline.version>3.21.0</dependency.jline.version>
+		<dependency.liboscal-java.version>1.0.1-SNAPSHOT</dependency.liboscal-java.version>
+		<dependency.log4j2.version>2.17.1</dependency.log4j2.version>
+
 		<dependency.commons-cli.version>1.4</dependency.commons-cli.version>
 		<dependency.commons-io.version>2.6</dependency.commons-io.version>
 	</properties>
@@ -55,12 +53,18 @@
 				<!-- For console log color -->
 				<groupId>org.fusesource.jansi</groupId>
 				<artifactId>jansi</artifactId>
-				<version>1.18</version>
+				<version>2.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sf.saxon</groupId>
 				<artifactId>Saxon-HE</artifactId>
-				<version>9.9.1-7</version>
+				<version>10.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.erosb</groupId>
+				<artifactId>everit-json-schema</artifactId>
+				<version>1.14.0</version>
 			</dependency>
 
 			<dependency>

@@ -28,8 +28,7 @@ package gov.nist.secauto.oscal.tools.cli.core.operations;
 
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -39,14 +38,9 @@ import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -54,11 +48,12 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 public class XMLOperations {
-  private static final Logger log = LogManager.getLogger(XMLOperations.class);
+//  private static final Logger log = LogManager.getLogger(XMLOperations.class);
   public static Source getStreamSource(URL url) throws IOException {
     return new StreamSource(url.openStream(), url.toString());
   }
 
+  @NotNull
   public static List<ValidationFinding> validate(File file, List<? extends Source> schemaSources)
       throws SAXException, IOException {
     SchemaFactory schemafactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -131,21 +126,21 @@ public class XMLOperations {
     transformer.transform(new StreamSource(input), new StreamResult(result));
   }
 
-  private static class LoggingURIResolver implements URIResolver {
-    private final URIResolver delegate;
-
-    
-    public LoggingURIResolver(URIResolver delegate) {
-      super();
-      this.delegate = delegate;
-    }
-
-
-    @Override
-    public Source resolve(String href, String base) throws TransformerException {
-      log.info("Resolve: base='{}', href='{}'", base, href);
-      return delegate.resolve(href,  base);
-    }
-    
-  }
+//  private static class LoggingURIResolver implements URIResolver {
+//    private final URIResolver delegate;
+//
+//    
+//    public LoggingURIResolver(URIResolver delegate) {
+//      super();
+//      this.delegate = delegate;
+//    }
+//
+//
+//    @Override
+//    public Source resolve(String href, String base) throws TransformerException {
+//      log.info("Resolve: base='{}', href='{}'", base, href);
+//      return delegate.resolve(href,  base);
+//    }
+//    
+//  }
 }

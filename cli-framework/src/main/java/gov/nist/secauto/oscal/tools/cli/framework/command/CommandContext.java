@@ -28,16 +28,12 @@ package gov.nist.secauto.oscal.tools.cli.framework.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
 public class CommandContext {
-  private static final Logger log = LogManager.getLogger(CommandContext.class);
-
   private final List<Command> callingCommands;
   private final Command command;
   private final  List<String> extraArgs;

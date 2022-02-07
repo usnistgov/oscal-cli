@@ -66,6 +66,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the characterStream
      */
+    @Override
     public Reader getCharacterStream() {
       return characterStream;
     }
@@ -74,6 +75,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param characterStream
      *          the characterStream to set
      */
+    @Override
     public void setCharacterStream(Reader characterStream) {
       this.characterStream = characterStream;
     }
@@ -81,6 +83,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the byteStream
      */
+    @Override
     public InputStream getByteStream() {
       return byteStream;
     }
@@ -89,6 +92,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param byteStream
      *          the byteStream to set
      */
+    @Override
     public void setByteStream(InputStream byteStream) {
       this.byteStream = byteStream;
     }
@@ -96,6 +100,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the stringData
      */
+    @Override
     public String getStringData() {
       return stringData;
     }
@@ -104,6 +109,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param stringData
      *          the stringData to set
      */
+    @Override
     public void setStringData(String stringData) {
       this.stringData = stringData;
     }
@@ -111,6 +117,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the systemId
      */
+    @Override
     public String getSystemId() {
       return systemId;
     }
@@ -119,6 +126,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param systemId
      *          the systemId to set
      */
+    @Override
     public void setSystemId(String systemId) {
       this.systemId = systemId;
     }
@@ -126,6 +134,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the publicId
      */
+    @Override
     public String getPublicId() {
       return publicId;
     }
@@ -134,6 +143,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param publicId
      *          the publicId to set
      */
+    @Override
     public void setPublicId(String publicId) {
       this.publicId = publicId;
     }
@@ -141,6 +151,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the baseURI
      */
+    @Override
     public String getBaseURI() {
       return baseURI;
     }
@@ -149,6 +160,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param baseURI
      *          the baseURI to set
      */
+    @Override
     public void setBaseURI(String baseURI) {
       this.baseURI = baseURI;
     }
@@ -156,6 +168,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     /**
      * @return the encoding
      */
+    @Override
     public String getEncoding() {
       return encoding;
     }
@@ -164,6 +177,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param encoding
      *          the encoding to set
      */
+    @Override
     public void setEncoding(String encoding) {
       this.encoding = encoding;
     }
@@ -172,6 +186,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
      * @param certifiedText
      *          the certifiedText to set
      */
+    @Override
     public void setCertifiedText(boolean certifiedText) {
       this.certifiedText = certifiedText;
     }

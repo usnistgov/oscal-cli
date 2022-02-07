@@ -29,8 +29,8 @@ import gov.nist.secauto.oscal.tools.cli.framework.VersionInfo;
 
 public class Version implements VersionInfo {
 
-  public static String VERSION = "${project.version}";
-  public static String BUILD_TIMESTAMP = "${timestamp}";
+  public static final String VERSION = "${project.version}";
+  public static final String BUILD_TIMESTAMP = "${timestamp}";
 
   public Version() {
   }

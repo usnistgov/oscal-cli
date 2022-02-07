@@ -26,10 +26,13 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
-import gov.nist.secauto.metaschema.binding.BindingContext;
-import gov.nist.secauto.metaschema.binding.BindingException;
-import gov.nist.secauto.oscal.java.OscalLoader;
-import gov.nist.secauto.oscal.java.OscalLoader.LoadableData;
+import gov.nist.secauto.metaschema.binding.IBindingContext;
+import gov.nist.secauto.metaschema.binding.io.BindingException;
+import gov.nist.secauto.metaschema.binding.io.IDeserializer;
+import gov.nist.secauto.metaschema.binding.io.Feature;
+import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
+import gov.nist.secauto.metaschema.binding.io.ISerializer;
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
@@ -41,7 +44,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,6 +59,7 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
 
   private static final String COMMAND = "convert";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
+
   static {
     List<ExtraArgument> args = new ArrayList<>(2);
     args.add(new DefaultExtraArgument("source file", true));
@@ -74,9 +77,8 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
 
   @Override
   public void gatherOptions(Options options) {
-    options
-      .addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build())
-      .addOption(Option.builder("t").longOpt("to").required().hasArg().argName("FORMAT")
+    options.addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build());
+    options.addOption(Option.builder("t").longOpt("to").required().hasArg().argName("FORMAT")
         .desc("convert to format: xml, json, or yaml").build());
   }
 
@@ -86,13 +88,11 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
   }
 
   @Override
-  public void validateOptions(CLIProcessor processor, CommandContext context)
-      throws InvalidArgumentException {
-    String toFormatText = context.getCmdLine().getOptionValue("to");
-
-    Format toFormat;
+  public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
+    
     try {
-      toFormat = Format.valueOf(toFormatText.toUpperCase());
+      String toFormatText = context.getCmdLine().getOptionValue("to");
+      Format.valueOf(toFormatText.toUpperCase());
     } catch (IllegalArgumentException ex) {
       throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: " + Format.values());
     }
@@ -121,13 +121,14 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
 
     File destination;
     if (extraArgs.size() == 1) {
-      String extension = toFormat.getDefaultExtension();
-      destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
+//      String extension = toFormat.getDefaultExtension();
+//      destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
+      destination = null;
     } else {
       destination = new File(extraArgs.get(1));
     }
 
-    if (destination.exists()) {
+    if (destination != null && destination.exists()) {
       if (!context.getCmdLine().hasOption("overwrite")) {
         return ExitCode.FAIL.toExitStatus("The provided destination '" + destination.getPath()
             + "' already exists and the --overwrite option was not provided.");
@@ -142,26 +143,41 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
     } catch (IOException | BindingException | IllegalArgumentException ex) {
       return ExitCode.FAIL.toExitStatus(ex.getMessage());
     }
-    log.info("Generated {} file: {}", toFormat.toString(), destination.getPath());
+    if (destination != null) {
+      log.info("Generated {} file: {}", toFormat.toString(), destination.getPath());
+    }
     return ExitCode.OK.toExitStatus();
   }
 
   protected void performConvert(File input, File result, Format toFormat)
       throws BindingException, FileNotFoundException, IOException {
-    BindingContext context = BindingContext.newInstance();
-    OscalLoader loader = new OscalLoader(context);
-    LoadableData data = loader.detectModel(input);
+    IBindingContext context = OscalBindingContext.instance();
+    IBoundLoader loader = context.newBoundLoader();
 
-    Format fromFormat = Format.lookup(data.getFormat());
+    Format fromFormat = Format.lookup(loader.detectFormat(input));
     if (fromFormat == null) {
-      throw new BindingException(String.format("Unsupported source format '%s'", data.getFormat()));
+      throw new BindingException(String.format("Unsupported source format for file '%s'", input.getPath()));
     } else if (fromFormat.equals(toFormat)) {
       throw new IllegalArgumentException(String.format("Source and destination are the same format '%s'", toFormat));
     }
 
-    Object object = data.load(getLoadedClass());
-    context.serializeToFormat(toFormat.getBindingFormat(), object, result);
+    convert(input, result, fromFormat, toFormat, getLoadedClass(), context);
+  }
 
+  protected <CLASS> void convert(File input, File result, Format fromFormat, Format toFormat, Class<CLASS> rootClass,
+      IBindingContext context) throws FileNotFoundException, BindingException {
+    IDeserializer<CLASS> deserializer = context.newDeserializer(fromFormat.getBindingFormat(), rootClass);
+    deserializer.enableFeature(Feature.DESERIALIZE_ROOT);
+
+    CLASS object = deserializer.deserialize(input);
+
+    ISerializer<CLASS> serializer = context.newSerializer(toFormat.getBindingFormat(), rootClass);
+    serializer.enableFeature(Feature.SERIALIZE_ROOT);
+    if (result == null) {
+      serializer.serialize(object, System.out);
+    } else {
+      serializer.serialize(object, result);
+    }
   }
 
   protected abstract Class<?> getLoadedClass();

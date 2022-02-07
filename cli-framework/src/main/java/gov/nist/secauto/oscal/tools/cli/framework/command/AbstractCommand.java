@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractCommand implements Command {
+  @Override
   public Command getCommandByName(String name) {
     return null;
   }

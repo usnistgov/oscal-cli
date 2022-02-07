@@ -26,26 +26,35 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
 
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractValidationSubcommand;
 import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.transform.Source;
 
-public class ValidateSubcommand extends AbstractValidationSubcommand {
+public class ValidateSubcommand
+    extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Validate that a specified OSCAL Catalog is well-formed";
+    return "Validate that the specified OSCAL Catalog is well-formed";
   }
 
   @Override
   protected List<Source> getSchemaSources() throws IOException {
     List<Source> retval = new LinkedList<>();
-    retval.add(XMLOperations.getStreamSource(getClass().getResource("/schema/xml/oscal_catalog_schema.xsd")));
+    retval.add(
+        XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_catalog_schema.xsd")));
     return Collections.unmodifiableList(retval);
+  }
+
+  @Override
+  protected InputStream getJsonSchema() {
+    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_catalog_schema.json");
   }
 }

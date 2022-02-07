@@ -24,21 +24,35 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan;
 
-import gov.nist.secauto.oscal.lib.model.Catalog;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractValidationSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 
-public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.xml.transform.Source;
+
+public class ValidateSubcommand extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Convert the specified OSCAL Catalog to a different format";
+    return "Validate that the specified OSCAL Assessment Plan is well-formed";
   }
 
   @Override
-  protected Class<?> getLoadedClass() {
-    return Catalog.class;
+  protected List<Source> getSchemaSources() throws IOException {
+    List<Source> retval = new LinkedList<>();
+    retval.add(XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_assessmen-plan_schema.xsd")));
+    return Collections.unmodifiableList(retval);
+  }
+
+  @Override
+  protected InputStream getJsonSchema() {
+    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_assessmen-plan_schema.json");
   }
 }

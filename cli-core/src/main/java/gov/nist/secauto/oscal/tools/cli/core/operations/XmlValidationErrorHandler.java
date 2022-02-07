@@ -23,8 +23,10 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.operations;
 
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -34,7 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class XmlValidationErrorHandler implements ErrorHandler {
-  private List<ValidationFinding> findings = new LinkedList<>(); 
+  @NotNull
+  private List<ValidationFinding> findings = new LinkedList<>();
 
   @Override
   public void warning(SAXParseException ex) throws SAXException {
@@ -51,6 +54,7 @@ public class XmlValidationErrorHandler implements ErrorHandler {
     findings.add(new ValidationFinding(Severity.FATAL, ex));
   }
 
+  @NotNull
   public List<ValidationFinding> getFindings() {
     return Collections.unmodifiableList(findings);
   }

@@ -23,18 +23,19 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class ProfileCommand extends AbstractParentCommand {
+public class ProfileCommand
+    extends AbstractParentCommand {
   private static final String COMMAND = "profile";
 
-  
   public ProfileCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
+    // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
   }
 

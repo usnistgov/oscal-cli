@@ -37,7 +37,7 @@ import javax.xml.transform.TransformerException;
 public class RenderSubcommand extends AbstractRenderSubcommand {
   @Override
   public String getDescription() {
-    return "Render a specified OSCAL Profile using a transform (e.g., to HTML)";
+    return "Render the specified OSCAL Profile as HTML";
   }
 
   @Override

@@ -30,15 +30,10 @@ import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class AbstractParentCommand extends AbstractCommand implements CommandCollection {
-  private static final Logger log = LogManager.getLogger(AbstractParentCommand.class);
-
   private final Map<String, Command> commandToSubcommandHandlerMap = new LinkedHashMap<>();
 
   public void addCommandHandler(Command handler) {
@@ -62,7 +57,7 @@ public abstract class AbstractParentCommand extends AbstractCommand implements C
     }
 
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("oscal [-h | --help] <command> [<args>]", context.getOptions());
+    formatter.printHelp(processor.getExec() + " [-h | --help] <command> [<args>]", context.getOptions());
     if (!commandToSubcommandHandlerMap.isEmpty()) {
       System.out.println();
       System.out.println("The following are available sub-commands:");

@@ -24,21 +24,24 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition;
 
-import gov.nist.secauto.oscal.lib.model.Catalog;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractRenderSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 
-public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
+import java.io.File;
+import java.io.IOException;
 
+import javax.xml.transform.TransformerException;
+
+public class RenderSubcommand extends AbstractRenderSubcommand {
   @Override
   public String getDescription() {
-    return "Convert the specified OSCAL Catalog to a different format";
+    return "Render the specified OSCAL Component Definition as HTML";
   }
 
   @Override
-  protected Class<?> getLoadedClass() {
-    return Catalog.class;
+  protected void performRender(File input, File result) throws IOException, TransformerException {
+    XMLOperations.renderProfileHTML(input, result);
   }
 }

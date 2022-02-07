@@ -45,18 +45,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.DumbTerminal;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -83,6 +83,10 @@ public class CLIProcessor {
       retval = TerminalBuilder.builder().system(true).jna(false).jansi(true).build();
     } catch (IOException ex) {
       throw new RuntimeException(ex);
+    }
+
+    if (retval instanceof DumbTerminal && retval.getSize().getColumns() == 0) {
+      retval.setSize(new Size(40, 23));
     }
     return retval;
   }
@@ -218,8 +222,6 @@ public class CLIProcessor {
       log.debug("Processing command chain: {}", builder.toString());
     }
 
-    Command command = commandStack.peek();
-
     Options options = newOptionsInstance();
 
     for (Command cmd : commandStack) {
@@ -235,10 +237,8 @@ public class CLIProcessor {
       return ExitCode.INVALID_COMMAND.toExitStatus(e.getMessage());
     }
 
-    boolean useColor = true;
     if (cmdLine.hasOption("no-color")) {
       Ansi.setEnabled(false);
-      useColor = false;
     }
 
     if (cmdLine.hasOption("help")) {

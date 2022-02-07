@@ -23,22 +23,19 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
 
-import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-
-public class CatalogCommand extends AbstractParentCommand {
+public class CatalogCommand
+    extends AbstractParentCommand {
   private static final String COMMAND = "catalog";
 
   public CatalogCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
-    addCommandHandler(new RenderSubcommand());
+    // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
   }
 

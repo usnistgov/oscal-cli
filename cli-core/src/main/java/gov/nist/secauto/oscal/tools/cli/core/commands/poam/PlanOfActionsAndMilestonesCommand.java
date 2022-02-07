@@ -24,21 +24,29 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
-import gov.nist.secauto.oscal.lib.model.Catalog;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
+public class PlanOfActionsAndMilestonesCommand extends AbstractParentCommand {
+  private static final String COMMAND = "poam";
+
+  
+  public PlanOfActionsAndMilestonesCommand() {
+    super();
+    addCommandHandler(new ValidateSubcommand());
+//    addCommandHandler(new RenderSubcommand());
+    addCommandHandler(new ConvertSubcommand());
+  }
+
+  @Override
+  public String getName() {
+    return COMMAND;
+  }
 
   @Override
   public String getDescription() {
-    return "Convert the specified OSCAL Catalog to a different format";
+    return "Perform an operation on an OSCAL Plan of Actions and Milestones";
   }
 
-  @Override
-  protected Class<?> getLoadedClass() {
-    return Catalog.class;
-  }
 }

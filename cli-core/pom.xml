@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
@@ -15,6 +12,13 @@
 
 	<name>OSCAL CLI Core</name>
 	<url>http://maven.apache.org</url>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -38,6 +42,10 @@
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.erosb</groupId>
+			<artifactId>everit-json-schema</artifactId>
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -49,9 +57,6 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<directory>${project.build.directory}/download</directory>
 			</resource>
 			<resource>
 				<directory>src/main/distro</directory>
@@ -68,9 +73,15 @@
 					<programs>
 						<program>
 							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
-							<id>app</id>
+							<id>oscal-cli</id>
 						</program>
 					</programs>
+					<generateRepository>false</generateRepository>
+					<repositoryLayout>flat</repositoryLayout>
+					<repositoryName>lib</repositoryName>
+					<outputFileNameMapping>@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
+					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8</extraJvmArguments>
+					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
 				</configuration>
 				<executions>
 					<execution>
@@ -83,27 +94,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.googlecode.maven-download-plugin</groupId>
-				<artifactId>download-maven-plugin</artifactId>
-				<configuration>
-					<skipCache>true</skipCache>
-					<overwrite>false</overwrite>
-				</configuration>
-				<executions>
-					<execution>
-						<id>download-oscal-catalog-xml-schema</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://github.com/usnistgov/OSCAL/raw/${oscal.commit}/xml/schema/oscal_catalog_schema.xsd</url>
-							<outputDirectory>${project.build.directory}/download/schema/xml</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
@@ -111,9 +101,9 @@
 						<manifest>
 							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
 							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
+							<!-- 							<classpathPrefix>lib/</classpathPrefix> -->
 							<classpathLayoutType>custom</classpathLayoutType>
-							<customClasspathLayout>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</customClasspathLayout>
+							<customClasspathLayout>${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
 						</manifest>
 					</archive>
 				</configuration>
@@ -121,6 +111,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>gov.nist.secauto.swid</groupId>
+						<artifactId>swid-maven-plugin</artifactId>
+						<version>0.7.0</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>make-assembly-bin</id> <!-- this is used for inheritance merges -->

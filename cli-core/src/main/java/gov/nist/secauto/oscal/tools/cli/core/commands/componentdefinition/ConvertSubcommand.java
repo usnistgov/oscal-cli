@@ -24,21 +24,20 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition;
 
-import gov.nist.secauto.oscal.lib.model.Catalog;
+import gov.nist.secauto.oscal.lib.model.ComponentDefinition;
 import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
 
 public class ConvertSubcommand
     extends AbstractConvertSubcommand {
-
   @Override
   public String getDescription() {
-    return "Convert the specified OSCAL Catalog to a different format";
+    return "Convert the specified OSCAL Component Definition to a different format";
   }
 
   @Override
   protected Class<?> getLoadedClass() {
-    return Catalog.class;
+    return ComponentDefinition.class;
   }
 }

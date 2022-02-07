@@ -5,7 +5,7 @@ if "%JAVA_HOME%" == "" goto NO_HOME
 goto HAS_HOME
 
 :NO_HOME
-set JAVA=java
+set JAVA=java -Dsun.stdout.encoding=UTF-8 and -Dsun.stderr.encoding=UTF-8
 
 goto BUILD_COMMAND
 

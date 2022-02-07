@@ -11,47 +11,48 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>/</outputDirectory>
-			<unpack>false</unpack>
-			<includes>
-				<include>${artifact}</include>
-			</includes>
-		</dependencySet>
-		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
-			<unpack>false</unpack>
-			<excludes>
-				<exclude>${artifact}</exclude>
-			</excludes>
+			<outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.version}.${artifact.extension}
+			</outputFileNameMapping>
+			<useProjectArtifact>true</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}/generated-distro</directory>
+			<directory>${project.basedir}</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>README*</include>
+				<include>LICENSE*</include>
+				<include>NOTICE*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/appassembler</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>**/*</include>
 			</includes>
 		</fileSet>
 	</fileSets>
-<!-- 	<containerDescriptorHandlers> -->
-<!-- 		<containerDescriptorHandler> -->
-<!-- 			<handlerName>swid-generator</handlerName> -->
-<!-- 			<configuration> -->
+	<containerDescriptorHandlers>
+		<containerDescriptorHandler>
+			<handlerName>swid-generator</handlerName>
+			<configuration>
 <!-- 				<excludes> -->
 <!-- 					<exclude>${artifact}</exclude> -->
 <!-- 				</excludes> -->
-<!-- 				<entities> -->
-<!-- 					<entity> -->
-<!-- 						<name>National Institute of Standards and Technology</name> -->
-<!-- 						<regid>nist.gov</regid> -->
-<!-- 						<roles> -->
-<!-- 							<role>tagCreator</role> -->
-<!-- 							<role>softwareCreator</role> -->
-<!-- 						</roles> -->
-<!-- 					</entity> -->
-<!-- 				</entities> -->
-<!-- 			</configuration> -->
-<!-- 		</containerDescriptorHandler> -->
-<!-- 	</containerDescriptorHandlers> -->
+				<entities>
+					<entity>
+						<name>National Institute of Standards and Technology</name>
+						<regid>nist.gov</regid>
+						<roles>
+							<role>tagCreator</role>
+							<role>softwareCreator</role>
+						</roles>
+					</entity>
+				</entities>
+			</configuration>
+		</containerDescriptorHandler>
+	</containerDescriptorHandlers>
 </assembly>
