@@ -34,7 +34,8 @@ import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
 
-public class RenderSubcommand extends AbstractRenderSubcommand {
+public class RenderSubcommand
+    extends AbstractRenderSubcommand {
   @Override
   public String getDescription() {
     return "Render the specified OSCAL Plan of Actions and Milestones as HTML";

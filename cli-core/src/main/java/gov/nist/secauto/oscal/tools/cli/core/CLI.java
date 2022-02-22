@@ -40,8 +40,9 @@ import java.io.IOException;
 public class CLI {
 
   public static void main(String[] args) throws IOException {
-    System.setProperty("java.util.logging.manager","org.apache.logging.log4j.jul.LogManager");
-    new CLI().parse(args);
+    System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+    int exitCode = new CLI().parse(args);
+    System.exit(exitCode);
   }
 
   private CLIProcessor cliProcessor;
@@ -57,7 +58,7 @@ public class CLI {
     cliProcessor.addCommandHandler(new PlanOfActionsAndMilestonesCommand());
   }
 
-  private void parse(String[] args) {
-    cliProcessor.process(args);
+  private int parse(String[] args) {
+    return cliProcessor.process(args);
   }
 }

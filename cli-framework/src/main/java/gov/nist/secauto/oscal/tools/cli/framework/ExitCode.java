@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
 public enum ExitCode {
@@ -36,7 +37,7 @@ public enum ExitCode {
     public ExitStatus toExitStatus(Object... messageArguments) {
       throw new UnsupportedOperationException();
     }
-    
+
   },
   FAIL(-1, false),
   INPUT_ERROR(-2),
@@ -47,17 +48,19 @@ public enum ExitCode {
   private final int statusCode;
   private final boolean error;
 
-  private ExitCode(int statusCode) {
+  ExitCode(int statusCode) {
     this(statusCode, true);
   }
 
-  private ExitCode(int statusCode, boolean isError) {
+  ExitCode(int statusCode, boolean isError) {
     this.statusCode = statusCode;
     this.error = isError;
   }
 
   /**
-   * @return the error
+   * Determine if the exit code is the result of an error.
+   * 
+   * @return {@code true} if the exit code is the result of an error, or {@code false} otherwise
    */
   public boolean isError() {
     return error;

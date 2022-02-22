@@ -28,54 +28,45 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
-import gov.nist.secauto.metaschema.model.common.constraint.FindingCollectingConstraintValidationHandler;
-import gov.nist.secauto.metaschema.model.common.constraint.IConstraint;
-import gov.nist.secauto.metaschema.model.common.constraint.IConstraint.Level;
+import gov.nist.secauto.metaschema.binding.validation.ConstraintContentValidator;
+import gov.nist.secauto.metaschema.binding.validation.IValidationFindingVisitor;
+import gov.nist.secauto.metaschema.binding.validation.IValidationResult;
+import gov.nist.secauto.metaschema.binding.validation.JsonSchemaContentValidator;
+import gov.nist.secauto.metaschema.binding.validation.XmlSchemaContentValidator;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
-import gov.nist.secauto.oscal.tools.cli.core.operations.ValidationFinding;
-import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
+import gov.nist.secauto.oscal.tools.cli.core.operations.YamlOperations;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractCommand;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractTerminalCommand;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.logging.log4j.LogBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.xml.sax.SAXException;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
-import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 import javax.xml.transform.Source;
 
-public abstract class AbstractValidationSubcommand extends AbstractCommand {
-  private static final Logger log = LogManager.getLogger(AbstractValidationSubcommand.class);
+public abstract class AbstractValidationSubcommand
+    extends AbstractTerminalCommand {
+  private static final Logger LOGGER = LogManager.getLogger(AbstractValidationSubcommand.class);
   private static final String COMMAND = "validate";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
 
@@ -83,10 +74,6 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
     List<ExtraArgument> args = new ArrayList<>(1);
     args.add(new DefaultExtraArgument("file to validate", true));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
-  }
-
-  public AbstractValidationSubcommand() {
-    super();
   }
 
   @Override
@@ -105,6 +92,7 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
     return EXTRA_ARGUMENTS;
   }
 
+  @SuppressWarnings("PMD")
   @Override
   public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
     List<String> extraArgs = context.getExtraArguments();
@@ -123,7 +111,7 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
     if (context.getCmdLine().hasOption("as")) {
       try {
         String toFormatText = context.getCmdLine().getOptionValue("as");
-        Format.valueOf(toFormatText.toUpperCase());
+        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
         throw new InvalidArgumentException("Invalid '--as' argument. The format must be one of: " + Format.values());
       }
@@ -143,7 +131,7 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
         throw newEx;
       } catch (IllegalArgumentException ex) {
         throw new InvalidArgumentException(
-            "Unable to determine the target file's format. Use '--as' to specify the format. The format must be one of: "
+            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Format.values());
       }
     }
@@ -152,13 +140,13 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File target = new File(extraArgs.get(0));
+    Path target = Paths.get(extraArgs.get(0));
 
     Format asFormat;
     if (context.getCmdLine().hasOption("as")) {
       try {
         String toFormatText = context.getCmdLine().getOptionValue("as");
-        asFormat = Format.valueOf(toFormatText.toUpperCase());
+        asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL.toExitStatus("Invalid '--as' argument. The format must be one of: " + Format.values());
       }
@@ -170,171 +158,78 @@ public abstract class AbstractValidationSubcommand extends AbstractCommand {
         asFormat = Format.lookup(loader.detectFormat(target));
       } catch (FileNotFoundException ex) {
         // this case was already checked for
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target.getPath() + "' does not exist.");
+        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target + "' does not exist.");
       } catch (IOException ex) {
         return ExitCode.FAIL.toExitStatus(ex.getMessage());
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL.toExitStatus(
-            "Unable to determine the target file's format. Use '--as' to specify the format. The format must be one of: "
+            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Format.values());
       }
     }
 
-    switch (asFormat) {
-    case JSON:
-      try {
-        validateJson(target, toJson(target));
-      } catch (FileNotFoundException ex) {
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target.getPath() + "' does not exist.");
-      } catch (JSONException | IOException ex) {
-        return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
-      } catch (ValidationException ex) {
-        log.error("The file '{}' had {} JSON validation issue(s). The issues are:", target.getPath(), ex.getViolationCount());
-        log.error(ex.getLocalizedMessage());
-        outputJsonViolations(ex.getCausingExceptions());
-        return ExitCode.FAIL.toExitStatus();
-      }
-      break;
-    case XML:
-      try {
-        List<ValidationFinding> findings = validateXml(target);
-        if (!findings.isEmpty()) {
-          log.info("The file '{}' had {} validation issue(s). The issues are:", target.getPath(), findings.size());
-
-          for (ValidationFinding finding : findings) {
-            log.info("[{}] file={}, line={}, column={}, message={}", finding.getSeverity(), finding.getSystemId(),
-                finding.getLineNumber(), finding.getColumnNumber(), finding.getMessage());
-          }
-          return ExitCode.FAIL.toExitStatus();
-        }
-      } catch (SAXException | IOException ex) {
-        return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
-      }
-      break;
-    case YAML:
-      try {
-        validateJson(target, yamlToJson(target));
-      } catch (FileNotFoundException ex) {
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target.getPath() + "' does not exist.");
-      } catch (JSONException | IOException ex) {
-        return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
-      } catch (ValidationException ex) {
-        log.error("The file '{}' had {} YAML validation issue(s). The issues are:", target.getPath(), ex.getViolationCount());
-        log.error(ex.getLocalizedMessage());
-        outputJsonViolations(ex.getCausingExceptions());
-        return ExitCode.FAIL.toExitStatus();
-      }
-      break;
-    default:
-      return ExitCode.FAIL.toExitStatus("Unsupported format: " + asFormat.name());
-    }
-
-    IBindingContext bindingContext = OscalBindingContext.instance();
-    IBoundLoader loader = bindingContext.newBoundLoader();
-
+    IValidationResult schemaValidationResult;
     try {
-      Object object = loader.load(target);
-      FindingCollectingConstraintValidationHandler handler = new FindingCollectingConstraintValidationHandler();
-      bindingContext.validate(object, target.toURI(), true, handler);
-      
-      List<FindingCollectingConstraintValidationHandler.Finding> findings = handler.getFindings();
-      outputConstraintViolations(findings);
-      if (handler.getHighestLevel().ordinal() > IConstraint.Level.WARNING.ordinal()) {
-        return ExitCode.FAIL.toExitStatus();
-      }
-    } catch (FileNotFoundException ex) {
-      return ExitCode.FAIL.toExitStatus("The provided target file '" + target.getPath() + "' does not exist.");
-    } catch (IOException ex) {
-      log.error(ex.getLocalizedMessage(), ex);
-      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getLocalizedMessage());
-    }
-
-    log.info("The file '{}' is valid.", target.getPath());
-    return ExitCode.OK.toExitStatus();
-
-  }
-
-  private static JSONObject yamlToJson(File target) throws FileNotFoundException {
-    Resolver resolver = new Resolver() {
-
-      @Override
-      protected void addImplicitResolvers() {
-        addImplicitResolver(Tag.BOOL, BOOL, "yYnNtTfFoO");
-        addImplicitResolver(Tag.INT, INT, "-+0123456789");
-        addImplicitResolver(Tag.FLOAT, FLOAT, "-+0123456789.");
-        addImplicitResolver(Tag.MERGE, MERGE, "<");
-        addImplicitResolver(Tag.NULL, NULL, "~nN\0");
-        addImplicitResolver(Tag.NULL, EMPTY, null);
-        // addImplicitResolver(Tag.TIMESTAMP, TIMESTAMP, "0123456789");
-      }
-
-    };
-    Yaml yaml = new Yaml(new Constructor(), new Representer(), new DumperOptions(), resolver);
-
-    @SuppressWarnings("unchecked")
-    Map<String, Object> map = (Map<String, Object>) yaml.load(new FileReader(target));
-
-    return new JSONObject(map);
-  }
-
-  private static JSONObject toJson(File target) throws JSONException, FileNotFoundException {
-    return new JSONObject(new JSONTokener(new FileReader(target)));
-  }
-
-  private void validateJson(@SuppressWarnings("unused") File ignoredTarget, JSONObject json) throws IOException, ValidationException {
-    try (InputStream inputStream = getJsonSchema()) {
-      JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
-      Schema schema = SchemaLoader.load(rawSchema);
-      schema.validate(json);
-    }
-  }
-
-  private void outputJsonViolations(List<ValidationException> causingExceptions) {
-    for (ValidationException ex : causingExceptions) {
-      log.error(ex.getLocalizedMessage());
-      outputJsonViolations(ex.getCausingExceptions());
-    }
-  }
-
-  private void outputConstraintViolations(List<FindingCollectingConstraintValidationHandler.Finding> findings) {
-    for (FindingCollectingConstraintValidationHandler.Finding finding : findings) {
-      IConstraint constraint = finding.getConstraint();
-      Level level = constraint.getLevel();
-
-      LogBuilder logBuilder;
-      switch (level) {
-      case CRITICAL:
-        logBuilder = log.atFatal();
+      switch (asFormat) {
+      case JSON:
+        try (InputStream inputStream = getJsonSchema()) {
+          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(target);
+        }
         break;
-      case ERROR:
-        logBuilder = log.atError();
+      case XML:
+        List<Source> schemaSources = getXmlSchemaSources();
+        schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(target);
         break;
-      case WARNING:
-        logBuilder = log.atWarn();
-        break;
-      case INFORMATIONAL:
-        logBuilder = log.atInfo();
+      case YAML:
+        JSONObject json = YamlOperations.yamlToJson(YamlOperations.parseYaml(target));
+        try (InputStream inputStream = getJsonSchema()) {
+          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(json, target.toUri());
+        }
         break;
       default:
-        throw new UnsupportedOperationException(String.format("unsupported level '%s'", level));
+        return ExitCode.FAIL.toExitStatus("Unsupported format: " + asFormat.name());
       }
-      if (finding.getCause() != null) {
-        logBuilder.withThrowable(finding.getCause());
-      }
-      
-      logBuilder.log("{}: ({}) {}", constraint.getLevel().name(), finding.getNode().getMetapath(), finding.getMessage());
+    } catch (IOException | SAXException ex) {
+      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
     }
+
+    if (!schemaValidationResult.isPassing()) {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("The file '{}' has schema validation issue(s). The issues are:", target);
+      }
+
+      IValidationFindingVisitor<Void, Void> visitor = new LoggingValidationFindingVisitor();
+      schemaValidationResult.getFindings().stream()
+          .forEachOrdered(finding -> finding.visit(visitor, null));
+      return ExitCode.FAIL.toExitStatus();
+    }
+
+    ConstraintContentValidator constraintValidator = new ConstraintContentValidator(OscalBindingContext.instance());
+    try {
+      IValidationResult constraintValidationResult = constraintValidator.validate(target);
+
+      if (!constraintValidationResult.isPassing()) {
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info("The file '{}' has constraint validation issue(s). The issues are:", target);
+        }
+
+        IValidationFindingVisitor<Void, Void> visitor = new LoggingValidationFindingVisitor();
+        schemaValidationResult.getFindings().stream()
+            .forEachOrdered(finding -> finding.visit(visitor, null));
+        return ExitCode.FAIL.toExitStatus();
+      }
+    } catch (IOException ex) {
+      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
+    }
+
+    if (!context.getCmdLine().hasOption(CLIProcessor.QUIET_OPTION_LONG_NAME) && LOGGER.isInfoEnabled()) {
+      LOGGER.info("The file '{}' is valid.", target);
+    }
+    return ExitCode.OK.toExitStatus();
   }
 
   protected abstract InputStream getJsonSchema();
 
-  protected List<ValidationFinding> validateXml(File target) throws IOException, SAXException {
-
-    List<Source> schemaSources = getSchemaSources();
-    List<ValidationFinding> findings = XMLOperations.validate(target, schemaSources);
-    return findings;
-  }
-
-  protected abstract List<Source> getSchemaSources() throws IOException;
+  protected abstract List<Source> getXmlSchemaSources() throws IOException;
 
 }

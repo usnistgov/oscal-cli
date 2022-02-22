@@ -28,14 +28,14 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class PlanOfActionsAndMilestonesCommand extends AbstractParentCommand {
+public class PlanOfActionsAndMilestonesCommand
+    extends AbstractParentCommand {
   private static final String COMMAND = "poam";
 
-  
   public PlanOfActionsAndMilestonesCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
-//    addCommandHandler(new RenderSubcommand());
+    // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
   }
 

@@ -46,7 +46,7 @@ public class ValidateSubcommand
   }
 
   @Override
-  protected List<Source> getSchemaSources() throws IOException {
+  protected List<Source> getXmlSchemaSources() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval.add(
         XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_catalog_schema.xsd")));

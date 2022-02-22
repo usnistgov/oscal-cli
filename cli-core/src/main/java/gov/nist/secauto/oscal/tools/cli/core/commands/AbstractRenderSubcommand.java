@@ -30,7 +30,8 @@ import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractCommand;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractTerminalCommand;
+import gov.nist.secauto.oscal.tools.cli.framework.command.Command;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
@@ -48,19 +49,17 @@ import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-public abstract class AbstractRenderSubcommand extends AbstractCommand {
-  private static final Logger log = LogManager.getLogger(AbstractRenderSubcommand.class);
+public abstract class AbstractRenderSubcommand extends AbstractTerminalCommand {
+  private static final Logger LOGGER = LogManager.getLogger(AbstractRenderSubcommand.class);
 
   private static final String COMMAND = "render";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
+
   static {
     List<ExtraArgument> args = new ArrayList<>(2);
     args.add(new DefaultExtraArgument("source file", true));
     args.add(new DefaultExtraArgument("destination file", false));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
-  }
-
-  public AbstractRenderSubcommand() {
   }
 
   @Override
@@ -71,7 +70,7 @@ public abstract class AbstractRenderSubcommand extends AbstractCommand {
   @Override
   public void gatherOptions(Options options) {
     options
-      .addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build());
+        .addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build());
   }
 
   @Override
@@ -117,7 +116,10 @@ public abstract class AbstractRenderSubcommand extends AbstractCommand {
     } catch (IOException | TransformerException e) {
       return ExitCode.FAIL.toExitStatus(e.getMessage());
     }
-    log.info("Generated HTML file: " + destination.getPath());
+
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Generated HTML file: " + destination.getPath());
+    }
     return ExitCode.OK.toExitStatus();
   }
 

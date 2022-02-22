@@ -23,17 +23,26 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework.command;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 
 import org.apache.commons.cli.HelpFormatter;
+import org.fusesource.jansi.AnsiConsole;
+
+import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public abstract class AbstractParentCommand extends AbstractCommand implements CommandCollection {
+public abstract class AbstractParentCommand implements Command {
   private final Map<String, Command> commandToSubcommandHandlerMap = new LinkedHashMap<>();
 
   public void addCommandHandler(Command handler) {
@@ -47,6 +56,17 @@ public abstract class AbstractParentCommand extends AbstractCommand implements C
   }
 
   @Override
+  public Collection<Command> getSubCommands() {
+    return Collections.unmodifiableCollection(commandToSubcommandHandlerMap.values());
+  }
+
+  @Override
+  public boolean isSubCommandRequired() {
+    return false;
+  }
+
+  @SuppressWarnings("PMD")
+  @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     StringBuilder builder = new StringBuilder();
     builder.append(processor.getExec());
@@ -56,19 +76,14 @@ public abstract class AbstractParentCommand extends AbstractCommand implements C
       builder.append(handler.getName());
     }
 
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp(processor.getExec() + " [-h | --help] <command> [<args>]", context.getOptions());
-    if (!commandToSubcommandHandlerMap.isEmpty()) {
-      System.out.println();
-      System.out.println("The following are available sub-commands:");
-      for (Command handler : commandToSubcommandHandlerMap.values()) {
-        System.out.printf("   %-12.12s %-60.60s%n", handler.getName(), handler.getDescription());
-      }
-      System.out.println();
-      System.out.println("'oscal <command> --help' will show help on that specific command.");
+    if (context.getExtraArguments().size() != getExtraArguments().size()) {
+      PrintStream err = AnsiConsole.err();
+      err.println(ansi().a('[').fgBrightRed().a("ERROR").reset().a("] ").a("Unhandled arguments: ").a(context.getExtraArguments().stream().collect(Collectors.joining(" "))));
+      err.flush();
+      return ExitCode.INVALID_COMMAND.toExitStatus();
     }
+    processor.showHelpCommand(context.getOptions(), context.getCommandParseResult());
     return ExitCode.OK.toExitStatus();
   }
 
-  
 }

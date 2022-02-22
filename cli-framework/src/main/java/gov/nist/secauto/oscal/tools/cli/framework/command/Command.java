@@ -32,6 +32,7 @@ import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
 
 import org.apache.commons.cli.Options;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface Command extends CommandCollection {
@@ -39,11 +40,23 @@ public interface Command extends CommandCollection {
 
   String getDescription();
 
-  List<ExtraArgument> getExtraArguments();
+  default List<ExtraArgument> getExtraArguments() {
+    return Collections.emptyList();
+  }
 
-  void gatherOptions(Options options);
+  default void gatherOptions(@SuppressWarnings("unused") Options options) {
+    // by default there are no options to handle
+  }
 
-  void validateOptions(CLIProcessor cliProcessor, CommandContext context) throws InvalidArgumentException;
+  @SuppressWarnings("unused")
+  default void validateOptions(CLIProcessor cliProcessor, CommandContext context) throws InvalidArgumentException {
+    // by default there are no options to handle
+  }
 
   ExitStatus executeCommand(CLIProcessor cliProcessor, CommandContext context);
+
+  @Override
+  default Command getCommandByName(String name) {
+    return null;
+  }
 }

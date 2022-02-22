@@ -37,6 +37,7 @@ public class ProfileCommand
     addCommandHandler(new ValidateSubcommand());
     // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
+    addCommandHandler(new ResolveSubcommand());
   }
 
   @Override

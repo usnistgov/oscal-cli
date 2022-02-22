@@ -38,16 +38,18 @@ import java.util.List;
 
 import javax.xml.transform.Source;
 
-public class ValidateSubcommand extends AbstractValidationSubcommand {
+public class ValidateSubcommand
+    extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
     return "Validate that the specified OSCAL System Security Plan is well-formed";
   }
 
   @Override
-  protected List<Source> getSchemaSources() throws IOException {
+  protected List<Source> getXmlSchemaSources() throws IOException {
     List<Source> retval = new LinkedList<>();
-    retval.add(XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_ssp_schema.xsd")));
+    retval.add(
+        XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_ssp_schema.xsd")));
     return Collections.unmodifiableList(retval);
   }
 

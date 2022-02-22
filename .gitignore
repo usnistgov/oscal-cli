@@ -5,3 +5,4 @@
 .checkstyle
 .classpath
 target/
+.ruleset

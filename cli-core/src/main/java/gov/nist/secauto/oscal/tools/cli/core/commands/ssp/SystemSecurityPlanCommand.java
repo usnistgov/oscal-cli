@@ -28,14 +28,14 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.ssp;
 
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class SystemSecurityPlanCommand extends AbstractParentCommand {
+public class SystemSecurityPlanCommand
+    extends AbstractParentCommand {
   private static final String COMMAND = "ssp";
 
-  
   public SystemSecurityPlanCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
-//    addCommandHandler(new RenderSubcommand());
+    // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
   }
 
@@ -48,5 +48,4 @@ public class SystemSecurityPlanCommand extends AbstractParentCommand {
   public String getDescription() {
     return "Perform an operation on an OSCAL System Security Plan";
   }
-
 }

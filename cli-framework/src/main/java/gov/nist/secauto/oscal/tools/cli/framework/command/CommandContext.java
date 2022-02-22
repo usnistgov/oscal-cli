@@ -31,29 +31,30 @@ import org.apache.commons.cli.Options;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
 
 public class CommandContext {
-  private final List<Command> callingCommands;
-  private final Command command;
-  private final  List<String> extraArgs;
+  private final CommandResolver.CommandResult commandParseResult;
+  private final List<String> extraArgs;
   private final Options options;
   private final CommandLine cmdLine;
 
-  public CommandContext(Stack<Command> callingCommands, Options options, CommandLine cmdLine) {
-    this.callingCommands = Collections.unmodifiableList(callingCommands);
-    this.command = callingCommands.peek();
+  public CommandContext(CommandResolver.CommandResult commandParseResult, Options options, CommandLine cmdLine) {
+    this.commandParseResult = commandParseResult;
     this.extraArgs = Collections.unmodifiableList(cmdLine.getArgList());
     this.options = options;
     this.cmdLine = cmdLine;
   }
 
+  protected CommandResolver.CommandResult getCommandParseResult() {
+    return commandParseResult;
+  }
+
   public List<Command> getCallingCommands() {
-    return callingCommands;
+    return Collections.unmodifiableList(getCommandParseResult().getCommands());
   }
 
   public Command getCommand() {
-    return command;
+    return getCommandParseResult().getCommands().peek();
   }
 
   public List<String> getExtraArguments() {

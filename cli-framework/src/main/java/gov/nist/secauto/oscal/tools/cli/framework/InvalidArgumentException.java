@@ -23,12 +23,14 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-public class InvalidArgumentException extends ParseException {
+public class InvalidArgumentException
+    extends ParseException {
 
   /**
    * the serial version UID.
@@ -53,6 +55,8 @@ public class InvalidArgumentException extends ParseException {
   }
 
   /**
+   * Assign the option requiring an argument that wasn't provided on the command line.
+   * 
    * @param option
    *          the option to set
    */

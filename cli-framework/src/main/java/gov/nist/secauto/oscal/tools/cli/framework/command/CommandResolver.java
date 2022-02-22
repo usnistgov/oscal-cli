@@ -23,41 +23,74 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework.command;
 
-import java.util.Queue;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
+import java.util.stream.Stream;
 
-public class CommandResolver {
-
-  
-  public static Stack<Command> resolveCommand(Queue<String> args, CommandCollection collection) {
-    Stack<Command> callingCommands = new Stack<>();
-
-    
-    resolveCommand(args, callingCommands, collection);
-
-    return callingCommands;
+public final class CommandResolver {
+  private CommandResolver() {
+    // disable construction
   }
 
-  protected static void resolveCommand(Queue<String> args, Stack<Command> callingCommands, CommandCollection collection) {
-    String commandName =  args.peek();
-    if (commandName == null) {
-      return;
-    }
+  public static CommandResult resolveCommand(List<String> args, CommandCollection collection) {
+    CommandResult result = new CommandResult();
 
-    Command command = collection.getCommandByName(commandName);
-    if (command == null) {
-      return;
+    CommandCollection currentCollection = collection;
+    for (int idx = 0; idx < args.size(); idx++) {
+      String arg = args.get(idx);
+      if (arg.startsWith("-")) {
+        result.addOption(arg);
+      } else if (currentCollection != null) {
+        Command command = currentCollection.getCommandByName(arg);
+        if (command == null) {
+          result.addExtra(arg);
+          currentCollection = null;
+        } else {
+          result.addCommand(command);
+          currentCollection = command;
+        }
+      } else {
+        result.addExtra(arg);
+      }
     }
-
-    // remove the arg from the queue
-    args.poll();
-    callingCommands.push(command);
-
-    if (!args.isEmpty()) {
-      resolveCommand(args, callingCommands, command);
-    }
+    return result;
   }
 
+  public static class CommandResult {
+    private final List<String> options = new LinkedList<>();
+    private final Stack<Command> commands = new Stack<>();
+    private final List<String> extraArgs = new LinkedList<>();
+
+    public List<String> getOptions() {
+      return options;
+    }
+
+    public Stack<Command> getCommands() {
+      return commands;
+    }
+
+    public List<String> getExtraArgs() {
+      return extraArgs;
+    }
+
+    public String[] getArgArray() {
+      return Stream.concat(options.stream(), extraArgs.stream()).toArray(size -> new String[size]);
+    }
+
+    public void addCommand(Command command) {
+      commands.push(command);
+    }
+
+    public void addOption(String option) {
+      options.add(option);
+    }
+
+    public void addExtra(String extraArg) {
+      extraArgs.add(extraArg);
+    }
+  }
 }

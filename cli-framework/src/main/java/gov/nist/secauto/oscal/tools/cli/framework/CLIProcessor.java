@@ -32,7 +32,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.Command;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandCollection;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandResolver;
-import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -41,58 +40,40 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.fusesource.jansi.Ansi;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.fusesource.jansi.AnsiConsole;
-import org.jline.terminal.Size;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
-import org.jline.terminal.impl.DumbTerminal;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 // TODO: remove oscal specific strings
 public class CLIProcessor {
-  private static final Logger log = LogManager.getLogger(CLIProcessor.class);
+  public static final String QUIET_OPTION_LONG_NAME = "quiet";
+
+  private static final Logger LOGGER = LogManager.getLogger(CLIProcessor.class);
 
   private final Map<String, Command> commandToCommandHandlerMap = new LinkedHashMap<>();
   private final String exec;
   private final VersionInfo versionInfo;
-  private final Terminal terminal;
 
-  public CLIProcessor(String exec, VersionInfo versionInfo) {
-    this.terminal = initTerminal();
+  public CLIProcessor(String exec, VersionInfo versionInfo) throws IOException {
     this.exec = exec;
     this.versionInfo = versionInfo;
-  }
-
-  private Terminal initTerminal() {
-    Terminal retval;
-    try {
-      AnsiConsole.systemInstall();
-      retval = TerminalBuilder.builder().system(true).jna(false).jansi(true).build();
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-
-    if (retval instanceof DumbTerminal && retval.getSize().getColumns() == 0) {
-      retval.setSize(new Size(40, 23));
-    }
-    return retval;
-  }
-
-  public Terminal getTerminal() {
-    return terminal;
+    AnsiConsole.systemInstall();
   }
 
   /**
@@ -105,6 +86,8 @@ public class CLIProcessor {
   }
 
   /**
+   * Retrieve the version information for this application.
+   * 
    * @return the versionInfo
    */
   public VersionInfo getVersionInfo() {
@@ -121,6 +104,8 @@ public class CLIProcessor {
     retval.addOption(Option.builder("h").longOpt("help").desc("display this help message").build());
     retval.addOption(Option.builder().longOpt("version").desc("display the application version").build());
     retval.addOption(Option.builder().longOpt("no-color").desc("do not colorize output").build());
+    retval.addOption(
+        Option.builder("q").longOpt(QUIET_OPTION_LONG_NAME).desc("minimize output to include only errors").build());
     return retval;
   }
 
@@ -129,21 +114,16 @@ public class CLIProcessor {
    * 
    * @param args
    *          the arguments to process
+   * @return the exit code
    */
-  public void process(String[] args) {
+  public int process(String[] args) {
     ExitStatus status = parseCommand(args);
     String message = status.getMessage();
     if (message != null && !message.isEmpty()) {
-      if (status.isError()) {
-        AnsiConsole.err().println(ansi().fgBrightRed().format("Error: %s%n", message).reset());
-        AnsiConsole.err().flush();
-      } else {
-        getTerminal().writer().println(message);
-        terminal.flush();
-      }
+      AnsiConsole.err().println(ansi().fgBrightRed().format("Error: %s%n", message).reset());
+      AnsiConsole.err().flush();
     }
-    int exitCode = status.getExitCode().getStatusCode();
-    System.exit(exitCode);
+    return status.getExitCode().getStatusCode();
   }
 
   private ExitStatus parseCommand(String line) {
@@ -152,206 +132,213 @@ public class CLIProcessor {
   }
 
   private ExitStatus parseCommand(String[] args) {
+    CommandCollection commandCollection = new TopLevelCommandCollection();
+
     ExitStatus status;
     // the first two arguments should be the <command> and <operation>, where <type> is the object type
     // the <operation> is performed against.
     if (args.length < 1) {
       status = ExitCode.INVALID_COMMAND.toExitStatus();
-      showHelp(newOptionsInstance());
-    } else if ("interactive".equals(args[0].toLowerCase())) {
-      status = processInteractive();
+      showHelpOptions(newOptionsInstance(), commandCollection);
+      // } else if ("interactive".equalsIgnoreCase(args[0])) {
+      // status = processInteractive();
     } else {
-      status = processCommand(args);
+      status = processCommand(args, commandCollection);
     }
 
     return status;
   }
 
-  private ExitStatus processCommand(String[] args) {
+  private static void handleNoColor() {
+    System.setProperty(AnsiConsole.JANSI_MODE, AnsiConsole.JANSI_MODE_STRIP);
+    AnsiConsole.systemUninstall();
+  }
+
+  private static void handleQuiet() {
+    LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    Configuration config = ctx.getConfiguration();
+    LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+    loggerConfig.setLevel(Level.ERROR);
+    ctx.updateLoggers();
+  }
+
+  private ExitStatus processCommand(String[] args, CommandCollection commandCollection) {
     // the first two arguments should be the <command> and <operation>, where <type> is the object type
     // the <operation> is performed against.
-    LinkedList<String> extraArgs = new LinkedList<String>(Arrays.asList(args));
-    Stack<Command> commandStack = CommandResolver.resolveCommand(extraArgs, new CommandCollection() {
-      @Override
-      public Command getCommandByName(String name) {
-        return commandToCommandHandlerMap.get(name);
-      }
-    });
+    List<String> commandArgs = Arrays.asList(args);
+    CommandResolver.CommandResult commandResult = CommandResolver.resolveCommand(commandArgs, commandCollection);
+    Options options = newOptionsInstance();
 
     ExitStatus retval;
-    if (commandStack.isEmpty()) {
+    if (commandResult.getCommands().isEmpty()) {
       CommandLineParser parser = new DefaultParser();
       try {
-        Options options = newOptionsInstance();
         CommandLine cmdLine = parser.parse(options, args);
         if (cmdLine.hasOption("no-color")) {
-          Ansi.setEnabled(false);
+          handleNoColor();
         }
+
+        if (cmdLine.hasOption(QUIET_OPTION_LONG_NAME)) {
+          handleQuiet();
+        }
+
         if (cmdLine.hasOption("version")) {
           showVersion();
           retval = ExitCode.OK.toExitStatus();
-        } else if (cmdLine.hasOption("help")) {
-          showHelp(options);
+        } else if (cmdLine.hasOption("help") || cmdLine.getArgList().isEmpty()) {
+          showHelpCommand(options, commandResult);
           retval = ExitCode.OK.toExitStatus();
         } else {
-          retval = ExitCode.INVALID_COMMAND.toExitStatus(
+          retval = handleInvalidCommand(commandResult, options,
               "Invalid command arguments: " + cmdLine.getArgList().stream().collect(Collectors.joining(" ")));
         }
-      } catch (ParseException e) {
-        retval = ExitCode.INVALID_COMMAND.toExitStatus(e.getMessage());
+      } catch (ParseException ex) {
+        retval = handleInvalidCommand(commandResult, options, ex.getMessage());
       }
     } else {
-      retval = invokeCommand(commandStack, extraArgs);
+      retval = invokeCommand(commandResult);
     }
     return retval;
   }
 
-  private ExitStatus invokeCommand(Stack<Command> commandStack, LinkedList<String> args) {
+  @SuppressWarnings("PMD")
+  private ExitStatus invokeCommand(CommandResolver.CommandResult commandResult) {
 
-    if (log.isDebugEnabled()) {
-      StringBuilder builder = new StringBuilder();
-      boolean first = true;
-      for (Command cmd : commandStack) {
-        if (first) {
-          first = false;
-        } else {
-          builder.append(" -> ");
-        }
-        builder.append(cmd.getName());
-      }
-      log.debug("Processing command chain: {}", builder.toString());
+    if (LOGGER.isDebugEnabled()) {
+      String commandChain = commandResult.getCommands().stream()
+          .map(command -> command.getName())
+          .collect(Collectors.joining(" -> "));
+      LOGGER.debug("Processing command chain: {}", commandChain);
     }
 
     Options options = newOptionsInstance();
 
-    for (Command cmd : commandStack) {
+    for (Command cmd : commandResult.getCommands()) {
       cmd.gatherOptions(options);
     }
 
     CommandLineParser parser = new DefaultParser();
     CommandLine cmdLine;
     try {
-      cmdLine = parser.parse(options, args.toArray(new String[args.size()]));
-    } catch (ParseException e) {
-      showCommandHelp(commandStack, options);
-      return ExitCode.INVALID_COMMAND.toExitStatus(e.getMessage());
+      cmdLine = parser.parse(options, commandResult.getArgArray());
+    } catch (ParseException ex) {
+      ExitStatus retval = handleInvalidCommand(commandResult, options, ex.getMessage());
+      showHelpCommand(options, commandResult);
+      return retval;
     }
 
     if (cmdLine.hasOption("no-color")) {
-      Ansi.setEnabled(false);
+      handleNoColor();
+    }
+
+    if (cmdLine.hasOption(QUIET_OPTION_LONG_NAME)) {
+      handleQuiet();
     }
 
     if (cmdLine.hasOption("help")) {
-      showCommandHelp(commandStack, options);
+      showHelpCommand(options, commandResult);
       return ExitCode.OK.toExitStatus();
     }
 
-    CommandContext context = new CommandContext(commandStack, options, cmdLine);
+    CommandContext context = new CommandContext(commandResult, options, cmdLine);
 
-    for (Command cmd : commandStack) {
+    for (Command cmd : commandResult.getCommands()) {
       try {
         cmd.validateOptions(this, context);
       } catch (InvalidArgumentException e) {
-        return handleInvalidCommand(commandStack, options, e.getMessage());
+        return handleInvalidCommand(commandResult, options, e.getMessage());
       }
     }
 
-    ExitStatus retval = commandStack.peek().executeCommand(this, context);
+    ExitStatus retval = commandResult.getCommands().peek().executeCommand(this, context);
     if (ExitCode.INVALID_COMMAND.equals(retval.getExitCode())) {
-      showCommandHelp(commandStack, options);
+      showHelpCommand(options, commandResult);
     }
     return retval;
   }
 
-  protected ExitStatus handleInvalidCommand(Stack<Command> callingCommands, Options options, String message) {
-    AnsiConsole.err().println(ansi().fgBrightRed().format("Error: %s%n", message).reset());
-    AnsiConsole.err().flush();
-    showCommandHelp(callingCommands, options);
+  public ExitStatus handleInvalidCommand(CommandResolver.CommandResult commandResult, Options options,
+      String message) {
+    PrintStream err = AnsiConsole.err();
+    err.println(ansi().a('[').fgBrightRed().a("ERROR").reset().a("] ").a(message));
+    err.flush();
+    showHelpCommand(options, commandResult);
     return ExitCode.INVALID_COMMAND.toExitStatus();
   }
 
-  protected void showCommandHelp(Stack<Command> callingCommands, Options options) {
-    StringBuilder builder = new StringBuilder();
-    builder.append(getExec());
+  protected void showHelpOptions(Options options, CommandCollection commandCollection) {
+    showHelp(options, new CommandCollectionCliSyntaxSupplier(this, commandCollection), null,
+        new SubCommandFooterSupplier(this, commandCollection));
+  }
 
-    for (Command handler : callingCommands) {
-      builder.append(' ');
-      builder.append(handler.getName());
-    }
+  public void showHelpCommand(Options options, CommandResolver.CommandResult commandResult) {
+    showHelp(options, new CommandResolverResultCliSyntaxSupplier(this, commandResult), null,
+        new SubCommandFooterSupplier(this, commandResult.getCommands().peek()));
+  }
 
-    builder.append(" [<args>]");
-
-    Command command = callingCommands.peek();
-    for (ExtraArgument argument : command.getExtraArguments()) {
-      builder.append(' ');
-      if (!argument.isRequired()) {
-        builder.append('[');
-      }
-
-      builder.append('<');
-      builder.append(argument.getName());
-      builder.append('>');
-
-      if (argument.getNumber() > 1) {
-        builder.append("...");
-      }
-
-      if (!argument.isRequired()) {
-        builder.append(']');
-      }
-    }
+  protected void showHelp(
+      Options options,
+      CliSyntaxSupplier cmdLineSyntax,
+      Supplier<CharSequence> header,
+      Supplier<CharSequence> footer) {
 
     HelpFormatter formatter = new HelpFormatter();
-    Terminal terminal = getTerminal();
-    PrintWriter writer = terminal.writer();
-    formatter.printHelp(writer, terminal.getWidth(), builder.toString(), null, options, HelpFormatter.DEFAULT_LEFT_PAD,
-        HelpFormatter.DEFAULT_DESC_PAD, null, false);
-    terminal.flush();
+    PrintStream out = AnsiConsole.out();
+
+    try (PrintWriter writer = new PrintWriter(out)) {
+      formatter.printHelp(
+          writer,
+          AnsiConsole.getTerminalWidth() < 40 ? 40 : AnsiConsole.getTerminalWidth(),
+          cmdLineSyntax == null ? null : cmdLineSyntax.get().toString(),
+          header == null ? null : header.get().toString(),
+          options,
+          HelpFormatter.DEFAULT_LEFT_PAD,
+          HelpFormatter.DEFAULT_DESC_PAD,
+          footer == null ? null : footer.get().toString(),
+          false);
+      writer.flush();
+    }
+    // out.flush();
   }
 
   private void showVersion() {
     VersionInfo info = getVersionInfo();
-    getTerminal().writer().println(ansi().bold().a(getExec()).boldOff().a(" version ").bold().a(info.getVersion())
+    PrintStream out = AnsiConsole.out();
+    out.println(ansi().bold().a(getExec()).boldOff().a(" version ").bold().a(info.getVersion())
         .boldOff().a(" built on ").bold().a(info.getBuildTime()).reset());
-    terminal.flush();
+    out.flush();
   }
 
-  private void showHelp(Options options) {
-    HelpFormatter formatter = new HelpFormatter();
-    Terminal terminal = getTerminal();
-    PrintWriter writer = terminal.writer();
-    int width = terminal.getWidth();
-    if (width == 0) {
-      width = HelpFormatter.DEFAULT_WIDTH;
-    }
-    formatter.printHelp(writer, width, String.format("%s [-h | --help] <command> [<args>]", getExec()),
-        null, options, HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD, null, true);
-    if (!commandToCommandHandlerMap.isEmpty()) {
-      writer.println();
-      writer.println("The following are available commands:");
-      for (Command handler : commandToCommandHandlerMap.values()) {
-        writer.printf("   %-12.12s %-60.60s%n", handler.getName(), handler.getDescription());
-      }
-      writer.println();
-      writer.println("'oscal <command> --help' will show help on that specific command.");
-    }
-    terminal.flush();
-  }
+  // private ExitStatus processInteractive() {
+  // ExitStatus status = null;
+  // try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+  // String line;
+  // while ((line = reader.readLine()) != null) {
+  // status = parseCommand(line);
+  // }
+  // } catch (IOException e) {
+  // status = ExitCode.INPUT_ERROR.toExitStatus();
+  // }
+  // if (status == null) {
+  // status = ExitCode.OK.toExitStatus();
+  // }
+  // return status;
+  // }
 
-  private ExitStatus processInteractive() {
-    ExitStatus status = null;
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
-      String line;
-      while ((line = in.readLine()) != null) {
-        status = parseCommand(line);
-      }
-    } catch (IOException e) {
-      status = ExitCode.INPUT_ERROR.toExitStatus();
+  private class TopLevelCommandCollection implements CommandCollection {
+    @Override
+    public Command getCommandByName(String name) {
+      return commandToCommandHandlerMap.get(name);
     }
-    if (status == null) {
-      status = ExitCode.OK.toExitStatus();
-    }
-    return status;
-  }
 
+    @Override
+    public Collection<Command> getSubCommands() {
+      return Collections.unmodifiableCollection(commandToCommandHandlerMap.values());
+    }
+
+    @Override
+    public boolean isSubCommandRequired() {
+      return true;
+    }
+  }
 }

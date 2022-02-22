@@ -23,13 +23,15 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class MessageExitStatus extends AbstractExitStatus {
+public class MessageExitStatus
+    extends AbstractExitStatus {
   private final List<Object> messageArguments;
 
   /**
@@ -58,13 +60,13 @@ public class MessageExitStatus extends AbstractExitStatus {
   private String lookupMessageForCode(@SuppressWarnings("unused") ExitCode ignoredExitCode) {
     // TODO: add message bundle support
     StringBuilder builder = new StringBuilder();
-//    builder.append(getExitCode()).append(":");
+    // builder.append(getExitCode()).append(":");
     for (int index = 1; index <= messageArguments.size(); index++) {
       if (index > 1) {
         builder.append(' ');
       }
       builder.append("%s");
-//      builder.append(index);
+      // builder.append(index);
     }
     return builder.toString();
   }

@@ -28,16 +28,16 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.binding.io.BindingException;
-import gov.nist.secauto.metaschema.binding.io.IDeserializer;
 import gov.nist.secauto.metaschema.binding.io.Feature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
+import gov.nist.secauto.metaschema.binding.io.IDeserializer;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractCommand;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractTerminalCommand;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
@@ -53,9 +53,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
-public abstract class AbstractConvertSubcommand extends AbstractCommand {
-  private static final Logger log = LogManager.getLogger(AbstractConvertSubcommand.class);
+public abstract class AbstractConvertSubcommand extends AbstractTerminalCommand {
+  private static final Logger LOGGER = LogManager.getLogger(AbstractConvertSubcommand.class);
 
   private static final String COMMAND = "convert";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
@@ -65,9 +66,6 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
     args.add(new DefaultExtraArgument("source file", true));
     args.add(new DefaultExtraArgument("destination file", false));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
-  }
-
-  public AbstractConvertSubcommand() {
   }
 
   @Override
@@ -87,18 +85,19 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
     return EXTRA_ARGUMENTS;
   }
 
+  @SuppressWarnings("PMD")
   @Override
   public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
-    
+
     try {
       String toFormatText = context.getCmdLine().getOptionValue("to");
-      Format.valueOf(toFormatText.toUpperCase());
+      Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException ex) {
       throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: " + Format.values());
     }
 
     List<String> extraArgs = context.getExtraArguments();
-    if (extraArgs.size() < 1 || extraArgs.size() > 2) {
+    if (extraArgs.isEmpty() || extraArgs.size() > 2) {
       throw new InvalidArgumentException("Illegal number of arguments.");
     }
 
@@ -113,16 +112,13 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
 
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
-    String toFormatText = context.getCmdLine().getOptionValue("to");
-    Format toFormat = Format.valueOf(toFormatText.toUpperCase());
-
     List<String> extraArgs = context.getExtraArguments();
     File input = new File(extraArgs.get(0));
 
     File destination;
     if (extraArgs.size() == 1) {
-//      String extension = toFormat.getDefaultExtension();
-//      destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
+      // String extension = toFormat.getDefaultExtension();
+      // destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
       destination = null;
     } else {
       destination = new File(extraArgs.get(1));
@@ -138,13 +134,16 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
       }
     }
 
+    String toFormatText = context.getCmdLine().getOptionValue("to");
+    Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+
     try {
       performConvert(input, destination, toFormat);
     } catch (IOException | BindingException | IllegalArgumentException ex) {
       return ExitCode.FAIL.toExitStatus(ex.getMessage());
     }
-    if (destination != null) {
-      log.info("Generated {} file: {}", toFormat.toString(), destination.getPath());
+    if (destination != null && LOGGER.isInfoEnabled()) {
+      LOGGER.info("Generated {} file: {}", toFormat.toString(), destination.getPath());
     }
     return ExitCode.OK.toExitStatus();
   }
@@ -165,7 +164,7 @@ public abstract class AbstractConvertSubcommand extends AbstractCommand {
   }
 
   protected <CLASS> void convert(File input, File result, Format fromFormat, Format toFormat, Class<CLASS> rootClass,
-      IBindingContext context) throws FileNotFoundException, BindingException {
+      IBindingContext context) throws FileNotFoundException, IOException {
     IDeserializer<CLASS> deserializer = context.newDeserializer(fromFormat.getBindingFormat(), rootClass);
     deserializer.enableFeature(Feature.DESERIALIZE_ROOT);
 

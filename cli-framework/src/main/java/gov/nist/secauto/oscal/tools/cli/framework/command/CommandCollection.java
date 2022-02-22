@@ -23,8 +23,15 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework.command;
+
+import java.util.Collection;
 
 public interface CommandCollection {
   Command getCommandByName(String name);
+
+  Collection<Command> getSubCommands();
+
+  boolean isSubCommandRequired();
 }

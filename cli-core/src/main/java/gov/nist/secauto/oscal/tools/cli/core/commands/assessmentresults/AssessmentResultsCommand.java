@@ -28,14 +28,14 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults;
 
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class AssessmentResultsCommand extends AbstractParentCommand {
+public class AssessmentResultsCommand
+    extends AbstractParentCommand {
   private static final String COMMAND = "ar";
 
-  
   public AssessmentResultsCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
-//    addCommandHandler(new RenderSubcommand());
+    // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());
   }
 
@@ -48,5 +48,4 @@ public class AssessmentResultsCommand extends AbstractParentCommand {
   public String getDescription() {
     return "Perform an operation on an OSCAL Assessment Results";
   }
-
 }

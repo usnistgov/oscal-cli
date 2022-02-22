@@ -26,8 +26,6 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.operations;
 
-import gov.nist.secauto.oscal.tools.cli.core.commands.catalog.ValidateSubcommand;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.ls.LSInput;
@@ -38,12 +36,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class ClasspathResourceResolver implements LSResourceResolver {
-  private static final Logger log = LogManager.getLogger(ValidateSubcommand.class);
+  private static final Logger LOGGER = LogManager.getLogger(ClasspathResourceResolver.class);
 
   @Override
-  public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-    log.debug("Resolving resource: type={}, namespaceURI={}, publicId={}, systemId={}, baseURI={}", type, namespaceURI,
-        publicId, systemId, baseURI);
+  public LSInput resolveResource(
+      String type,
+      String namespaceURI,
+      String publicId,
+      String systemId,
+      String baseURI) { // NOPMD - can't change the signature of this method
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Resolving resource: type={}, namespaceURI={}, publicId={}, systemId={}, baseURI={}", type,
+          namespaceURI,
+          publicId, systemId, baseURI);
+    }
     InputStream resourceAsStream = this.getClass().getResourceAsStream(systemId);
     LSInputImpl retval = new LSInputImpl();
     retval.setPublicId(publicId);
@@ -63,129 +69,76 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     private String encoding;
     private boolean certifiedText;
 
-    /**
-     * @return the characterStream
-     */
     @Override
     public Reader getCharacterStream() {
       return characterStream;
     }
 
-    /**
-     * @param characterStream
-     *          the characterStream to set
-     */
     @Override
     public void setCharacterStream(Reader characterStream) {
       this.characterStream = characterStream;
     }
 
-    /**
-     * @return the byteStream
-     */
     @Override
     public InputStream getByteStream() {
       return byteStream;
     }
 
-    /**
-     * @param byteStream
-     *          the byteStream to set
-     */
     @Override
     public void setByteStream(InputStream byteStream) {
       this.byteStream = byteStream;
     }
 
-    /**
-     * @return the stringData
-     */
     @Override
     public String getStringData() {
       return stringData;
     }
 
-    /**
-     * @param stringData
-     *          the stringData to set
-     */
     @Override
     public void setStringData(String stringData) {
       this.stringData = stringData;
     }
 
-    /**
-     * @return the systemId
-     */
     @Override
     public String getSystemId() {
       return systemId;
     }
 
-    /**
-     * @param systemId
-     *          the systemId to set
-     */
     @Override
     public void setSystemId(String systemId) {
       this.systemId = systemId;
     }
 
-    /**
-     * @return the publicId
-     */
     @Override
     public String getPublicId() {
       return publicId;
     }
 
-    /**
-     * @param publicId
-     *          the publicId to set
-     */
     @Override
     public void setPublicId(String publicId) {
       this.publicId = publicId;
     }
 
-    /**
-     * @return the baseURI
-     */
     @Override
     public String getBaseURI() {
       return baseURI;
     }
 
-    /**
-     * @param baseURI
-     *          the baseURI to set
-     */
     @Override
     public void setBaseURI(String baseURI) {
       this.baseURI = baseURI;
     }
 
-    /**
-     * @return the encoding
-     */
     @Override
     public String getEncoding() {
       return encoding;
     }
 
-    /**
-     * @param encoding
-     *          the encoding to set
-     */
     @Override
     public void setEncoding(String encoding) {
       this.encoding = encoding;
     }
 
-    /**
-     * @param certifiedText
-     *          the certifiedText to set
-     */
     @Override
     public void setCertifiedText(boolean certifiedText) {
       this.certifiedText = certifiedText;
