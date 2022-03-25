@@ -32,7 +32,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.io.PrintStream;
@@ -43,9 +42,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class AbstractParentCommand implements Command {
-  private final Map<String, Command> commandToSubcommandHandlerMap = new LinkedHashMap<>();
+  private final Map<String, Command> commandToSubcommandHandlerMap = Collections.synchronizedMap(new LinkedHashMap<>());
 
-  public void addCommandHandler(Command handler) {
+  protected void addCommandHandler(Command handler) {
     String commandName = handler.getName();
     this.commandToSubcommandHandlerMap.put(commandName, handler);
   }
@@ -78,7 +77,8 @@ public abstract class AbstractParentCommand implements Command {
 
     if (context.getExtraArguments().size() != getExtraArguments().size()) {
       PrintStream err = AnsiConsole.err();
-      err.println(ansi().a('[').fgBrightRed().a("ERROR").reset().a("] ").a("Unhandled arguments: ").a(context.getExtraArguments().stream().collect(Collectors.joining(" "))));
+      err.println(ansi().a('[').fgBrightRed().a("ERROR").reset().a("] ").a("Unhandled arguments: ")
+          .a(context.getExtraArguments().stream().collect(Collectors.joining(" "))));
       err.flush();
       return ExitCode.INVALID_COMMAND.toExitStatus();
     }

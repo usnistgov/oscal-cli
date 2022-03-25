@@ -24,38 +24,26 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
+package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractValidationSubcommand;
-import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+public class MetaschemaCommand
+    extends AbstractParentCommand {
+  private static final String COMMAND = "metaschema";
 
-import javax.xml.transform.Source;
+  public MetaschemaCommand() {
+    addCommandHandler(new GenerateSchemaSubcommand());
+    addCommandHandler(new ValidateSubcommand());
+  }
 
-public class ValidateSubcommand
-    extends AbstractValidationSubcommand {
+  @Override
+  public String getName() {
+    return COMMAND;
+  }
+
   @Override
   public String getDescription() {
-    return "Check that the specified OSCAL Plan of Actions and Milestones (POA&M) is well-formed"
-        + " and valid to the POA&M model.";
-  }
-
-  @Override
-  protected List<Source> getXmlSchemaSources() throws IOException {
-    List<Source> retval = new LinkedList<>();
-    retval
-        .add(XMLOperations.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_poam_schema.xsd")));
-    return Collections.unmodifiableList(retval);
-  }
-
-  @Override
-  protected InputStream getJsonSchema() {
-    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_poam_schema.json");
+    return "Perform an operation on a Metaschema";
   }
 }

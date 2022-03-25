@@ -24,17 +24,15 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands;
+package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
-import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.validation.ConstraintContentValidator;
-import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
+import gov.nist.secauto.metaschema.model.MetaschemaLoader;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
-import gov.nist.secauto.metaschema.model.common.validation.JsonSchemaContentValidator;
 import gov.nist.secauto.metaschema.model.common.validation.XmlSchemaContentValidator;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
-import gov.nist.secauto.oscal.tools.cli.core.operations.YamlOperations;
+import gov.nist.secauto.oscal.tools.cli.core.commands.LoggingValidationHandler;
+import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
@@ -44,36 +42,29 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.xml.transform.Source;
 
-public abstract class AbstractValidationSubcommand
-    extends AbstractTerminalCommand {
-  private static final Logger LOGGER = LogManager.getLogger(AbstractValidationSubcommand.class);
+public class ValidateSubcommand extends AbstractTerminalCommand {
+  private static final Logger LOGGER = LogManager.getLogger(ValidateSubcommand.class);
   private static final String COMMAND = "validate";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
 
   static {
     List<ExtraArgument> args = new ArrayList<>(1);
-    args.add(new DefaultExtraArgument("file to validate", true));
+    args.add(new DefaultExtraArgument("Metaschema file to validate", true));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
   }
 
@@ -83,14 +74,20 @@ public abstract class AbstractValidationSubcommand
   }
 
   @Override
-  public void gatherOptions(Options options) {
-    options.addOption(Option.builder().longOpt("as").hasArg().argName("FORMAT")
-        .desc("validate as format: xml, json, or yaml").build());
+  public String getDescription() {
+    return "Validate that the specified Metaschema is well-formed and valid to the Metaschema model";
   }
 
   @Override
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
+  }
+  
+  protected List<Source> getXmlSchemaSources() throws IOException {
+    List<Source> retval = new LinkedList<>();
+    retval.add(XMLOperations
+        .getStreamSource(MetaschemaLoader.class.getResource("/schema/xml/metaschema.xsd")));
+    return Collections.unmodifiableList(retval);
   }
 
   @SuppressWarnings("PMD")
@@ -108,37 +105,6 @@ public abstract class AbstractValidationSubcommand
     if (!target.canRead()) {
       throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' is not readable.");
     }
-
-    if (context.getCmdLine().hasOption("as")) {
-      try {
-        String toFormatText = context.getCmdLine().getOptionValue("as");
-        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
-      } catch (IllegalArgumentException ex) {
-        throw new InvalidArgumentException(
-            "Invalid '--as' argument. The format must be one of: " + Arrays.asList(Format.values()).stream()
-                .map(format -> format.name())
-                .collect(CustomCollectors.joiningWithOxfordComma("and")));
-      }
-    } else {
-      // attempt to determine the format
-      try {
-        IBindingContext bindingContext = OscalBindingContext.instance();
-        IBoundLoader loader = bindingContext.newBoundLoader();
-        Format.lookup(loader.detectFormat(target));
-      } catch (FileNotFoundException ex) {
-        // this case was already checked for
-        throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
-      } catch (IOException ex) {
-        InvalidArgumentException newEx
-            = new InvalidArgumentException("Unable to read the provided target file '" + target.getPath() + "'.");
-        newEx.initCause(ex);
-        throw newEx;
-      } catch (IllegalArgumentException ex) {
-        throw new InvalidArgumentException(
-            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-                + Format.values());
-      }
-    }
   }
 
   @Override
@@ -146,53 +112,10 @@ public abstract class AbstractValidationSubcommand
     List<String> extraArgs = context.getExtraArguments();
     Path target = Paths.get(extraArgs.get(0));
 
-    Format asFormat;
-    if (context.getCmdLine().hasOption("as")) {
-      try {
-        String toFormatText = context.getCmdLine().getOptionValue("as");
-        asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
-      } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus("Invalid '--as' argument. The format must be one of: " + Format.values());
-      }
-    } else {
-      // attempt to determine the format
-      try {
-        IBindingContext bindingContext = OscalBindingContext.instance();
-        IBoundLoader loader = bindingContext.newBoundLoader();
-        asFormat = Format.lookup(loader.detectFormat(target));
-      } catch (FileNotFoundException ex) {
-        // this case was already checked for
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target + "' does not exist.");
-      } catch (IOException ex) {
-        return ExitCode.FAIL.toExitStatus(ex.getMessage());
-      } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus(
-            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-                + Format.values());
-      }
-    }
-
     IValidationResult schemaValidationResult;
     try {
-      switch (asFormat) {
-      case JSON:
-        try (InputStream inputStream = getJsonSchema()) {
-          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(target);
-        }
-        break;
-      case XML:
-        List<Source> schemaSources = getXmlSchemaSources();
-        schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(target);
-        break;
-      case YAML:
-        JSONObject json = YamlOperations.yamlToJson(YamlOperations.parseYaml(target));
-        try (InputStream inputStream = getJsonSchema()) {
-          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(json, target.toUri());
-        }
-        break;
-      default:
-        return ExitCode.FAIL.toExitStatus("Unsupported format: " + asFormat.name());
-      }
+      List<Source> schemaSources = getXmlSchemaSources();
+      schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(target);
     } catch (IOException | SAXException ex) {
       return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
     }
@@ -226,8 +149,4 @@ public abstract class AbstractValidationSubcommand
     }
     return ExitCode.OK.toExitStatus();
   }
-
-  protected abstract InputStream getJsonSchema();
-
-  protected abstract List<Source> getXmlSchemaSources() throws IOException;
 }

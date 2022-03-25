@@ -39,7 +39,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
   private static final Logger LOGGER = LogManager.getLogger(ClasspathResourceResolver.class);
 
   @Override
-  public LSInput resolveResource(
+  public LSInput resolveResource( // NOPMD - intentional
       String type,
       String namespaceURI,
       String publicId,
@@ -59,7 +59,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     return retval;
   }
 
-  private static class LSInputImpl implements LSInput {
+  private static class LSInputImpl implements LSInput { // NOPMD - intentional
     private Reader characterStream;
     private InputStream byteStream;
     private String stringData;

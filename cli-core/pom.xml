@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
@@ -12,14 +15,7 @@
 
 	<name>OSCAL CLI Core</name>
 	<url>http://maven.apache.org</url>
-<!--
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
--->
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -28,6 +24,10 @@
 		<dependency>
 			<groupId>gov.nist.secauto.oscal</groupId>
 			<artifactId>liboscal-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>metaschema-schema-generator</artifactId>
 		</dependency>
 		<dependency>
 			<!-- For console log color -->
@@ -80,7 +80,8 @@
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
 					<outputFileNameMapping>@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
-					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8</extraJvmArguments>
+					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
+						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
 					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
 				</configuration>
 				<executions>
@@ -101,7 +102,7 @@
 						<manifest>
 							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
 							<addClasspath>true</addClasspath>
-							<!-- 							<classpathPrefix>lib/</classpathPrefix> -->
+							<!-- <classpathPrefix>lib/</classpathPrefix> -->
 							<classpathLayoutType>custom</classpathLayoutType>
 							<customClasspathLayout>${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
 						</manifest>

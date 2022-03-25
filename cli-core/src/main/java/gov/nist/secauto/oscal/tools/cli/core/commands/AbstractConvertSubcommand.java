@@ -32,6 +32,7 @@ import gov.nist.secauto.metaschema.binding.io.Feature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.IDeserializer;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
+import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
@@ -51,11 +52,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class AbstractConvertSubcommand extends AbstractTerminalCommand {
+public abstract class AbstractConvertSubcommand
+    extends AbstractTerminalCommand {
   private static final Logger LOGGER = LogManager.getLogger(AbstractConvertSubcommand.class);
 
   private static final String COMMAND = "convert";
@@ -93,7 +96,10 @@ public abstract class AbstractConvertSubcommand extends AbstractTerminalCommand 
       String toFormatText = context.getCmdLine().getOptionValue("to");
       Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException ex) {
-      throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: " + Format.values());
+      throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+          + Arrays.asList(Format.values()).stream()
+              .map(format -> format.name())
+              .collect(CustomCollectors.joiningWithOxfordComma("and")));
     }
 
     List<String> extraArgs = context.getExtraArguments();
@@ -166,7 +172,7 @@ public abstract class AbstractConvertSubcommand extends AbstractTerminalCommand 
   protected <CLASS> void convert(File input, File result, Format fromFormat, Format toFormat, Class<CLASS> rootClass,
       IBindingContext context) throws FileNotFoundException, IOException {
     IDeserializer<CLASS> deserializer = context.newDeserializer(fromFormat.getBindingFormat(), rootClass);
-    deserializer.enableFeature(Feature.DESERIALIZE_ROOT);
+    deserializer.enableFeature(Feature.DESERIALIZE_JSON_ROOT_PROPERTY);
 
     CLASS object = deserializer.deserialize(input);
 

@@ -30,6 +30,7 @@ import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.AssessmentP
 import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.AssessmentResultsCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.catalog.CatalogCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition.ComponentDefinitionCommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.metaschema.MetaschemaCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.poam.PlanOfActionsAndMilestonesCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.profile.ProfileCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.ssp.SystemSecurityPlanCommand;
@@ -56,6 +57,7 @@ public class CLI {
     cliProcessor.addCommandHandler(new AssessmentPlanCommand());
     cliProcessor.addCommandHandler(new AssessmentResultsCommand());
     cliProcessor.addCommandHandler(new PlanOfActionsAndMilestonesCommand());
+    cliProcessor.addCommandHandler(new MetaschemaCommand());
   }
 
   private int parse(String[] args) {

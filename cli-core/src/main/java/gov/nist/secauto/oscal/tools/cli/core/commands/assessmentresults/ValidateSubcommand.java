@@ -42,7 +42,7 @@ public class ValidateSubcommand
     extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Validate that the specified OSCAL Assessment Results is well-formed";
+    return "Check that the specified OSCAL System Assessment Results (SAR) is well-formed and valid to the SAR model";
   }
 
   @Override
