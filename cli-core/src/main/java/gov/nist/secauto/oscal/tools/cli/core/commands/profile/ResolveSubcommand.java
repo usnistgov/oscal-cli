@@ -82,6 +82,7 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
 
   @Override
   public void gatherOptions(Options options) {
+    // TODO: add "as" support to select output format
   }
 
   @Override
@@ -128,29 +129,29 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File target = new File(extraArgs.get(0));
+    File source = new File(extraArgs.get(0));
 
     Format asFormat;
     // attempt to determine the format
     try {
       IBindingContext bindingContext = OscalBindingContext.instance();
       IBoundLoader loader = bindingContext.newBoundLoader();
-      asFormat = Format.lookup(loader.detectFormat(target));
+      asFormat = Format.lookup(loader.detectFormat(source));
     } catch (FileNotFoundException ex) {
       // this case was already checked for
-      return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target.getPath() + "' does not exist.");
+      return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source.getPath() + "' does not exist.");
     } catch (IOException ex) {
       return ExitCode.FAIL.toExitStatus(ex.getMessage());
     } catch (IllegalArgumentException ex) {
       return ExitCode.FAIL.toExitStatus(
-          "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
+          "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
               + Format.values());
     }
 
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
     IDocumentNodeItem document;
     try {
-      document = loader.loadAsNodeItem(target);
+      document = loader.loadAsNodeItem(source);
     } catch (IOException ex) {
       return ExitCode.INPUT_ERROR.toExitStatus(ex.getMessage());
     }
@@ -159,7 +160,7 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
       return ExitCode.FAIL.toExitStatus("The target file is already a catalog");
     } else if (object instanceof Profile) {
       StaticContext staticContext = new StaticContext();
-      URI targetUri = target.toURI();
+      URI targetUri = source.toURI();
       staticContext.setBaseUri(targetUri);
       DynamicContext dynamicContext = staticContext.newDynamicContext();
       dynamicContext.setDocumentLoader(loader);

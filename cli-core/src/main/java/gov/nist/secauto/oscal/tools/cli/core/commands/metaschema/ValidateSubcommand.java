@@ -26,11 +26,9 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
-import gov.nist.secauto.metaschema.binding.validation.ConstraintContentValidator;
 import gov.nist.secauto.metaschema.model.MetaschemaLoader;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
 import gov.nist.secauto.metaschema.model.common.validation.XmlSchemaContentValidator;
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.core.commands.LoggingValidationHandler;
 import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
@@ -100,10 +98,10 @@ public class ValidateSubcommand extends AbstractTerminalCommand {
 
     File target = new File(extraArgs.get(0));
     if (!target.exists()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
+      throw new InvalidArgumentException("The provided source file '" + target.getPath() + "' does not exist.");
     }
     if (!target.canRead()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' is not readable.");
+      throw new InvalidArgumentException("The provided source file '" + target.getPath() + "' is not readable.");
     }
   }
 
@@ -126,22 +124,6 @@ public class ValidateSubcommand extends AbstractTerminalCommand {
       }
       LoggingValidationHandler.handleValidationResults(schemaValidationResult);
       return ExitCode.FAIL.toExitStatus();
-    }
-
-    ConstraintContentValidator constraintValidator = new ConstraintContentValidator(OscalBindingContext.instance());
-    try {
-      IValidationResult constraintValidationResult = constraintValidator.validate(target);
-
-      if (!constraintValidationResult.isPassing()) {
-        if (LOGGER.isInfoEnabled()) {
-          LOGGER.info("The file '{}' has constraint validation issue(s). The issues are:", target);
-        }
-
-        LoggingValidationHandler.handleValidationResults(constraintValidationResult);
-        return ExitCode.FAIL.toExitStatus();
-      }
-    } catch (IOException ex) {
-      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
     }
 
     if (!context.getCmdLine().hasOption(CLIProcessor.QUIET_OPTION_LONG_NAME) && LOGGER.isInfoEnabled()) {

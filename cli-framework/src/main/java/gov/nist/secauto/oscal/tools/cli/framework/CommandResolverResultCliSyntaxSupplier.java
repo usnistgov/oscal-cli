@@ -6,8 +6,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.CommandCollection;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandResolver;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
-import java.util.Collection;
-
 public class CommandResolverResultCliSyntaxSupplier
     extends AbstractCliSyntaxSupplier {
 

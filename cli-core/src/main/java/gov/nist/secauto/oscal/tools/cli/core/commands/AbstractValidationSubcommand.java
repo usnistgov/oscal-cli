@@ -28,7 +28,7 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
-import gov.nist.secauto.metaschema.binding.validation.ConstraintContentValidator;
+import gov.nist.secauto.metaschema.binding.metapath.item.ConstraintContentValidator;
 import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
 import gov.nist.secauto.metaschema.model.common.validation.JsonSchemaContentValidator;

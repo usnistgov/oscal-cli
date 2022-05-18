@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 		<artifactId>cli-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cli-core</artifactId>
@@ -83,14 +83,29 @@
 					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
 						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
 					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
+					<includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
 				</configuration>
 				<executions>
 					<execution>
-						<id>exec-oscal-cli</id>
+						<id>exec-oscal-cli-windows</id>
 						<phase>package</phase>
 						<goals>
 							<goal>assemble</goal>
 						</goals>
+						<configuration>
+							<useWildcardClassPath>true</useWildcardClassPath>
+							<platforms>windows</platforms>
+						</configuration>
+					</execution>
+					<execution>
+						<id>exec-oscal-cli-bash</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+						<configuration>
+							<platforms>unix</platforms>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

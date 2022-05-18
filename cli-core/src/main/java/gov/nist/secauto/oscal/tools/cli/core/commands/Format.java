@@ -36,6 +36,10 @@ public enum Format {
   YAML(gov.nist.secauto.metaschema.binding.io.Format.YAML, ".yml");
 
   private static final Map<gov.nist.secauto.metaschema.binding.io.Format, Format> FORMAT_MAP;
+
+  private final String defaultExtension;
+  private final gov.nist.secauto.metaschema.binding.io.Format bindingFormat;
+
   static {
     Map<gov.nist.secauto.metaschema.binding.io.Format, Format> map = new HashMap<>(); // NOPMD - HashMap is ok here
     for (Format format : Format.values()) {
@@ -47,9 +51,6 @@ public enum Format {
   public static Format lookup(gov.nist.secauto.metaschema.binding.io.Format format) {
     return FORMAT_MAP.get(format);
   }
-
-  private final String defaultExtension;
-  private final gov.nist.secauto.metaschema.binding.io.Format bindingFormat;
 
   Format(gov.nist.secauto.metaschema.binding.io.Format bindingFormat, String defaultExtension) {
     this.bindingFormat = bindingFormat;

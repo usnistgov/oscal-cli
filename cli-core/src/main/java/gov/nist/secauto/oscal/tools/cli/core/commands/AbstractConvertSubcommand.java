@@ -47,6 +47,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -78,8 +80,14 @@ public abstract class AbstractConvertSubcommand
 
   @Override
   public void gatherOptions(Options options) {
-    options.addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build());
-    options.addOption(Option.builder("t").longOpt("to").required().hasArg().argName("FORMAT")
+    options.addOption(Option.builder()
+        .longOpt("overwrite")
+        .desc("overwrite the destination if it exists")
+        .build());
+    options.addOption(Option.builder("t")
+        .longOpt("to")
+        .required()
+        .hasArg().argName("FORMAT")
         .desc("convert to format: xml, json, or yaml").build());
   }
 
@@ -154,7 +162,7 @@ public abstract class AbstractConvertSubcommand
     return ExitCode.OK.toExitStatus();
   }
 
-  protected void performConvert(File input, File result, Format toFormat)
+  protected void performConvert(@NotNull File input, @Nullable File result, @NotNull Format toFormat)
       throws BindingException, FileNotFoundException, IOException {
     IBindingContext context = OscalBindingContext.instance();
     IBoundLoader loader = context.newBoundLoader();

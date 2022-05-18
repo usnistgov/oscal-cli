@@ -47,6 +47,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.fusesource.jansi.AnsiConsole;
+import org.fusesource.jansi.AnsiPrintStream;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -70,7 +71,7 @@ public class CLIProcessor {
   private final String exec;
   private final VersionInfo versionInfo;
 
-  public CLIProcessor(String exec, VersionInfo versionInfo) throws IOException {
+  public CLIProcessor(String exec, VersionInfo versionInfo) {
     this.exec = exec;
     this.versionInfo = versionInfo;
     AnsiConsole.systemInstall();
@@ -283,12 +284,12 @@ public class CLIProcessor {
       Supplier<CharSequence> footer) {
 
     HelpFormatter formatter = new HelpFormatter();
-    PrintStream out = AnsiConsole.out();
+    AnsiPrintStream out = AnsiConsole.out();
 
     try (PrintWriter writer = new PrintWriter(out)) {
       formatter.printHelp(
           writer,
-          AnsiConsole.getTerminalWidth() < 40 ? 40 : AnsiConsole.getTerminalWidth(),
+          out.getTerminalWidth() < 40 ? 40 : out.getTerminalWidth(),
           cmdLineSyntax == null ? null : cmdLineSyntax.get().toString(),
           header == null ? null : header.get().toString(),
           options,

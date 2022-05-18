@@ -40,13 +40,13 @@ import java.io.IOException;
 
 public class CLI {
 
-  public static void main(String[] args) throws IOException {
+  private final CLIProcessor cliProcessor;
+
+  public static void main(String... args) throws IOException {
     System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
     int exitCode = new CLI().parse(args);
     System.exit(exitCode);
   }
-
-  private CLIProcessor cliProcessor;
 
   public CLI() throws IOException {
     this.cliProcessor = new CLIProcessor("oscal-cli", new Version());
@@ -60,7 +60,7 @@ public class CLI {
     cliProcessor.addCommandHandler(new MetaschemaCommand());
   }
 
-  private int parse(String[] args) {
+  private int parse(String... args) {
     return cliProcessor.process(args);
   }
 }

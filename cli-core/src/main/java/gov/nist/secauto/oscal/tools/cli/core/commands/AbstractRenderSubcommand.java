@@ -31,7 +31,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractTerminalCommand;
-import gov.nist.secauto.oscal.tools.cli.framework.command.Command;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
@@ -98,7 +97,6 @@ public abstract class AbstractRenderSubcommand extends AbstractTerminalCommand {
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File input = new File(extraArgs.get(0));
     File destination = new File(extraArgs.get(1));
 
     if (destination.exists()) {
@@ -111,6 +109,7 @@ public abstract class AbstractRenderSubcommand extends AbstractTerminalCommand {
       }
     }
 
+    File input = new File(extraArgs.get(0));
     try {
       performRender(input, destination);
     } catch (IOException | TransformerException e) {

@@ -12,8 +12,7 @@
 	<dependencySets>
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.version}.${artifact.extension}
-			</outputFileNameMapping>
+			<outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
 			<useProjectArtifact>true</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>

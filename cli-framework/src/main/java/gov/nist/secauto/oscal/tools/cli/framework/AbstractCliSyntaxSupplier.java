@@ -4,7 +4,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.Command;
 import gov.nist.secauto.oscal.tools.cli.framework.command.CommandCollection;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 
 public abstract class AbstractCliSyntaxSupplier implements CliSyntaxSupplier {
   private final CLIProcessor cliProcessor;

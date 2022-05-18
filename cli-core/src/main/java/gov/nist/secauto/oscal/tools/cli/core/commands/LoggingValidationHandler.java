@@ -3,7 +3,7 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-import gov.nist.secauto.metaschema.binding.validation.ConstraintContentValidator.ConstraintValidationFinding;
+import gov.nist.secauto.metaschema.binding.metapath.item.ConstraintContentValidator.ConstraintValidationFinding;
 import gov.nist.secauto.metaschema.model.common.constraint.IConstraint.Level;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationFinding;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
@@ -123,7 +123,7 @@ public final class LoggingValidationHandler {
       ansi = ansi().fgBright(Color.MAGENTA).a(level.name()).reset();
       break;
     }
-    ansi = ansi().fgBright(Color.WHITE).a("] ").reset();
+    ansi = ansi.fgBright(Color.WHITE).a("] ").reset();
     return ansi;
   }
 }
