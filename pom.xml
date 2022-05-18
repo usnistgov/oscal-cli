@@ -34,7 +34,7 @@
 		<dependency.everit-json.version>1.14.0</dependency.everit-json.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
 		<dependency.liboscal-java.version>1.0.4-SNAPSHOT</dependency.liboscal-java.version>
-		<dependency.log4j2.version>2.17.1</dependency.log4j2.version>
+		<dependency.log4j2.version>2.17.2</dependency.log4j2.version>
 		<dependency.metaschema-framework.version>0.8.0-SNAPSHOT</dependency.metaschema-framework.version>
 	</properties>
 
