@@ -1,4 +1,4 @@
-/**
+/*
  * Portions of this software was developed by employees of the National Institute
  * of Standards and Technology (NIST), an agency of the Federal Government and is
  * being made available as a public service. Pursuant to title 17 United States
@@ -23,7 +23,6 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-
 package gov.nist.secauto.oscal.tools.cli.framework;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -268,10 +267,10 @@ public class CLIProcessor {
       List<Command> callingCommands) {
 
     HelpFormatter formatter = new HelpFormatter();
-    
+
     AnsiPrintStream out = AnsiConsole.out();
     int terminalWidth = Math.max(out.getTerminalWidth(), 40);
-    
+
     PrintWriter writer = new PrintWriter(out);
     formatter.printHelp(
         writer,
@@ -290,7 +289,8 @@ public class CLIProcessor {
     VersionInfo info = getVersionInfo();
     PrintStream out = AnsiConsole.out(); // NOPMD - not owner
     out.println(ansi().bold().a(getExec()).boldOff().a(" version ").bold().a(info.getVersion())
-        .boldOff().a(" built on ").bold().a(info.getBuildTime()).boldOff().a(" on commit ").bold().a(info.getCommit()).reset());
+        .boldOff().a(" built on ").bold().a(info.getBuildTime()).boldOff().a(" on commit ").bold().a(info.getCommit())
+        .reset());
     info.generateExtraInfo(out);
     out.flush();
   }

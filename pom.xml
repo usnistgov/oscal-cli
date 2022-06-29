@@ -13,21 +13,101 @@
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-parent</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-
-	<name>OSCAL CLI</name>
-	<url>http://maven.apache.org</url>
-
+	
 	<packaging>pom</packaging>
 
-	<modules>
-		<module>cli-framework</module>
-		<module>cli-core</module>
-	</modules>
+	<name>OSCAL CLI</name>
+	<url>${site.url}</url>
+
+	<issueManagement>
+		<url>https://github.com/usnistgov/oscal-cli/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
+
+	<scm>
+		<url>https://github.com/usnistgov/oscal-cli/tree/main</url>
+		<connection>scm:git:git@github.com/usnistgov/oscal-cli.git</connection>
+		<developerConnection>scm:git:git@github.com:usnistgov/oscal-cli.git</developerConnection>
+	  <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+	<snapshotRepository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	</snapshotRepository>
+	<site>
+		<id>nist-pages</id>
+		<url>${site.url}</url>
+	</site>
+</distributionManagement>
+
+<licenses>
+	<license>
+		<name>NIST License</name>
+		<url>https://www.nist.gov/director/licensing</url>
+		<distribution>repo</distribution>
+		<comments>NIST software License</comments>
+	</license>
+</licenses>
+
+<organization>
+	<name>National Institute of Standards and Technology</name>
+	<url>https://www.nist.gov</url>
+</organization>
+
+<developers>
+	<developer>
+		<id>david.waltermire@nist.gov</id>
+		<name>David Waltermire</name>
+		<email>david.waltermire@nist.gov</email>
+		<organization>National Institute of Standards and Technology</organization>
+		<roles>
+			<role>architect</role>
+			<role>developer</role>
+			<role>maintainer</role>
+		</roles>
+	</developer>
+</developers>
+
+<mailingLists>
+	<mailingList>
+		<name>OSCAL NIST Team</name>
+		<post>oscal@nist.gov</post>
+	</mailingList>
+	<mailingList>
+		<name>OSCAL Project Development Discussion</name>
+		<post>oscal-dev@nist.gov</post>
+		<subscribe>oscal-dev-join@nist.gov</subscribe>
+		<unsubscribe>oscal-dev-leave@nist.gov</unsubscribe>
+	</mailingList>
+	<mailingList>
+		<name>OSCAL Project Updates</name>
+		<subscribe>oscal-updates-join@nist.gov</subscribe>
+		<unsubscribe>oscal-updates-leave@nist.gov</unsubscribe>
+	</mailingList>
+</mailingLists>
 
 	<properties>
+				<!-- site configuration -->
+				<site.url>https://pages.nist.gov/metaschema-java/</site.url>
+				<scm.url>https://github.com/usnistgov/metaschema-java</scm.url>
+				<issueManagement.url>https://github.com/usnistgov/metaschema-java/issues</issueManagement.url>
+				<anchorJsVesrion>3.2.2</anchorJsVesrion>
+		<bootstrapVersion>4.4.1</bootstrapVersion>
+		<bootswatchVersion>4.4.1</bootswatchVersion>
+		<highlightJsVersion>9.15.7</highlightJsVersion>
+		<highlightJsTheme>github</highlightJsTheme>
+		<jqueryVersion>3.4.1</jqueryVersion>
+		<fontawesomeVersion>5.12.1</fontawesomeVersion>
+		<popperVersion>1.16.0</popperVersion>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.release>11</maven.compiler.release>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<dependency.commons-cli.version>1.5.0</dependency.commons-cli.version>
 		<dependency.commons-io.version>2.11.0</dependency.commons-io.version>
@@ -37,6 +117,8 @@
 		<dependency.liboscal-java.version>1.0.4</dependency.liboscal-java.version>
 		<dependency.log4j2.version>2.17.2</dependency.log4j2.version>
 		<dependency.metaschema-framework.version>0.8.0</dependency.metaschema-framework.version>
+
+		<plugin.license.version>4.2.rc3</plugin.license.version>
 	</properties>
 
 	<repositories>
@@ -140,7 +222,225 @@
 					<artifactId>download-maven-plugin</artifactId>
 					<version>1.6.8</version>
 				</plugin>
-			</plugins>
-		</pluginManagement>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${plugin.license.version}</version>
+				<configuration>
+					<licenseSets>
+						<licenseSet>
+							<header>license/nist/license.txt</header>
+							<includes>
+								<include>src/**/*.java</include>
+							</includes>
+						</licenseSet>
+					</licenseSets>
+					<failIfMissing>true</failIfMissing>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<topSiteURL>${site.url}</topSiteURL>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkCount>1.5C</forkCount>
+					<reuseForks>true</reuseForks>
+					<argLine>-Xmx1024m</argLine>
+					<excludedEnvironmentVariables>
+						<excludedEnvironmentVariable>JAVA_TOOL_OPTIONS</excludedEnvironmentVariable>
+					</excludedEnvironmentVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<failOnWarnings>false</failOnWarnings>
+				</configuration>
+			</plugin>
+		</plugins>
+	</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>attach-descriptor</id>
+						<goals>
+							<goal>attach-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-java</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>enforce-dependencies</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<fail>false</fail>
+									<rules>
+										<requireUpperBoundDeps>
+											<excludes>
+												<exclude>org.jetbrains:annotations</exclude>
+											</excludes>
+										</requireUpperBoundDeps>
+										<dependencyConvergence>
+											<uniqueVersions>true</uniqueVersions>
+										</dependencyConvergence>
+									</rules>
+								</configuration>
+							</execution>
+							<execution>
+								<id>enforce-classes</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<fail>true</fail>
+									<rules>
+										<!-- <reactorModuleConvergence> <ignoreModuleDependencies>true</ignoreModuleDependencies> 
+											</reactorModuleConvergence> -->
+										<banDuplicateClasses>
+											<scopes>
+												<scope>compile</scope>
+												<scope>provided</scope>
+											</scopes>
+											<findAllDuplicates>true</findAllDuplicates>
+											<ignoreWhenIdentical>true</ignoreWhenIdentical>
+										</banDuplicateClasses>
+									</rules>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.codehaus.mojo</groupId>
+								<artifactId>extra-enforcer-rules</artifactId>
+								<version>1.5.1</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>reporting</id>
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<excludePackageNames>:*.impl</excludePackageNames>
+						</configuration>
+						<reportSets>
+							<reportSet>
+								<id>aggregate</id>
+								<inherited>false</inherited>
+								<reports>
+									<report>aggregate</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-project-info-reports-plugin</artifactId>
+						<reportSets>
+							<reportSet>
+								<id>default</id>
+								<reports>
+									<report>summary</report>
+									<report>licenses</report>
+									<report>modules</report>
+									<report>issue-management</report>
+									<report>dependencies</report>
+									<report>dependency-convergence</report>
+									<report>dependency-management</report>
+									<report>plugins</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jxr-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+		<profile>
+			<id>gpg</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+  
+	<modules>
+		<module>cli-framework</module>
+		<module>cli-core</module>
+	</modules>
 </project>

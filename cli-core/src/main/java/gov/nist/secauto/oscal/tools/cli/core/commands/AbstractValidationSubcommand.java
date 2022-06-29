@@ -1,4 +1,4 @@
-/**
+/*
  * Portions of this software was developed by employees of the National Institute
  * of Standards and Technology (NIST), an agency of the Federal Government and is
  * being made available as a public service. Pursuant to title 17 United States
@@ -23,7 +23,6 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
@@ -112,13 +111,16 @@ public abstract class AbstractValidationSubcommand
       for (String arg : args) {
         Path constraint = Paths.get(arg);
         if (!Files.exists(constraint)) {
-          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' does not exist.");
+          throw new InvalidArgumentException(
+              "The provided external constraint file '" + constraint + "' does not exist.");
         }
         if (!Files.isRegularFile(constraint)) {
-          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' is not a file.");
+          throw new InvalidArgumentException(
+              "The provided external constraint file '" + constraint + "' is not a file.");
         }
         if (!Files.isReadable(constraint)) {
-          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' is not readable.");
+          throw new InvalidArgumentException(
+              "The provided external constraint file '" + constraint + "' is not readable.");
         }
       }
     }
@@ -162,14 +164,14 @@ public abstract class AbstractValidationSubcommand
         try {
           constraintSets.add(constraintLoader.load(constraintPath));
         } catch (IOException | MetaschemaException ex) {
-          return ExitCode.FAIL.toExitStatus("Unable to load constraint set '"+arg+"'.");
+          return ExitCode.FAIL.toExitStatus("Unable to load constraint set '" + arg + "'.");
         }
       }
       bindingContext = new OscalBindingContext(constraintSets);
     } else {
       bindingContext = OscalBindingContext.instance();
     }
-    
+
     IBoundLoader loader = bindingContext.newBoundLoader();
 
     List<String> extraArgs = context.getExtraArguments();

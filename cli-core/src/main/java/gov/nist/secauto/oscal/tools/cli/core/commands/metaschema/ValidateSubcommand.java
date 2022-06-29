@@ -1,4 +1,4 @@
-/**
+/*
  * Portions of this software was developed by employees of the National Institute
  * of Standards and Technology (NIST), an agency of the Federal Government and is
  * being made available as a public service. Pursuant to title 17 United States
@@ -23,7 +23,6 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-
 package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
 import gov.nist.secauto.metaschema.model.MetaschemaLoader;
@@ -55,7 +54,8 @@ import java.util.List;
 
 import javax.xml.transform.Source;
 
-public class ValidateSubcommand extends AbstractTerminalCommand {
+public class ValidateSubcommand
+    extends AbstractTerminalCommand {
   private static final Logger LOGGER = LogManager.getLogger(ValidateSubcommand.class);
   private static final String COMMAND = "validate";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
@@ -80,7 +80,7 @@ public class ValidateSubcommand extends AbstractTerminalCommand {
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
-  
+
   protected List<Source> getXmlSchemaSources() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval.add(XMLOperations
