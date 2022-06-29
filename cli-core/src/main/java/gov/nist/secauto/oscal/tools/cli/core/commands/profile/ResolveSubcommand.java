@@ -26,13 +26,12 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
-import gov.nist.secauto.metaschema.binding.io.Feature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
 import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
 import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
 import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
+import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.lib.metapath.function.library.ResolveProfile;
 import gov.nist.secauto.oscal.lib.model.Catalog;
@@ -47,6 +46,7 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
 import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
 import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,11 +55,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
-public class ResolveSubcommand extends AbstractTerminalCommand {
+public class ResolveSubcommand
+    extends AbstractTerminalCommand {
   @Override
   public String getDescription() {
     return "Resolve the specified OSCAL Profile";
@@ -82,7 +87,15 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
 
   @Override
   public void gatherOptions(Options options) {
-    // TODO: add "as" support to select output format
+    options.addOption(Option.builder()
+        .longOpt("as")
+        .hasArg().argName("FORMAT")
+        .desc("source format: xml, json, or yaml").build());
+    options.addOption(Option.builder("t")
+        .longOpt("to")
+        .required()
+        .hasArg().argName("FORMAT")
+        .desc("convert to format: xml, json, or yaml").build());
   }
 
   @Override
@@ -93,75 +106,88 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
   @SuppressWarnings("PMD")
   @Override
   public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
+
+    if (context.getCmdLine().hasOption("as")) {
+      try {
+        String toFormatText = context.getCmdLine().getOptionValue("as");
+        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+      } catch (IllegalArgumentException ex) {
+        throw new InvalidArgumentException(
+            "Invalid '--as' argument. The format must be one of: " + Arrays.asList(Format.values()).stream()
+                .map(format -> format.name())
+                .collect(CustomCollectors.joiningWithOxfordComma("and")));
+      }
+    }
+
+    try {
+      String toFormatText = context.getCmdLine().getOptionValue("to");
+      Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+    } catch (IllegalArgumentException ex) {
+      throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+          + Arrays.asList(Format.values()).stream()
+              .map(format -> format.name())
+              .collect(CustomCollectors.joiningWithOxfordComma("and")));
+    }
+
     List<String> extraArgs = context.getExtraArguments();
     if (extraArgs.size() != 1) {
       throw new InvalidArgumentException("The source to resolve must be provided.");
     }
 
-    File target = new File(extraArgs.get(0));
-    if (!target.exists()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
+    File source = new File(extraArgs.get(0));
+    if (!source.exists()) {
+      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' does not exist.");
     }
-    if (!target.canRead()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' is not readable.");
-    }
-
-    // attempt to determine the format
-    try {
-      IBindingContext bindingContext = OscalBindingContext.instance();
-      IBoundLoader loader = bindingContext.newBoundLoader();
-      Format.lookup(loader.detectFormat(target));
-    } catch (FileNotFoundException ex) {
-      // this case was already checked for
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
-    } catch (IOException ex) {
-      InvalidArgumentException newEx
-          = new InvalidArgumentException("Unable to read the provided target file '" + target.getPath() + "'.");
-      newEx.initCause(ex);
-      throw newEx;
-    } catch (IllegalArgumentException ex) {
-      throw new InvalidArgumentException(
-          "Target file has unrecognizable format. The format must be one of: "
-              + Format.values());
+    if (!source.canRead()) {
+      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' is not readable.");
     }
   }
 
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File source = new File(extraArgs.get(0));
-
-    Format asFormat;
-    // attempt to determine the format
-    try {
-      IBindingContext bindingContext = OscalBindingContext.instance();
-      IBoundLoader loader = bindingContext.newBoundLoader();
-      asFormat = Format.lookup(loader.detectFormat(source));
-    } catch (FileNotFoundException ex) {
-      // this case was already checked for
-      return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source.getPath() + "' does not exist.");
-    } catch (IOException ex) {
-      return ExitCode.FAIL.toExitStatus(ex.getMessage());
-    } catch (IllegalArgumentException ex) {
-      return ExitCode.FAIL.toExitStatus(
-          "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-              + Format.values());
-    }
 
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
+
+    Path source = Paths.get(extraArgs.get(0));
+    Format asFormat;
+    // attempt to determine the format
+    if (context.getCmdLine().hasOption("as")) {
+      try {
+        String toFormatText = context.getCmdLine().getOptionValue("as");
+        asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+      } catch (IllegalArgumentException ex) {
+        return ExitCode.FAIL.toExitStatus("Invalid '--as' argument. The format must be one of: " + Format.values());
+      }
+    } else {
+      // attempt to determine the format
+      try {
+        asFormat = Format.lookup(loader.detectFormat(source));
+      } catch (FileNotFoundException ex) {
+        // this case was already checked for
+        return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source + "' does not exist.");
+      } catch (IOException ex) {
+        return ExitCode.FAIL.toExitStatus(ex.getMessage());
+      } catch (IllegalArgumentException ex) {
+        return ExitCode.FAIL.toExitStatus(
+            "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
+                + Format.values());
+      }
+    }
+
     IDocumentNodeItem document;
     try {
       document = loader.loadAsNodeItem(source);
     } catch (IOException ex) {
       return ExitCode.INPUT_ERROR.toExitStatus(ex.getMessage());
     }
-    Object object = document.toBoundObject();
+    Object object = document.getValue();
     if (object instanceof Catalog) {
       return ExitCode.FAIL.toExitStatus("The target file is already a catalog");
     } else if (object instanceof Profile) {
       StaticContext staticContext = new StaticContext();
-      URI targetUri = source.toURI();
-      staticContext.setBaseUri(targetUri);
+      URI sourceUri = source.toUri();
+      staticContext.setBaseUri(sourceUri);
       DynamicContext dynamicContext = staticContext.newDynamicContext();
       dynamicContext.setDocumentLoader(loader);
 
@@ -173,9 +199,8 @@ public class ResolveSubcommand extends AbstractTerminalCommand {
 
       ISerializer<Catalog> serializer
           = OscalBindingContext.instance().newSerializer(asFormat.getBindingFormat(), Catalog.class);
-      serializer.enableFeature(Feature.SERIALIZE_ROOT);
       try {
-        serializer.serialize(resolvedProfile.toBoundObject(), System.out);
+        serializer.serialize((Catalog)resolvedProfile.getValue(), System.out);
       } catch (IOException ex) {
         return ExitCode.FAIL.toExitStatus(ex.getMessage());
       }

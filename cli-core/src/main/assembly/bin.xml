@@ -19,7 +19,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory></outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>README*</include>
 				<include>LICENSE*</include>
@@ -27,8 +27,15 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>${project.build.directory}/generated-distro</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>${project.build.directory}/appassembler</directory>
-			<outputDirectory></outputDirectory>
+			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>**/*</include>
 			</includes>

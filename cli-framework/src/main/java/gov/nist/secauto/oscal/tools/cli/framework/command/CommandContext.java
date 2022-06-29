@@ -33,28 +33,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class CommandContext {
-  private final CommandResolver.CommandResult commandParseResult;
+  private final List<Command> callingCommands;
   private final List<String> extraArgs;
   private final Options options;
   private final CommandLine cmdLine;
 
-  public CommandContext(CommandResolver.CommandResult commandParseResult, Options options, CommandLine cmdLine) {
-    this.commandParseResult = commandParseResult;
+  public CommandContext(List<Command> callingCommands, Options options, CommandLine cmdLine) {
+    this.callingCommands = callingCommands;
     this.extraArgs = Collections.unmodifiableList(cmdLine.getArgList());
     this.options = options;
     this.cmdLine = cmdLine;
   }
 
-  protected CommandResolver.CommandResult getCommandParseResult() {
-    return commandParseResult;
-  }
-
   public List<Command> getCallingCommands() {
-    return Collections.unmodifiableList(getCommandParseResult().getCommands());
-  }
-
-  public Command getCommand() {
-    return getCommandParseResult().getCommands().peek();
+    return Collections.unmodifiableList(callingCommands);
   }
 
   public List<String> getExtraArguments() {

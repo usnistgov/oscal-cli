@@ -6,8 +6,10 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every weekday
       interval: "daily"
+    target-branch: "develop"
   # Maintain dependencies for Maven
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "develop"

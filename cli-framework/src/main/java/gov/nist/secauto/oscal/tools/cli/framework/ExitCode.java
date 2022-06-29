@@ -39,11 +39,11 @@ public enum ExitCode {
     }
 
   },
-  FAIL(-1, false),
-  INPUT_ERROR(-2),
-  INVALID_COMMAND(-3),
-  INVALID_TARGET(-4),
-  PROCESSING_ERROR(-5);
+  FAIL(1, false),
+  INPUT_ERROR(2),
+  INVALID_COMMAND(3),
+  INVALID_TARGET(4),
+  PROCESSING_ERROR(5);
 
   private final int statusCode;
   private final boolean error;

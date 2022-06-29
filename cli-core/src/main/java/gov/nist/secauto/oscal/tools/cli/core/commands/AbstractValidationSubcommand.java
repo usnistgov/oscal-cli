@@ -26,9 +26,16 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
+import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
-import gov.nist.secauto.metaschema.binding.metapath.item.ConstraintContentValidator;
+import gov.nist.secauto.metaschema.model.ConstraintLoader;
+import gov.nist.secauto.metaschema.model.common.MetaschemaException;
+import gov.nist.secauto.metaschema.model.common.constraint.DefaultConstraintValidator;
+import gov.nist.secauto.metaschema.model.common.constraint.FindingCollectingConstraintValidationHandler;
+import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
+import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
+import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
+import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
 import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
 import gov.nist.secauto.metaschema.model.common.validation.JsonSchemaContentValidator;
@@ -51,17 +58,19 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 
@@ -85,7 +94,9 @@ public abstract class AbstractValidationSubcommand
   @Override
   public void gatherOptions(Options options) {
     options.addOption(Option.builder().longOpt("as").hasArg().argName("FORMAT")
-        .desc("validate as format: xml, json, or yaml").build());
+        .desc("source format: xml, json, or yaml").build());
+    options.addOption(Option.builder("c").hasArg().argName("FILE")
+        .desc("additional constraint definitions").build());
   }
 
   @Override
@@ -96,17 +107,33 @@ public abstract class AbstractValidationSubcommand
   @SuppressWarnings("PMD")
   @Override
   public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
+    if (context.getCmdLine().hasOption('c')) {
+      String[] args = context.getCmdLine().getOptionValues('c');
+      for (String arg : args) {
+        Path constraint = Paths.get(arg);
+        if (!Files.exists(constraint)) {
+          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' does not exist.");
+        }
+        if (!Files.isRegularFile(constraint)) {
+          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' is not a file.");
+        }
+        if (!Files.isReadable(constraint)) {
+          throw new InvalidArgumentException("The provided external constraint file '" + constraint + "' is not readable.");
+        }
+      }
+    }
+
     List<String> extraArgs = context.getExtraArguments();
     if (extraArgs.size() != 1) {
       throw new InvalidArgumentException("The source to validate must be provided.");
     }
 
-    File target = new File(extraArgs.get(0));
-    if (!target.exists()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
+    Path source = Paths.get(extraArgs.get(0));
+    if (!Files.exists(source)) {
+      throw new InvalidArgumentException("The provided source file '" + source + "' does not exist.");
     }
-    if (!target.canRead()) {
-      throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' is not readable.");
+    if (!Files.isReadable(source)) {
+      throw new InvalidArgumentException("The provided source file '" + source + "' is not readable.");
     }
 
     if (context.getCmdLine().hasOption("as")) {
@@ -119,33 +146,34 @@ public abstract class AbstractValidationSubcommand
                 .map(format -> format.name())
                 .collect(CustomCollectors.joiningWithOxfordComma("and")));
       }
-    } else {
-      // attempt to determine the format
-      try {
-        IBindingContext bindingContext = OscalBindingContext.instance();
-        IBoundLoader loader = bindingContext.newBoundLoader();
-        Format.lookup(loader.detectFormat(target));
-      } catch (FileNotFoundException ex) {
-        // this case was already checked for
-        throw new InvalidArgumentException("The provided target file '" + target.getPath() + "' does not exist.");
-      } catch (IOException ex) {
-        InvalidArgumentException newEx
-            = new InvalidArgumentException("Unable to read the provided target file '" + target.getPath() + "'.");
-        newEx.initCause(ex);
-        throw newEx;
-      } catch (IllegalArgumentException ex) {
-        throw new InvalidArgumentException(
-            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-                + Format.values());
-      }
     }
   }
 
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
-    List<String> extraArgs = context.getExtraArguments();
-    Path target = Paths.get(extraArgs.get(0));
 
+    OscalBindingContext bindingContext;
+    if (context.getCmdLine().hasOption('c')) {
+      ConstraintLoader constraintLoader = new ConstraintLoader();
+      Set<IConstraintSet> constraintSets = new LinkedHashSet<>();
+      String[] args = context.getCmdLine().getOptionValues('c');
+      for (String arg : args) {
+        Path constraintPath = Paths.get(arg);
+        try {
+          constraintSets.add(constraintLoader.load(constraintPath));
+        } catch (IOException | MetaschemaException ex) {
+          return ExitCode.FAIL.toExitStatus("Unable to load constraint set '"+arg+"'.");
+        }
+      }
+      bindingContext = new OscalBindingContext(constraintSets);
+    } else {
+      bindingContext = OscalBindingContext.instance();
+    }
+    
+    IBoundLoader loader = bindingContext.newBoundLoader();
+
+    List<String> extraArgs = context.getExtraArguments();
+    Path source = Paths.get(extraArgs.get(0));
     Format asFormat;
     if (context.getCmdLine().hasOption("as")) {
       try {
@@ -157,17 +185,15 @@ public abstract class AbstractValidationSubcommand
     } else {
       // attempt to determine the format
       try {
-        IBindingContext bindingContext = OscalBindingContext.instance();
-        IBoundLoader loader = bindingContext.newBoundLoader();
-        asFormat = Format.lookup(loader.detectFormat(target));
+        asFormat = Format.lookup(loader.detectFormat(source));
       } catch (FileNotFoundException ex) {
         // this case was already checked for
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided target file '" + target + "' does not exist.");
+        return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source + "' does not exist.");
       } catch (IOException ex) {
         return ExitCode.FAIL.toExitStatus(ex.getMessage());
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL.toExitStatus(
-            "Target file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
+            "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Format.values());
       }
     }
@@ -177,17 +203,17 @@ public abstract class AbstractValidationSubcommand
       switch (asFormat) {
       case JSON:
         try (InputStream inputStream = getJsonSchema()) {
-          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(target);
+          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(source);
         }
         break;
       case XML:
         List<Source> schemaSources = getXmlSchemaSources();
-        schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(target);
+        schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(source);
         break;
       case YAML:
-        JSONObject json = YamlOperations.yamlToJson(YamlOperations.parseYaml(target));
+        JSONObject json = YamlOperations.yamlToJson(YamlOperations.parseYaml(source));
         try (InputStream inputStream = getJsonSchema()) {
-          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(json, target.toUri());
+          schemaValidationResult = new JsonSchemaContentValidator(inputStream).validate(json, source.toUri());
         }
         break;
       default:
@@ -199,22 +225,30 @@ public abstract class AbstractValidationSubcommand
 
     if (!schemaValidationResult.isPassing()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("The file '{}' has schema validation issue(s). The issues are:", target);
+        LOGGER.info("The file '{}' has schema validation issue(s). The issues are:", source);
       }
       LoggingValidationHandler.handleValidationResults(schemaValidationResult);
       return ExitCode.FAIL.toExitStatus();
     }
 
-    ConstraintContentValidator constraintValidator = new ConstraintContentValidator(OscalBindingContext.instance());
-    try {
-      IValidationResult constraintValidationResult = constraintValidator.validate(target);
+    // Validate after loading instead
+    loader.disableFeature(DeserializationFeature.DESERIALIZE_VALIDATE_CONSTRAINTS);
+    DynamicContext dynamicContext = new StaticContext().newDynamicContext();
+    dynamicContext.setDocumentLoader(loader);
+    FindingCollectingConstraintValidationHandler handler = new FindingCollectingConstraintValidationHandler();
+    DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext, handler);
 
-      if (!constraintValidationResult.isPassing()) {
+    try {
+      IDocumentNodeItem nodeItem = loader.loadAsNodeItem(source);
+      validator.visit(nodeItem);
+      validator.finalizeValidation();
+
+      if (!handler.isPassing()) {
         if (LOGGER.isInfoEnabled()) {
-          LOGGER.info("The file '{}' has constraint validation issue(s). The issues are:", target);
+          LOGGER.info("The file '{}' has constraint validation issue(s). The issues are:", source);
         }
 
-        LoggingValidationHandler.handleValidationResults(constraintValidationResult);
+        LoggingValidationHandler.handleValidationResults(handler);
         return ExitCode.FAIL.toExitStatus();
       }
     } catch (IOException ex) {
@@ -222,7 +256,7 @@ public abstract class AbstractValidationSubcommand
     }
 
     if (!context.getCmdLine().hasOption(CLIProcessor.QUIET_OPTION_LONG_NAME) && LOGGER.isInfoEnabled()) {
-      LOGGER.info("The file '{}' is valid.", target);
+      LOGGER.info("The file '{}' is valid.", source);
     }
     return ExitCode.OK.toExitStatus();
   }

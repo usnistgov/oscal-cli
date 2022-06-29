@@ -3,7 +3,7 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-import gov.nist.secauto.metaschema.binding.metapath.item.ConstraintContentValidator.ConstraintValidationFinding;
+import gov.nist.secauto.metaschema.model.common.constraint.ConstraintValidationFinding;
 import gov.nist.secauto.metaschema.model.common.constraint.IConstraint.Level;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationFinding;
 import gov.nist.secauto.metaschema.model.common.validation.IValidationResult;
@@ -50,10 +50,9 @@ public final class LoggingValidationHandler {
             .a(finding.getCause().getPointerToViolation())
             .reset()
             .a(']')
-            .format(" {} [{}]",
+            .format(" %s [%s]",
                 finding.getMessage(),
-                finding.getDocumentUri().toString(),
-                finding.getDocumentUri()));
+                finding.getDocumentUri().toString()));
   }
 
   public static void handleXmlValidationFinding(XmlValidationFinding finding) {
@@ -61,7 +60,7 @@ public final class LoggingValidationHandler {
     SAXParseException ex = finding.getCause();
 
     getLogger(finding).log(
-        ansi.format("{} [{}{{},{}}]",
+        ansi.format("%s [%s{%d,%d}]",
             finding.getMessage(),
             finding.getDocumentUri().toString(),
             ex.getLineNumber(),
@@ -72,11 +71,11 @@ public final class LoggingValidationHandler {
     Ansi ansi = generatePreamble(finding.getSeverity());
 
     getLogger(finding).log(
-        ansi.format("[{}] {}", finding.getNode().getMetapath(), finding.getMessage()));
+        ansi.format("[%s] %s", finding.getNode().getMetapath(), finding.getMessage()));
   }
 
   @NotNull
-  protected static LogBuilder getLogger(@NotNull IValidationFinding finding) {
+  private static LogBuilder getLogger(@NotNull IValidationFinding finding) {
     LogBuilder retval;
     switch (finding.getSeverity()) {
     case CRITICAL:
@@ -103,7 +102,7 @@ public final class LoggingValidationHandler {
   }
 
   @NotNull
-  protected static Ansi generatePreamble(@NotNull Level level) {
+  private static Ansi generatePreamble(@NotNull Level level) {
     Ansi ansi = ansi().fgBright(Color.WHITE).a('[').reset();
 
     switch (level) {

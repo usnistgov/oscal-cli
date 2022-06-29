@@ -26,8 +26,14 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework;
 
+import java.io.PrintStream;
+
 public interface VersionInfo {
   String getVersion();
 
   String getBuildTime();
+
+  String getCommit();
+
+  void generateExtraInfo(PrintStream out);
 }

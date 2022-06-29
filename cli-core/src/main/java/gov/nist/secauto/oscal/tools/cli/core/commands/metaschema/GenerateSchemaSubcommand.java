@@ -4,14 +4,15 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 import gov.nist.secauto.metaschema.model.MetaschemaLoader;
 import gov.nist.secauto.metaschema.model.common.IMetaschema;
 import gov.nist.secauto.metaschema.model.common.MetaschemaException;
+import gov.nist.secauto.metaschema.model.common.configuration.DefaultConfiguration;
+import gov.nist.secauto.metaschema.model.common.configuration.IConfiguration;
+import gov.nist.secauto.metaschema.model.common.configuration.IMutableConfiguration;
 import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
-import gov.nist.secauto.metaschema.schemagen.DefaultMutableConfiguration;
-import gov.nist.secauto.metaschema.schemagen.Feature;
-import gov.nist.secauto.metaschema.schemagen.IConfiguration;
-import gov.nist.secauto.metaschema.schemagen.IMutableConfiguration;
 import gov.nist.secauto.metaschema.schemagen.ISchemaGenerator;
 import gov.nist.secauto.metaschema.schemagen.JsonSchemaGenerator;
+import gov.nist.secauto.metaschema.schemagen.SchemaGenerationFeature;
 import gov.nist.secauto.metaschema.schemagen.XmlSchemaGenerator;
+import gov.nist.secauto.oscal.tools.cli.core.commands.Format;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
@@ -37,11 +38,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class GenerateSchemaSubcommand
     extends AbstractTerminalCommand {
@@ -53,7 +52,7 @@ public class GenerateSchemaSubcommand
   static {
     List<ExtraArgument> args = new ArrayList<>(2);
     args.add(new DefaultExtraArgument("metaschema file", true));
-    args.add(new DefaultExtraArgument("destination file", false));
+    args.add(new DefaultExtraArgument("destination schema file", false));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
   }
 
@@ -70,7 +69,10 @@ public class GenerateSchemaSubcommand
   @Override
   public void gatherOptions(Options options) {
     options.addOption(Option.builder().longOpt("overwrite").desc("overwrite the destination if it exists").build());
-    options.addOption(Option.builder("s").longOpt("as").required().hasArg().argName("FORMAT")
+    options.addOption(Option.builder()
+        .longOpt("as")
+        .required()
+        .hasArg().argName("FORMAT")
         .desc("generated schema format: xml (for XSD) or json (for JSON Schema)").build());
     options.addOption(
         Option.builder().longOpt("inline-types").desc("definitions declared inline will be generated as inline types")
@@ -91,8 +93,7 @@ public class GenerateSchemaSubcommand
     } catch (IllegalArgumentException ex) {
       throw new InvalidArgumentException(
           "Invalid '--as' argument. The format must be one of: "
-              + Arrays.asList(SchemaFormat.values()).stream()
-                  .map(format -> format.name())
+              + Format.names().stream()
                   .collect(CustomCollectors.joiningWithOxfordComma("and")));
     }
 
@@ -117,33 +118,42 @@ public class GenerateSchemaSubcommand
 
     Path destination;
     if (extraArgs.size() == 1) {
-      // String extension = toFormat.getDefaultExtension();
-      // destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
       destination = null;
+      // make quiet to avoid output noise, since redirection will be likely
+      CLIProcessor.handleQuiet();
     } else {
       destination = Paths.get(extraArgs.get(1));
     }
 
-    if (destination != null && Files.exists(destination)) {
-      if (!context.getCmdLine().hasOption("overwrite")) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination
-            + "' already exists and the --overwrite option was not provided.");
-      }
-      if (!Files.isWritable(destination)) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination + "' is not writable.");
+    if (destination != null) {
+      if (Files.exists(destination)) {
+        if (!context.getCmdLine().hasOption("overwrite")) {
+          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination
+              + "' already exists and the --overwrite option was not provided.");
+        }
+        if (!Files.isWritable(destination)) {
+          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination + "' is not writable.");
+        }
+      } else {
+        try {
+          Files.createDirectories(destination.getParent());
+        } catch (IOException ex) {
+          return ExitCode.INVALID_TARGET.toExitStatus(ex.getMessage());
+        }
       }
     }
 
     String asFormatText = context.getCmdLine().getOptionValue("as");
     SchemaFormat asFormat = SchemaFormat.valueOf(asFormatText.toUpperCase(Locale.ROOT));
 
-    IMutableConfiguration configuration = new DefaultMutableConfiguration();
+    IMutableConfiguration<SchemaGenerationFeature> configuration
+        = new DefaultConfiguration<>(SchemaGenerationFeature.class);
     if (context.getCmdLine().hasOption("inline-types")) {
-      configuration.enableFeature(Feature.INLINE_DEFINITIONS);
+      configuration.enableFeature(SchemaGenerationFeature.INLINE_DEFINITIONS);
       if (SchemaFormat.JSON.equals(asFormat)) {
-        configuration.disableFeature(Feature.INLINE_CHOICE_DEFINITIONS);
+        configuration.disableFeature(SchemaGenerationFeature.INLINE_CHOICE_DEFINITIONS);
       } else {
-        configuration.enableFeature(Feature.INLINE_CHOICE_DEFINITIONS);
+        configuration.enableFeature(SchemaGenerationFeature.INLINE_CHOICE_DEFINITIONS);
       }
     }
 
@@ -159,7 +169,8 @@ public class GenerateSchemaSubcommand
   }
 
   private void performGeneration(@NotNull Path metaschemaPath, @Nullable Path destination,
-      @NotNull SchemaFormat asFormat, @NotNull IConfiguration configuration) throws MetaschemaException, IOException {
+      @NotNull SchemaFormat asFormat, @NotNull IConfiguration<SchemaGenerationFeature> configuration)
+      throws MetaschemaException, IOException {
     ISchemaGenerator schemaGenerator;
     switch (asFormat) {
     case JSON:
@@ -172,7 +183,7 @@ public class GenerateSchemaSubcommand
       throw new IllegalStateException("Unsupported schema format: " + asFormat.name());
     }
 
-    IMetaschema metaschema = new MetaschemaLoader().loadXmlMetaschema(metaschemaPath);
+    IMetaschema metaschema = new MetaschemaLoader().load(metaschemaPath);
     if (destination == null) {
       try (Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
         schemaGenerator.generateFromMetaschema(metaschema, writer, configuration);

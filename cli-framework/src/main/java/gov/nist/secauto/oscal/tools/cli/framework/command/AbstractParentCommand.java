@@ -42,7 +42,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class AbstractParentCommand implements Command {
-  private final Map<String, Command> commandToSubcommandHandlerMap = Collections.synchronizedMap(new LinkedHashMap<>());
+  private final Map<String, Command> commandToSubcommandHandlerMap // NOPMD - intentional
+      = Collections.synchronizedMap(new LinkedHashMap<>());
 
   protected void addCommandHandler(Command handler) {
     String commandName = handler.getName();
@@ -82,7 +83,7 @@ public abstract class AbstractParentCommand implements Command {
       err.flush();
       return ExitCode.INVALID_COMMAND.toExitStatus();
     }
-    processor.showHelpCommand(context.getOptions(), context.getCommandParseResult());
+    processor.showHelp(context.getOptions(), this, context.getCallingCommands());
     return ExitCode.OK.toExitStatus();
   }
 

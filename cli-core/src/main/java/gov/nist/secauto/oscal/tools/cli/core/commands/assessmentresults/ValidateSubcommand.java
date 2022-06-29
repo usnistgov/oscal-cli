@@ -49,12 +49,12 @@ public class ValidateSubcommand
   protected List<Source> getXmlSchemaSources() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval.add(XMLOperations
-        .getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_assessmen-results_schema.xsd")));
+        .getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_assessment-results_schema.xsd")));
     return Collections.unmodifiableList(retval);
   }
 
   @Override
   protected InputStream getJsonSchema() {
-    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_assessmen-results_schema.json");
+    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_assessment-results_schema.json");
   }
 }

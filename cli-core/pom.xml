@@ -63,8 +63,34 @@
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}/generated-distro</targetPath>
 			</resource>
+			<resource>
+				<directory>${project.build.directory}/generated-resources/license</directory>
+			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+				<version>5.0.0</version>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
+					<verbose>true</verbose>
+					<useNativeGit>false</useNativeGit>
+					<prefix>git</prefix>
+				</configuration>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
@@ -162,6 +188,26 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.0.0</version>
+				<executions>
+				  <execution>
+					<id>third-party-license</id>
+					<goals>
+						<goal>add-third-party</goal>
+					  </goals>
+					<configuration>
+					  <outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
+					  <thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
+					  <licenseMerges>
+						<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
+					  </licenseMerges>
+					</configuration>
+				  </execution>
+				</executions>
+			  </plugin>
 		</plugins>
 	</build>
 </project>

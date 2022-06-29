@@ -50,7 +50,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
           namespaceURI,
           publicId, systemId, baseURI);
     }
-    InputStream resourceAsStream = this.getClass().getResourceAsStream(systemId);
+    InputStream resourceAsStream = this.getClass().getResourceAsStream(systemId); // NOPMD - caller must close
     LSInputImpl retval = new LSInputImpl();
     retval.setPublicId(publicId);
     retval.setSystemId(systemId);

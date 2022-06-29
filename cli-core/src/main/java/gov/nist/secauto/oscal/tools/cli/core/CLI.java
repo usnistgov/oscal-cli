@@ -38,7 +38,7 @@ import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 
 import java.io.IOException;
 
-public class CLI {
+public class CLI { // NOPMD - intentional
 
   private final CLIProcessor cliProcessor;
 

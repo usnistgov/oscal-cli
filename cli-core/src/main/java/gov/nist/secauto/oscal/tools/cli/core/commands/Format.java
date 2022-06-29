@@ -26,9 +26,13 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum Format {
   XML(gov.nist.secauto.metaschema.binding.io.Format.XML, ".xml"),
@@ -52,6 +56,12 @@ public enum Format {
     return FORMAT_MAP.get(format);
   }
 
+  public static List<String> names() {
+    return Arrays.stream(Format.values())
+        .map(format -> format.name().toLowerCase(Locale.ROOT))
+        .collect(Collectors.toUnmodifiableList());
+  }
+  
   Format(gov.nist.secauto.metaschema.binding.io.Format bindingFormat, String defaultExtension) {
     this.bindingFormat = bindingFormat;
     this.defaultExtension = defaultExtension;

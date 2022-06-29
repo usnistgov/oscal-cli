@@ -28,7 +28,6 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.binding.io.BindingException;
-import gov.nist.secauto.metaschema.binding.io.Feature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.IDeserializer;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
@@ -50,11 +49,12 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +84,7 @@ public abstract class AbstractConvertSubcommand
         .longOpt("overwrite")
         .desc("overwrite the destination if it exists")
         .build());
-    options.addOption(Option.builder("t")
+    options.addOption(Option.builder()
         .longOpt("to")
         .required()
         .hasArg().argName("FORMAT")
@@ -105,8 +105,7 @@ public abstract class AbstractConvertSubcommand
       Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException ex) {
       throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
-          + Arrays.asList(Format.values()).stream()
-              .map(format -> format.name())
+          + Format.names().stream()
               .collect(CustomCollectors.joiningWithOxfordComma("and")));
     }
 
@@ -115,81 +114,93 @@ public abstract class AbstractConvertSubcommand
       throw new InvalidArgumentException("Illegal number of arguments.");
     }
 
-    File source = new File(extraArgs.get(0));
-    if (!source.exists()) {
-      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' does not exist.");
+    Path source = Paths.get(extraArgs.get(0));
+    if (!Files.exists(source)) {
+      throw new InvalidArgumentException("The provided source '" + source + "' does not exist.");
     }
-    if (!source.canRead()) {
-      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' is not readable.");
+    if (!Files.isReadable(source)) {
+      throw new InvalidArgumentException("The provided source '" + source + "' is not readable.");
     }
   }
 
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
-    List<String> extraArgs = context.getExtraArguments();
-    File input = new File(extraArgs.get(0));
-
-    File destination;
-    if (extraArgs.size() == 1) {
-      // String extension = toFormat.getDefaultExtension();
-      // destination = new File(FilenameUtils.removeExtension(extraArgs.get(0)) + extension);
-      destination = null;
-    } else {
-      destination = new File(extraArgs.get(1));
-    }
-
-    if (destination != null && destination.exists()) {
-      if (!context.getCmdLine().hasOption("overwrite")) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination.getPath()
-            + "' already exists and the --overwrite option was not provided.");
-      }
-      if (!destination.canWrite()) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination.getPath() + "' is not writable.");
-      }
-    }
 
     String toFormatText = context.getCmdLine().getOptionValue("to");
     Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
 
+    List<String> extraArgs = context.getExtraArguments();
+
+    Path destination;
+    if (extraArgs.size() == 1) {
+      destination = null;
+      // make quiet to avoid output noise, since redirection will be likely
+      CLIProcessor.handleQuiet();
+    } else {
+      destination = Paths.get(extraArgs.get(1));
+    }
+
+    if (destination != null) {
+      if (Files.exists(destination)) {
+        if (!context.getCmdLine().hasOption("overwrite")) {
+          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination
+              + "' already exists and the --overwrite option was not provided.");
+        }
+        if (!Files.isWritable(destination)) {
+          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination + "' is not writable.");
+        }
+      } else {
+        try {
+          Files.createDirectories(destination.getParent());
+        } catch (IOException ex) {
+          return ExitCode.INVALID_TARGET.toExitStatus(ex.getMessage());
+        }
+      }
+    }
+
+    Path source = Paths.get(extraArgs.get(0));
     try {
-      performConvert(input, destination, toFormat);
+      performConvert(source, destination, toFormat);
     } catch (IOException | BindingException | IllegalArgumentException ex) {
       return ExitCode.FAIL.toExitStatus(ex.getMessage());
     }
     if (destination != null && LOGGER.isInfoEnabled()) {
-      LOGGER.info("Generated {} file: {}", toFormat.toString(), destination.getPath());
+      LOGGER.info("Generated {} file: {}", toFormat.toString(), destination);
     }
     return ExitCode.OK.toExitStatus();
   }
 
-  protected void performConvert(@NotNull File input, @Nullable File result, @NotNull Format toFormat)
+  protected void performConvert(@NotNull Path source, @Nullable Path destination, @NotNull Format toFormat)
       throws BindingException, FileNotFoundException, IOException {
     IBindingContext context = OscalBindingContext.instance();
     IBoundLoader loader = context.newBoundLoader();
 
-    Format fromFormat = Format.lookup(loader.detectFormat(input));
+    Format fromFormat = Format.lookup(loader.detectFormat(source));
     if (fromFormat == null) {
-      throw new BindingException(String.format("Unsupported source format for file '%s'", input.getPath()));
+      throw new BindingException(String.format("Unsupported source format for file '%s'", source));
     } else if (fromFormat.equals(toFormat)) {
       throw new IllegalArgumentException(String.format("Source and destination are the same format '%s'", toFormat));
     }
 
-    convert(input, result, fromFormat, toFormat, getLoadedClass(), context);
+    convert(source, destination, fromFormat, toFormat, getLoadedClass(), context);
   }
 
-  protected <CLASS> void convert(File input, File result, Format fromFormat, Format toFormat, Class<CLASS> rootClass,
-      IBindingContext context) throws FileNotFoundException, IOException {
+  protected <CLASS> void convert(
+      @NotNull Path source,
+      @Nullable Path destination,
+      @NotNull Format fromFormat,
+      @NotNull Format toFormat,
+      @NotNull Class<CLASS> rootClass,
+      @NotNull IBindingContext context) throws FileNotFoundException, IOException {
     IDeserializer<CLASS> deserializer = context.newDeserializer(fromFormat.getBindingFormat(), rootClass);
-    deserializer.enableFeature(Feature.DESERIALIZE_JSON_ROOT_PROPERTY);
 
-    CLASS object = deserializer.deserialize(input);
+    CLASS object = deserializer.deserialize(source);
 
     ISerializer<CLASS> serializer = context.newSerializer(toFormat.getBindingFormat(), rootClass);
-    serializer.enableFeature(Feature.SERIALIZE_ROOT);
-    if (result == null) {
+    if (destination == null) {
       serializer.serialize(object, System.out);
     } else {
-      serializer.serialize(object, result);
+      serializer.serialize(object, destination);
     }
   }
 

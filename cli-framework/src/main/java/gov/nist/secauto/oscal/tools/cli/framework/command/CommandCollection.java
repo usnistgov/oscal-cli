@@ -26,7 +26,14 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
+import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
+import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
+
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public interface CommandCollection {
   Command getCommandByName(String name);
@@ -34,4 +41,95 @@ public interface CommandCollection {
   Collection<Command> getSubCommands();
 
   boolean isSubCommandRequired();
+
+  /**
+   * Callback for providing a help header.
+   * 
+   * @return the header or {@code null}
+   */
+  default String buildHelpHeader() {
+    return null;
+  }
+
+  /**
+   * Get the CLI syntax.
+   * 
+   * @param exec
+   *          the executable name
+   * @param calledCommands
+   *          the parsed commands
+   * 
+   * @return the CLI syntax to display in help output
+   */
+  default String buildHelpCliSyntax(String exec, List<Command> calledCommands) {
+    StringBuilder builder = new StringBuilder(64);
+    builder.append(exec);
+
+    if (!calledCommands.isEmpty()) {
+      builder.append(calledCommands.stream()
+          .map(Command::getName)
+          .collect(Collectors.joining(" ", " ", "")));
+    }
+
+    Collection<Command> subCommands = getSubCommands();
+    if (!subCommands.isEmpty()) {
+      builder.append(' ');
+      if (!isSubCommandRequired()) {
+        builder.append('[');
+      }
+
+      builder.append("<command>");
+
+      if (!isSubCommandRequired()) {
+        builder.append(']');
+      }
+    }
+
+    builder.append(" [<options>]");
+    return builder.toString();
+  }
+
+  /**
+   * Callback for providing a help footer.
+   * 
+   * @param exec
+   *          the executable name
+   * 
+   * @return the footer or {@code null}
+   */
+  default String buildHelpFooter(String exec) {
+    CharSequence retval;
+    Collection<Command> subCommands = getSubCommands();
+    if (subCommands.isEmpty()) {
+      retval = "";
+    } else {
+      StringBuilder builder = new StringBuilder(64);
+      builder
+          .append(System.lineSeparator())
+          .append("The following are available commands:")
+          .append(System.lineSeparator());
+
+      int length = subCommands.stream()
+          .mapToInt(command -> command.getName().length())
+          .max().orElse(0);
+
+      for (Command command : subCommands) {
+        builder.append(
+            ansi()
+                .render(String.format("   @|bold %-" + length + "s|@ %s%n",
+                    command.getName(),
+                    command.getDescription())));
+      }
+      builder
+          .append(System.lineSeparator())
+          .append('\'')
+          .append(exec)
+          .append(" <command> --help' will show help on that specific command.")
+          .append(System.lineSeparator());
+      retval = builder;
+    }
+    return retval.toString();
+  }
+
+  ExitStatus executeCommand(CLIProcessor cliProcessor, CommandContext context);
 }

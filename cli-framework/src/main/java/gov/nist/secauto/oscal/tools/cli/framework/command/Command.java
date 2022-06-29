@@ -27,7 +27,6 @@
 package gov.nist.secauto.oscal.tools.cli.framework.command;
 
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
 
 import org.apache.commons.cli.Options;
@@ -53,10 +52,35 @@ public interface Command extends CommandCollection {
     // by default there are no options to handle
   }
 
-  ExitStatus executeCommand(CLIProcessor cliProcessor, CommandContext context);
-
   @Override
   default Command getCommandByName(String name) {
     return null;
+  }
+
+  @Override
+  default String buildHelpCliSyntax(String exec, List<Command> calledCommands) {
+    
+    StringBuilder builder = new StringBuilder(CommandCollection.super.buildHelpCliSyntax(exec, calledCommands));
+
+    for (ExtraArgument argument : getExtraArguments()) {
+      builder.append(' ');
+      if (!argument.isRequired()) {
+        builder.append('[');
+      }
+
+      builder.append('<');
+      builder.append(argument.getName());
+      builder.append('>');
+
+      if (argument.getNumber() > 1) {
+        builder.append("...");
+      }
+
+      if (!argument.isRequired()) {
+        builder.append(']');
+      }
+    }
+    
+    return builder.toString();
   }
 }
