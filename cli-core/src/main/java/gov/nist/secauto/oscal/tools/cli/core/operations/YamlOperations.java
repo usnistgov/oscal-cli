@@ -45,23 +45,23 @@ import java.util.Map;
 
 public final class YamlOperations {
   private static final Yaml YAML_PARSER;
-  
+
   static {
     Constructor constructor = new Constructor();
     Representer representer = new Representer();
     YAML_PARSER = new Yaml(constructor, representer, new DumperOptions(), new Resolver() {
-        @Override
-        protected void addImplicitResolvers() {
-          addImplicitResolver(Tag.BOOL, BOOL, "yYnNtTfFoO");
-          addImplicitResolver(Tag.INT, INT, "-+0123456789");
-          addImplicitResolver(Tag.FLOAT, FLOAT, "-+0123456789.");
-          addImplicitResolver(Tag.MERGE, MERGE, "<");
-          addImplicitResolver(Tag.NULL, NULL, "~nN\0");
-          addImplicitResolver(Tag.NULL, EMPTY, null);
-          // addImplicitResolver(Tag.TIMESTAMP, TIMESTAMP, "0123456789");
-        }
-        
-      });
+      @Override
+      protected void addImplicitResolvers() {
+        addImplicitResolver(Tag.BOOL, BOOL, "yYnNtTfFoO");
+        addImplicitResolver(Tag.INT, INT, "-+0123456789");
+        addImplicitResolver(Tag.FLOAT, FLOAT, "-+0123456789.");
+        addImplicitResolver(Tag.MERGE, MERGE, "<");
+        addImplicitResolver(Tag.NULL, NULL, "~nN\0");
+        addImplicitResolver(Tag.NULL, EMPTY, null);
+        // addImplicitResolver(Tag.TIMESTAMP, TIMESTAMP, "0123456789");
+      }
+
+    });
   }
 
   private YamlOperations() {

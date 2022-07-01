@@ -183,7 +183,8 @@ public abstract class AbstractValidationSubcommand
         String toFormatText = context.getCmdLine().getOptionValue("as");
         asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values()).withThrowable(ex);
+        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values())
+            .withThrowable(ex);
       }
     } else {
       // attempt to determine the format

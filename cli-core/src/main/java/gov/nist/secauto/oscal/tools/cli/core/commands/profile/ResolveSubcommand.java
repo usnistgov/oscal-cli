@@ -89,10 +89,10 @@ public class ResolveSubcommand
 
   @Override
   public void gatherOptions(Options options) {
-//    options.addOption(Option.builder()
-//        .longOpt("as")
-//        .hasArg().argName("FORMAT")
-//        .desc("source format: xml, json, or yaml").build());
+    // options.addOption(Option.builder()
+    // .longOpt("as")
+    // .hasArg().argName("FORMAT")
+    // .desc("source format: xml, json, or yaml").build());
     options.addOption(Option.builder("t")
         .longOpt("to")
         .required()
@@ -205,7 +205,7 @@ public class ResolveSubcommand
         }
       }
     }
-    
+
     IDocumentNodeItem document;
     try {
       // TODO: support as format
