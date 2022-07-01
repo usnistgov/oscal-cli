@@ -73,7 +73,7 @@ public abstract class AbstractParentCommand implements Command {
 
     if (context.getExtraArguments().size() != getExtraArguments().size()) {
       return ExitCode.INVALID_COMMAND
-          .exitMessage("Unhandled arguments: "+context.getExtraArguments().stream().collect(Collectors.joining(" ")));
+          .exitMessage("Unhandled arguments: " + context.getExtraArguments().stream().collect(Collectors.joining(" ")));
     }
     processor.showHelp(context.getOptions(), this, context.getCallingCommands());
     return ExitCode.OK.exit();
