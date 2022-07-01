@@ -23,15 +23,29 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-import java.util.Objects;
+import org.apache.logging.log4j.LogBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractExitStatus implements ExitStatus {
+  private static final Logger LOGGER = LogManager.getLogger(MessageExitStatus.class);
+
   private final ExitCode exitCode;
 
-  public AbstractExitStatus(ExitCode exitCode) {
-    Objects.requireNonNull(exitCode, "exitCode");
+  private Throwable throwable;
+
+  /**
+   * Construct a new exit status based on the provided {@code exitCode}.
+   * 
+   * @param exitCode
+   *          the exit code
+   */
+  public AbstractExitStatus(@NotNull ExitCode exitCode) {
     this.exitCode = exitCode;
   }
 
@@ -40,8 +54,55 @@ public abstract class AbstractExitStatus implements ExitStatus {
     return exitCode;
   }
 
-  @Override
-  public boolean isError() {
-    return getExitCode().isError();
+  /**
+   * Get the associated throwable.
+   * 
+   * @return the throwable or {@code null}
+   */
+  @NotNull
+  protected Throwable getThrowable() {
+    return throwable;
   }
+
+  @Override
+  public ExitStatus withThrowable(@NotNull Throwable throwable) {
+    return this;
+  }
+
+  /**
+   * Get the associated message.
+   * 
+   * @return the message or {@code null}
+   */
+  @Nullable
+  protected abstract String getMessage();
+
+  @Override
+  public int handle() {
+    LogBuilder logBuilder = null;
+    if (ExitCode.OK.compareTo(getExitCode()) <= 0) {
+      if (LOGGER.isInfoEnabled()) {
+        logBuilder = LOGGER.atInfo();
+      }
+    } else if (LOGGER.isErrorEnabled()) {
+      logBuilder = LOGGER.atError();
+    }
+
+    if (logBuilder != null) {
+      Throwable throwable = getThrowable();
+      if (throwable != null) {
+        logBuilder.withThrowable(throwable);
+      }
+
+      String message = getMessage();
+      if (message != null && !message.isEmpty()) {
+        logBuilder.log(message);
+      } else if (throwable != null) {
+        // log the throwable
+        logBuilder.log();
+      }
+    }
+    return getExitCode().getStatusCode();
+  }
+
 }

@@ -23,17 +23,13 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.framework.command;
 
-import static org.fusesource.jansi.Ansi.ansi;
+package gov.nist.secauto.oscal.tools.cli.framework.command;
 
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
 
-import org.fusesource.jansi.AnsiConsole;
-
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -76,14 +72,11 @@ public abstract class AbstractParentCommand implements Command {
     }
 
     if (context.getExtraArguments().size() != getExtraArguments().size()) {
-      PrintStream err = AnsiConsole.err();
-      err.println(ansi().a('[').fgBrightRed().a("ERROR").reset().a("] ").a("Unhandled arguments: ")
-          .a(context.getExtraArguments().stream().collect(Collectors.joining(" "))));
-      err.flush();
-      return ExitCode.INVALID_COMMAND.toExitStatus();
+      return ExitCode.INVALID_COMMAND
+          .exitMessage("Unhandled arguments: "+context.getExtraArguments().stream().collect(Collectors.joining(" ")));
     }
     processor.showHelp(context.getOptions(), this, context.getCallingCommands());
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 
 }

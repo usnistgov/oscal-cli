@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
@@ -97,29 +98,29 @@ public abstract class AbstractRenderSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File destination = new File(extraArgs.get(1));
+    File destination = new File(extraArgs.get(1)); //.toAbsolutePath();
 
     if (destination.exists()) {
       if (!context.getCmdLine().hasOption("overwrite")) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination.getPath()
+        return ExitCode.FAIL.exitMessage("The provided destination '" + destination.getPath()
             + "' already exists and the --overwrite option was not provided.");
       }
       if (!destination.canWrite()) {
-        return ExitCode.FAIL.toExitStatus("The provided destination '" + destination.getPath() + "' is not writable.");
+        return ExitCode.FAIL.exitMessage("The provided destination '" + destination.getPath() + "' is not writable.");
       }
     }
 
     File input = new File(extraArgs.get(0));
     try {
       performRender(input, destination);
-    } catch (IOException | TransformerException e) {
-      return ExitCode.FAIL.toExitStatus(e.getMessage());
+    } catch (IOException | TransformerException ex) {
+      return ExitCode.FAIL.exit().withThrowable(ex);
     }
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("Generated HTML file: " + destination.getPath());
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 
   protected abstract void performRender(File input, File result) throws IOException, TransformerException;

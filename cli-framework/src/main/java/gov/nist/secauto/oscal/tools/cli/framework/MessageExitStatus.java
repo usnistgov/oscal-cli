@@ -23,7 +23,10 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +44,7 @@ public class MessageExitStatus
    * @param messageArguments
    *          the arguments that can be passed to a formatted string to generate the message
    */
-  public MessageExitStatus(ExitCode code, Object... messageArguments) {
+  public MessageExitStatus(@NotNull ExitCode code, @NotNull Object... messageArguments) {
     super(code);
     if (messageArguments == null || messageArguments.length == 0) {
       this.messageArguments = Collections.emptyList();
@@ -52,8 +55,8 @@ public class MessageExitStatus
 
   @Override
   public String getMessage() {
-    String message = lookupMessageForCode(getExitCode());
-    return String.format(message, messageArguments.toArray());
+    String format = lookupMessageForCode(getExitCode());
+    return String.format(format, messageArguments.toArray());
   }
 
   private String lookupMessageForCode(@SuppressWarnings("unused") ExitCode ignoredExitCode) {

@@ -2,11 +2,11 @@
 <!DOCTYPE Configuration>
 <Configuration verbose="true">
 	<Appenders>
-		<Console name="console-stdout-trace" target="SYSTEM_OUT" immediateFlush="true">
+		<Console name="console-trace" target="SYSTEM_ERR" immediateFlush="true">
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />
 			<ThresholdFilter level="INFO" onMatch="DENY" onMismatch="ACCEPT" />
 		</Console>
-		<Console name="console-stdout" target="SYSTEM_OUT" immediateFlush="true">
+		<Console name="console-info" target="SYSTEM_ERR" immediateFlush="true">
 			<PatternLayout pattern="%m%n" charset="UTF-8" />
 			<Filters>
 				<ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT" />
@@ -14,7 +14,7 @@
 				<ThresholdFilter level="TRACE" onMatch="DENY" onMismatch="NEUTRAL" />
 			</Filters>
 		</Console>
-		<Console name="console-stderr" target="SYSTEM_ERR" immediateFlush="true">
+		<Console name="console-error" target="SYSTEM_ERR" immediateFlush="true">
 <!--			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />-->
 			<PatternLayout pattern="%m%n" charset="UTF-8" />
 			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
@@ -22,9 +22,9 @@
 	</Appenders>
 	<Loggers>
 		<Root level="INFO">
-			<AppenderRef ref="console-stdout-trace" />
-			<AppenderRef ref="console-stdout" />
-			<AppenderRef ref="console-stderr" />
+			<AppenderRef ref="console-trace" />
+			<AppenderRef ref="console-info" />
+			<AppenderRef ref="console-error" />
 		</Root>
 	</Loggers>
 </Configuration>

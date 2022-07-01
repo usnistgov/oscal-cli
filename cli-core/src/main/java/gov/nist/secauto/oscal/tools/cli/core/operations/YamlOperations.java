@@ -38,13 +38,18 @@ import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
 public final class YamlOperations {
-  private static final Yaml YAML_PARSER
-      = new Yaml(new Constructor(), new Representer(), new DumperOptions(), new Resolver() {
+  private static final Yaml YAML_PARSER;
+  
+  static {
+    Constructor constructor = new Constructor();
+    Representer representer = new Representer();
+    YAML_PARSER = new Yaml(constructor, representer, new DumperOptions(), new Resolver() {
         @Override
         protected void addImplicitResolvers() {
           addImplicitResolver(Tag.BOOL, BOOL, "yYnNtTfFoO");
@@ -55,8 +60,9 @@ public final class YamlOperations {
           addImplicitResolver(Tag.NULL, EMPTY, null);
           // addImplicitResolver(Tag.TIMESTAMP, TIMESTAMP, "0123456789");
         }
-
+        
       });
+  }
 
   private YamlOperations() {
     // disable construction
@@ -65,7 +71,7 @@ public final class YamlOperations {
   @SuppressWarnings("unchecked")
   @NotNull
   public static Map<String, Object> parseYaml(Path target) throws IOException {
-    try (BufferedReader reader = Files.newBufferedReader(target)) {
+    try (BufferedReader reader = Files.newBufferedReader(target.toAbsolutePath(), StandardCharsets.UTF_8)) {
       return (Map<String, Object>) YAML_PARSER.load(reader);
     }
   }

@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
 import org.apache.commons.cli.Option;
@@ -39,6 +40,12 @@ public class InvalidArgumentException
   /** The option that had the invalid argument. */
   private Option option;
 
+  /**
+   * Generate a new exception.
+   * 
+   * @param message
+   *          the message
+   */
   public InvalidArgumentException(String message) {
     super(message);
   }

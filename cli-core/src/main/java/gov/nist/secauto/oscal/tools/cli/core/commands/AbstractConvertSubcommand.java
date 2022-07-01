@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
@@ -133,26 +134,24 @@ public abstract class AbstractConvertSubcommand
     Path destination;
     if (extraArgs.size() == 1) {
       destination = null;
-      // make quiet to avoid output noise, since redirection will be likely
-      CLIProcessor.handleQuiet();
     } else {
-      destination = Paths.get(extraArgs.get(1));
+      destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
     }
 
     if (destination != null) {
       if (Files.exists(destination)) {
         if (!context.getCmdLine().hasOption("overwrite")) {
-          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
               + "' already exists and the --overwrite option was not provided.");
         }
         if (!Files.isWritable(destination)) {
-          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination + "' is not writable.");
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
         try {
           Files.createDirectories(destination.getParent());
         } catch (IOException ex) {
-          return ExitCode.INVALID_TARGET.toExitStatus(ex.getMessage());
+          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
         }
       }
     }
@@ -161,12 +160,12 @@ public abstract class AbstractConvertSubcommand
     try {
       performConvert(source, destination, toFormat);
     } catch (IOException | BindingException | IllegalArgumentException ex) {
-      return ExitCode.FAIL.toExitStatus(ex.getMessage());
+      return ExitCode.FAIL.exit().withThrowable(ex);
     }
     if (destination != null && LOGGER.isInfoEnabled()) {
       LOGGER.info("Generated {} file: {}", toFormat.toString(), destination);
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 
   protected void performConvert(@NotNull Path source, @Nullable Path destination, @NotNull Format toFormat)

@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
@@ -54,6 +55,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -76,6 +78,7 @@ public class ResolveSubcommand
   static {
     List<ExtraArgument> args = new ArrayList<>(1);
     args.add(new DefaultExtraArgument("file to resolve", true));
+    args.add(new DefaultExtraArgument("destination file", false));
     EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
   }
 
@@ -86,10 +89,10 @@ public class ResolveSubcommand
 
   @Override
   public void gatherOptions(Options options) {
-    options.addOption(Option.builder()
-        .longOpt("as")
-        .hasArg().argName("FORMAT")
-        .desc("source format: xml, json, or yaml").build());
+//    options.addOption(Option.builder()
+//        .longOpt("as")
+//        .hasArg().argName("FORMAT")
+//        .desc("source format: xml, json, or yaml").build());
     options.addOption(Option.builder("t")
         .longOpt("to")
         .required()
@@ -129,7 +132,7 @@ public class ResolveSubcommand
     }
 
     List<String> extraArgs = context.getExtraArguments();
-    if (extraArgs.size() != 1) {
+    if (extraArgs.size() < 1) {
       throw new InvalidArgumentException("The source to resolve must be provided.");
     }
 
@@ -149,14 +152,15 @@ public class ResolveSubcommand
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
 
     Path source = Paths.get(extraArgs.get(0));
+
     Format asFormat;
     // attempt to determine the format
     if (context.getCmdLine().hasOption("as")) {
       try {
-        String toFormatText = context.getCmdLine().getOptionValue("as");
-        asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+        String asFormatText = context.getCmdLine().getOptionValue("as");
+        asFormat = Format.valueOf(asFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus("Invalid '--as' argument. The format must be one of: " + Format.values());
+        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values());
       }
     } else {
       // attempt to determine the format
@@ -164,25 +168,54 @@ public class ResolveSubcommand
         asFormat = Format.lookup(loader.detectFormat(source));
       } catch (FileNotFoundException ex) {
         // this case was already checked for
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source + "' does not exist.");
+        return ExitCode.INPUT_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
       } catch (IOException ex) {
-        return ExitCode.FAIL.toExitStatus(ex.getMessage());
+        return ExitCode.FAIL.exit().withThrowable(ex);
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus(
+        return ExitCode.FAIL.exitMessage(
             "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Format.values());
       }
     }
 
+    String toFormatText = context.getCmdLine().getOptionValue("to");
+    Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+
+    Path destination;
+    if (extraArgs.size() == 1) {
+      destination = null;
+    } else {
+      destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
+    }
+
+    if (destination != null) {
+      if (Files.exists(destination)) {
+        if (!context.getCmdLine().hasOption("overwrite")) {
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
+              + "' already exists and the --overwrite option was not provided.");
+        }
+        if (!Files.isWritable(destination)) {
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
+        }
+      } else {
+        try {
+          Files.createDirectories(destination.getParent());
+        } catch (IOException ex) {
+          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+        }
+      }
+    }
+    
     IDocumentNodeItem document;
     try {
+      // TODO: support as format
       document = loader.loadAsNodeItem(source);
     } catch (IOException ex) {
-      return ExitCode.INPUT_ERROR.toExitStatus(ex.getMessage());
+      return ExitCode.INPUT_ERROR.exit().withThrowable(ex);
     }
     Object object = document.getValue();
     if (object instanceof Catalog) {
-      return ExitCode.FAIL.toExitStatus("The target file is already a catalog");
+      return ExitCode.FAIL.exitMessage("The target file is already a catalog");
     } else if (object instanceof Profile) {
       StaticContext staticContext = new StaticContext();
       URI sourceUri = source.toUri();
@@ -197,13 +230,17 @@ public class ResolveSubcommand
       // validator.finalizeValidation();
 
       ISerializer<Catalog> serializer
-          = OscalBindingContext.instance().newSerializer(asFormat.getBindingFormat(), Catalog.class);
+          = OscalBindingContext.instance().newSerializer(toFormat.getBindingFormat(), Catalog.class);
       try {
-        serializer.serialize((Catalog) resolvedProfile.getValue(), System.out);
+        if (destination == null) {
+          serializer.serialize((Catalog) resolvedProfile.getValue(), System.out);
+        } else {
+          serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
+        }
       } catch (IOException ex) {
-        return ExitCode.FAIL.toExitStatus(ex.getMessage());
+        return ExitCode.FAIL.exit().withThrowable(ex);
       }
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 }

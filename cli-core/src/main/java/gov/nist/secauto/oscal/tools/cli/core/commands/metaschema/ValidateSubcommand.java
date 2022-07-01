@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
 import gov.nist.secauto.metaschema.model.MetaschemaLoader;
@@ -115,20 +116,20 @@ public class ValidateSubcommand
       List<Source> schemaSources = getXmlSchemaSources();
       schemaValidationResult = new XmlSchemaContentValidator(schemaSources).validate(target);
     } catch (IOException | SAXException ex) {
-      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
+      return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
     }
 
     if (!schemaValidationResult.isPassing()) {
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("The file '{}' has schema validation issue(s). The issues are:", target);
+      if (LOGGER.isErrorEnabled()) {
+        LOGGER.error("The file '{}' has schema validation issue(s). The issues are:", target);
       }
       LoggingValidationHandler.handleValidationResults(schemaValidationResult);
-      return ExitCode.FAIL.toExitStatus();
+      return ExitCode.FAIL.exit();
     }
 
     if (!context.getCmdLine().hasOption(CLIProcessor.QUIET_OPTION_LONG_NAME) && LOGGER.isInfoEnabled()) {
       LOGGER.info("The file '{}' is valid.", target);
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 }

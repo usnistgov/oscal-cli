@@ -144,26 +144,24 @@ public class GenerateSchemaSubcommand
     Path destination;
     if (extraArgs.size() == 1) {
       destination = null;
-      // make quiet to avoid output noise, since redirection will be likely
-      CLIProcessor.handleQuiet();
     } else {
-      destination = Paths.get(extraArgs.get(1));
+      destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
     }
 
     if (destination != null) {
       if (Files.exists(destination)) {
         if (!context.getCmdLine().hasOption("overwrite")) {
-          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
               + "' already exists and the --overwrite option was not provided.");
         }
         if (!Files.isWritable(destination)) {
-          return ExitCode.FAIL.toExitStatus("The provided destination '" + destination + "' is not writable.");
+          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
         try {
           Files.createDirectories(destination.getParent());
         } catch (IOException ex) {
-          return ExitCode.INVALID_TARGET.toExitStatus(ex.getMessage());
+          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
         }
       }
     }
@@ -185,12 +183,12 @@ public class GenerateSchemaSubcommand
     try {
       performGeneration(input, destination, asFormat, configuration);
     } catch (IOException | MetaschemaException ex) {
-      return ExitCode.FAIL.toExitStatus(ex.getMessage());
+      return ExitCode.FAIL.exit().withThrowable(ex);
     }
     if (destination != null && LOGGER.isInfoEnabled()) {
       LOGGER.info("Generated {} schema file: {}", asFormat.toString(), destination);
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 
   private void performGeneration(@NotNull Path metaschemaPath, @Nullable Path destination,

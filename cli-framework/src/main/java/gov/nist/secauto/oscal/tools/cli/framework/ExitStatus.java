@@ -23,17 +23,31 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-public interface ExitStatus {
-  String getMessage();
+import org.jetbrains.annotations.NotNull;
 
+public interface ExitStatus {
   /**
-   * Get the related status code for use with {@link System#exit(int)}.
-   * 
-   * @return the statusCode
+   * Get the exit code information associated with this exit status.
+   * @return the exit code information
    */
+  @NotNull
   ExitCode getExitCode();
 
-  boolean isError();
+  /**
+   * Process the exit status.
+   * 
+   * @return the exit code
+   */
+  int handle();
+
+  /**
+   * Associate a throwable with the exit status.
+   * @param throwable the throwable
+   * @return this exit status
+   */
+  @NotNull
+  ExitStatus withThrowable(@NotNull Throwable throwable);
 }

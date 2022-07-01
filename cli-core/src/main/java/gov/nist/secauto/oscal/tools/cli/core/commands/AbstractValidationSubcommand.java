@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
@@ -164,7 +165,7 @@ public abstract class AbstractValidationSubcommand
         try {
           constraintSets.add(constraintLoader.load(constraintPath));
         } catch (IOException | MetaschemaException ex) {
-          return ExitCode.FAIL.toExitStatus("Unable to load constraint set '" + arg + "'.");
+          return ExitCode.FAIL.exitMessage("Unable to load constraint set '" + arg + "'.").withThrowable(ex);
         }
       }
       bindingContext = new OscalBindingContext(constraintSets);
@@ -182,7 +183,7 @@ public abstract class AbstractValidationSubcommand
         String toFormatText = context.getCmdLine().getOptionValue("as");
         asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus("Invalid '--as' argument. The format must be one of: " + Format.values());
+        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values()).withThrowable(ex);
       }
     } else {
       // attempt to determine the format
@@ -190,11 +191,11 @@ public abstract class AbstractValidationSubcommand
         asFormat = Format.lookup(loader.detectFormat(source));
       } catch (FileNotFoundException ex) {
         // this case was already checked for
-        return ExitCode.INPUT_ERROR.toExitStatus("The provided source file '" + source + "' does not exist.");
+        return ExitCode.INPUT_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
       } catch (IOException ex) {
-        return ExitCode.FAIL.toExitStatus(ex.getMessage());
+        return ExitCode.FAIL.exit().withThrowable(ex);
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.toExitStatus(
+        return ExitCode.FAIL.exitMessage(
             "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Format.values());
       }
@@ -219,10 +220,10 @@ public abstract class AbstractValidationSubcommand
         }
         break;
       default:
-        return ExitCode.FAIL.toExitStatus("Unsupported format: " + asFormat.name());
+        return ExitCode.FAIL.exitMessage("Unsupported format: " + asFormat.name());
       }
     } catch (IOException | SAXException ex) {
-      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
+      return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
     }
 
     if (!schemaValidationResult.isPassing()) {
@@ -230,7 +231,7 @@ public abstract class AbstractValidationSubcommand
         LOGGER.info("The file '{}' has schema validation issue(s). The issues are:", source);
       }
       LoggingValidationHandler.handleValidationResults(schemaValidationResult);
-      return ExitCode.FAIL.toExitStatus();
+      return ExitCode.FAIL.exit();
     }
 
     // Validate after loading instead
@@ -251,16 +252,16 @@ public abstract class AbstractValidationSubcommand
         }
 
         LoggingValidationHandler.handleValidationResults(handler);
-        return ExitCode.FAIL.toExitStatus();
+        return ExitCode.FAIL.exit();
       }
     } catch (IOException ex) {
-      return ExitCode.PROCESSING_ERROR.toExitStatus(ex.getMessage());
+      return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
     }
 
     if (!context.getCmdLine().hasOption(CLIProcessor.QUIET_OPTION_LONG_NAME) && LOGGER.isInfoEnabled()) {
       LOGGER.info("The file '{}' is valid.", source);
     }
-    return ExitCode.OK.toExitStatus();
+    return ExitCode.OK.exit();
   }
 
   protected abstract InputStream getJsonSchema();

@@ -23,16 +23,24 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.framework;
+
+import org.jetbrains.annotations.NotNull;
 
 public class NonMessageExitStatus
     extends AbstractExitStatus {
-  public NonMessageExitStatus(ExitCode code) {
+
+  /**
+   * Construct a new message status.
+   */
+  NonMessageExitStatus(@NotNull ExitCode code) {
     super(code);
   }
 
   @Override
-  public String getMessage() {
+  protected String getMessage() {
+    // always null
     return null;
   }
 }
