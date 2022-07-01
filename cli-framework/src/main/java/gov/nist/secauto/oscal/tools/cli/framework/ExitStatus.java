@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ExitStatus {
   /**
    * Get the exit code information associated with this exit status.
+   * 
    * @return the exit code information
    */
   @NotNull
@@ -45,7 +46,9 @@ public interface ExitStatus {
 
   /**
    * Associate a throwable with the exit status.
-   * @param throwable the throwable
+   * 
+   * @param throwable
+   *          the throwable
    * @return this exit status
    */
   @NotNull

@@ -98,7 +98,7 @@ public abstract class AbstractRenderSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File destination = new File(extraArgs.get(1)); //.toAbsolutePath();
+    File destination = new File(extraArgs.get(1)); // .toAbsolutePath();
 
     if (destination.exists()) {
       if (!context.getCmdLine().hasOption("overwrite")) {
