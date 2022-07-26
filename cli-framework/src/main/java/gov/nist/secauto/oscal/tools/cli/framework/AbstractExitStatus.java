@@ -29,8 +29,10 @@ package gov.nist.secauto.oscal.tools.cli.framework;
 import org.apache.logging.log4j.LogBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class AbstractExitStatus implements ExitStatus {
   private static final Logger LOGGER = LogManager.getLogger(MessageExitStatus.class);
@@ -45,7 +47,7 @@ public abstract class AbstractExitStatus implements ExitStatus {
    * @param exitCode
    *          the exit code
    */
-  public AbstractExitStatus(@NotNull ExitCode exitCode) {
+  public AbstractExitStatus(@NonNull ExitCode exitCode) {
     this.exitCode = exitCode;
   }
 
@@ -59,13 +61,15 @@ public abstract class AbstractExitStatus implements ExitStatus {
    * 
    * @return the throwable or {@code null}
    */
-  @NotNull
+  @NonNull
   protected Throwable getThrowable() {
     return throwable;
   }
 
   @Override
-  public ExitStatus withThrowable(@NotNull Throwable throwable) {
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "intended as a exposed property")
+  public ExitStatus withThrowable(@NonNull Throwable throwable) {
+    this.throwable = throwable;
     return this;
   }
 
@@ -78,7 +82,7 @@ public abstract class AbstractExitStatus implements ExitStatus {
   protected abstract String getMessage();
 
   @Override
-  public int handle() {
+  public void generateMessage(boolean withThrowable) {
     LogBuilder logBuilder = null;
     if (ExitCode.OK.compareTo(getExitCode()) <= 0) {
       if (LOGGER.isInfoEnabled()) {
@@ -89,20 +93,21 @@ public abstract class AbstractExitStatus implements ExitStatus {
     }
 
     if (logBuilder != null) {
-      Throwable throwable = getThrowable();
-      if (throwable != null) {
-        logBuilder.withThrowable(throwable);
+      if (withThrowable) {
+        Throwable throwable = getThrowable();
+        if (throwable != null) {
+          logBuilder.withThrowable(throwable);
+        }
       }
 
       String message = getMessage();
       if (message != null && !message.isEmpty()) {
         logBuilder.log(message);
-      } else if (throwable != null) {
+      } else {
         // log the throwable
         logBuilder.log();
       }
     }
-    return getExitCode().getStatusCode();
   }
 
 }

@@ -26,7 +26,7 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-import org.jetbrains.annotations.NotNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public interface ExitStatus {
   /**
@@ -34,15 +34,14 @@ public interface ExitStatus {
    * 
    * @return the exit code information
    */
-  @NotNull
+  @NonNull
   ExitCode getExitCode();
 
   /**
    * Process the exit status.
-   * 
-   * @return the exit code
+   * @param withThrowable include information about any associated throwable
    */
-  int handle();
+  void generateMessage(boolean withThrowable);
 
   /**
    * Associate a throwable with the exit status.
@@ -51,6 +50,6 @@ public interface ExitStatus {
    *          the throwable
    * @return this exit status
    */
-  @NotNull
-  ExitStatus withThrowable(@NotNull Throwable throwable);
+  @NonNull
+  ExitStatus withThrowable(@NonNull Throwable throwable);
 }

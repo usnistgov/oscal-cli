@@ -55,6 +55,8 @@ import java.util.List;
 
 import javax.xml.transform.Source;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class ValidateSubcommand
     extends AbstractTerminalCommand {
   private static final Logger LOGGER = LogManager.getLogger(ValidateSubcommand.class);
@@ -78,6 +80,7 @@ public class ValidateSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }

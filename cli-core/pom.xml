@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
@@ -26,6 +28,12 @@
 			<groupId>gov.nist.secauto.metaschema</groupId>
 			<artifactId>metaschema-schema-generator</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+
 		<dependency>
 			<!-- For console log color -->
 			<groupId>org.fusesource.jansi</groupId>
@@ -42,6 +50,10 @@
 		<dependency>
 			<groupId>com.github.erosb</groupId>
 			<artifactId>everit-json-schema</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -190,21 +202,22 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.0.0</version>
 				<executions>
-				  <execution>
-					<id>third-party-license</id>
-					<goals>
-						<goal>add-third-party</goal>
-					  </goals>
-					<configuration>
-					  <outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
-					  <thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
-					  <licenseMerges>
-						<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
-					  </licenseMerges>
-					</configuration>
-				  </execution>
+					<execution>
+						<id>third-party-license</id>
+						<goals>
+							<goal>add-third-party</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
+							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
+							<licenseMerges>
+								<licenseMerge>The Apache Software License, Version 2.0|Apache
+									License, Version 2.0|Apache Public License 2.0</licenseMerge>
+							</licenseMerges>
+						</configuration>
+					</execution>
 				</executions>
-			  </plugin>
+			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -42,8 +42,8 @@ public class ValidateSubcommand
     extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Check that the specified OSCAL Plan of Actions and Milestones (POA&M) is well-formed"
-        + " and valid to the POA&M model.";
+    return "Check that the specified OSCAL instance is well-formed"
+        + " and valid to the Plan of Actions and Milestones model.";
   }
 
   @Override

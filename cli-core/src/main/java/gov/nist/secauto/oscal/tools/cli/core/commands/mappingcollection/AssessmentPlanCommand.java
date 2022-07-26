@@ -24,25 +24,28 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan;
+package gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection;
 
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractRenderSubcommand;
-import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
+import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-import java.io.File;
-import java.io.IOException;
+public class AssessmentPlanCommand
+    extends AbstractParentCommand {
+  private static final String COMMAND = "mapping-collection";
 
-import javax.xml.transform.TransformerException;
-
-public class RenderSubcommand
-    extends AbstractRenderSubcommand {
-  @Override
-  public String getDescription() {
-    return "Render the specified OSCAL Assessment Plan as HTML";
+  public AssessmentPlanCommand() {
+    super();
+    addCommandHandler(new ValidateSubcommand());
+    // addCommandHandler(new RenderSubcommand());
+    addCommandHandler(new ConvertSubcommand());
   }
 
   @Override
-  protected void performRender(File input, File result) throws IOException, TransformerException {
-    XMLOperations.renderProfileHTML(input, result);
+  public String getName() {
+    return COMMAND;
+  }
+
+  @Override
+  public String getDescription() {
+    return "Perform an operation on an OSCAL Assessment Plan";
   }
 }

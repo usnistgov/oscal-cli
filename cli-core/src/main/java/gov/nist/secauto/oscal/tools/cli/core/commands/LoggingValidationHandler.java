@@ -40,8 +40,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Color;
-import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXParseException;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public final class LoggingValidationHandler {
   private static final Logger LOGGER = LogManager.getLogger(LoggingValidationHandler.class);
@@ -66,7 +67,7 @@ public final class LoggingValidationHandler {
     return result.isPassing();
   }
 
-  public static void handleJsonValidationFinding(@NotNull JsonValidationFinding finding) {
+  public static void handleJsonValidationFinding(@NonNull JsonValidationFinding finding) {
     Ansi ansi = generatePreamble(finding.getSeverity());
 
     getLogger(finding).log(
@@ -92,15 +93,15 @@ public final class LoggingValidationHandler {
             ex.getColumnNumber()));
   }
 
-  public static void handleConstraintValidationFinding(@NotNull ConstraintValidationFinding finding) {
+  public static void handleConstraintValidationFinding(@NonNull ConstraintValidationFinding finding) {
     Ansi ansi = generatePreamble(finding.getSeverity());
 
     getLogger(finding).log(
         ansi.format("[%s] %s", finding.getNode().getMetapath(), finding.getMessage()));
   }
 
-  @NotNull
-  private static LogBuilder getLogger(@NotNull IValidationFinding finding) {
+  @NonNull
+  private static LogBuilder getLogger(@NonNull IValidationFinding finding) {
     LogBuilder retval;
     switch (finding.getSeverity()) {
     case CRITICAL:
@@ -126,8 +127,8 @@ public final class LoggingValidationHandler {
     return retval;
   }
 
-  @NotNull
-  private static Ansi generatePreamble(@NotNull Level level) {
+  @NonNull
+  private static Ansi generatePreamble(@NonNull Level level) {
     Ansi ansi = ansi().fgBright(Color.WHITE).a('[').reset();
 
     switch (level) {

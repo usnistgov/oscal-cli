@@ -46,8 +46,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,6 +56,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class AbstractConvertSubcommand
     extends AbstractTerminalCommand {
@@ -92,6 +94,7 @@ public abstract class AbstractConvertSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
@@ -148,10 +151,13 @@ public abstract class AbstractConvertSubcommand
           return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
-        try {
-          Files.createDirectories(destination.getParent());
-        } catch (IOException ex) {
-          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+        Path parent = destination.getParent();
+        if (parent != null) {
+          try {
+            Files.createDirectories(parent);
+          } catch (IOException ex) {
+            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+          }
         }
       }
     }
@@ -168,7 +174,7 @@ public abstract class AbstractConvertSubcommand
     return ExitCode.OK.exit();
   }
 
-  protected void performConvert(@NotNull Path source, @Nullable Path destination, @NotNull Format toFormat)
+  protected void performConvert(@NonNull Path source, @Nullable Path destination, @NonNull Format toFormat)
       throws BindingException, FileNotFoundException, IOException {
     IBindingContext context = OscalBindingContext.instance();
     IBoundLoader loader = context.newBoundLoader();
@@ -184,12 +190,12 @@ public abstract class AbstractConvertSubcommand
   }
 
   protected <CLASS> void convert(
-      @NotNull Path source,
+      @NonNull Path source,
       @Nullable Path destination,
-      @NotNull Format fromFormat,
-      @NotNull Format toFormat,
-      @NotNull Class<CLASS> rootClass,
-      @NotNull IBindingContext context) throws FileNotFoundException, IOException {
+      @NonNull Format fromFormat,
+      @NonNull Format toFormat,
+      @NonNull Class<CLASS> rootClass,
+      @NonNull IBindingContext context) throws FileNotFoundException, IOException {
     IDeserializer<CLASS> deserializer = context.newDeserializer(fromFormat.getBindingFormat(), rootClass);
 
     CLASS object = deserializer.deserialize(source);
