@@ -42,7 +42,7 @@ public class ValidateSubcommand
     extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Check that the specified OSCAL Component Definition (CDEF) is well-formed and valid to the CDEF model.";
+    return "Check that the specified OSCAL instance is well-formed and valid to the Component Definition model.";
   }
 
   @Override

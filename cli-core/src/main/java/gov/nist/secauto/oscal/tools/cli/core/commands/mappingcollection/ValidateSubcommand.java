@@ -24,25 +24,37 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.ssp;
+package gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection;
 
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractRenderSubcommand;
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractValidationSubcommand;
 import gov.nist.secauto.oscal.tools.cli.core.operations.XMLOperations;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.Source;
 
-public class RenderSubcommand
-    extends AbstractRenderSubcommand {
+public class ValidateSubcommand
+    extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Render the specified OSCAL System Security Plan as HTML";
+    return "Check that the specified OSCAL instance is well-formed and valid to the Mapping Collection model.";
   }
 
   @Override
-  protected void performRender(File input, File result) throws IOException, TransformerException {
-    XMLOperations.renderProfileHTML(input, result);
+  protected List<Source> getXmlSchemaSources() throws IOException {
+    List<Source> retval = new LinkedList<>();
+    retval.add(XMLOperations
+        .getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_mapping_schema.xsd")));
+    return Collections.unmodifiableList(retval);
+  }
+
+  @Override
+  protected InputStream getJsonSchema() {
+    return OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_mapping_schema.json");
   }
 }

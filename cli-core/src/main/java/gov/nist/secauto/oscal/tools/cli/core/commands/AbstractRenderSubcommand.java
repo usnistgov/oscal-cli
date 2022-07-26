@@ -42,11 +42,16 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class AbstractRenderSubcommand
     extends AbstractTerminalCommand {
@@ -74,6 +79,7 @@ public abstract class AbstractRenderSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
@@ -98,19 +104,19 @@ public abstract class AbstractRenderSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    File destination = new File(extraArgs.get(1)); // .toAbsolutePath();
+    Path destination = resolvePathAgainstCWD(Paths.get(extraArgs.get(1))); // .toAbsolutePath();
 
-    if (destination.exists()) {
+    if (Files.exists(destination)) {
       if (!context.getCmdLine().hasOption("overwrite")) {
-        return ExitCode.FAIL.exitMessage("The provided destination '" + destination.getPath()
+        return ExitCode.FAIL.exitMessage("The provided destination '" + destination
             + "' already exists and the --overwrite option was not provided.");
       }
-      if (!destination.canWrite()) {
-        return ExitCode.FAIL.exitMessage("The provided destination '" + destination.getPath() + "' is not writable.");
+      if (!Files.isWritable(destination)) {
+        return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
       }
     }
 
-    File input = new File(extraArgs.get(0));
+    Path input = resolvePathAgainstCWD(Paths.get(extraArgs.get(0)));
     try {
       performRender(input, destination);
     } catch (IOException | TransformerException ex) {
@@ -118,10 +124,10 @@ public abstract class AbstractRenderSubcommand
     }
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Generated HTML file: " + destination.getPath());
+      LOGGER.info("Generated HTML file: " + destination.toString());
     }
     return ExitCode.OK.exit();
   }
 
-  protected abstract void performRender(File input, File result) throws IOException, TransformerException;
+  protected abstract void performRender(Path input, Path result) throws IOException, TransformerException;
 }

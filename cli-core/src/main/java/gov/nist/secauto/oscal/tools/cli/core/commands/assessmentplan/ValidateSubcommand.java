@@ -42,7 +42,7 @@ public class ValidateSubcommand
     extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Check that the specified OSCAL System Assessment Plan (SAP) is well-formed and valid to the SAP model.";
+    return "Check that the specified OSCAL instance is well-formed and valid to the System Assessment Plan model.";
   }
 
   @Override

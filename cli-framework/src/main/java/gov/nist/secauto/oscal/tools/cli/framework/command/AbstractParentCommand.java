@@ -63,14 +63,6 @@ public abstract class AbstractParentCommand implements Command {
   @SuppressWarnings("PMD")
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
-    StringBuilder builder = new StringBuilder();
-    builder.append(processor.getExec());
-
-    for (Command handler : context.getCallingCommands()) {
-      builder.append(' ');
-      builder.append(handler.getName());
-    }
-
     if (context.getExtraArguments().size() != getExtraArguments().size()) {
       return ExitCode.INVALID_COMMAND
           .exitMessage("Unhandled arguments: " + context.getExtraArguments().stream().collect(Collectors.joining(" ")));

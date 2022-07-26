@@ -26,8 +26,12 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework.command;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public abstract class AbstractTerminalCommand implements Command {
 
@@ -39,5 +43,9 @@ public abstract class AbstractTerminalCommand implements Command {
   @Override
   public boolean isSubCommandRequired() {
     return false;
+  }
+  
+  protected static Path resolvePathAgainstCWD(@NonNull Path path) {
+    return Paths.get("").toAbsolutePath().resolve(path).normalize();
   }
 }

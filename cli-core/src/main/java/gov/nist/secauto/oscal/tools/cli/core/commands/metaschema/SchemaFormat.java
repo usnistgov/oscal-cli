@@ -28,11 +28,11 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
 public enum SchemaFormat {
   /**
-   * JSON Schema
+   * a JSON Schema.
    */
   JSON,
   /**
-   * XML Schema
+   * an XML Schema.
    */
   XML;
 }

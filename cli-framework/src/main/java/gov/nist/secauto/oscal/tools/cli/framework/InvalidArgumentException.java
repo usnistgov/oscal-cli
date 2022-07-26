@@ -29,6 +29,9 @@ package gov.nist.secauto.oscal.tools.cli.framework;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class InvalidArgumentException
     extends ParseException {
 
@@ -54,8 +57,8 @@ public class InvalidArgumentException
    * Return the option requiring an argument that wasn't provided on the command line.
    *
    * @return the related option
-   * @since 1.2
    */
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "intended to expose option for error handling")
   public Option getOption() {
     return option;
   }
@@ -66,7 +69,8 @@ public class InvalidArgumentException
    * @param option
    *          the option to set
    */
-  public void setOption(Option option) {
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "intended to expose option for error handling")
+  public void setOption(@NonNull Option option) {
     this.option = option;
   }
 }
