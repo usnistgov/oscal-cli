@@ -26,7 +26,7 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-import org.jetbrains.annotations.NotNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public enum ExitCode {
   OK(0),
@@ -77,7 +77,7 @@ public enum ExitCode {
    * 
    * @return the exit status
    */
-  public ExitStatus exitMessage(@NotNull Object... messageArguments) {
+  public ExitStatus exitMessage(@NonNull Object... messageArguments) {
     return new MessageExitStatus(this, messageArguments);
   }
 }

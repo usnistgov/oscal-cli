@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -11,7 +12,7 @@
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-parent</artifactId>
 	<version>0.2.0-SNAPSHOT</version>
-	
+
 	<packaging>pom</packaging>
 
 	<name>OSCAL CLI</name>
@@ -26,72 +27,72 @@
 		<url>https://github.com/usnistgov/oscal-cli/tree/main</url>
 		<connection>scm:git:git@github.com/usnistgov/oscal-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:usnistgov/oscal-cli.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
-  <distributionManagement>
-	<snapshotRepository>
-		<id>ossrh</id>
-		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-	</snapshotRepository>
-	<site>
-		<id>nist-pages</id>
-		<url>${site.url}</url>
-	</site>
-</distributionManagement>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>nist-pages</id>
+			<url>${site.url}</url>
+		</site>
+	</distributionManagement>
 
-<licenses>
-	<license>
-		<name>NIST License</name>
-		<url>https://www.nist.gov/director/licensing</url>
-		<distribution>repo</distribution>
-		<comments>NIST software License</comments>
-	</license>
-</licenses>
+	<licenses>
+		<license>
+			<name>NIST License</name>
+			<url>https://www.nist.gov/director/licensing</url>
+			<distribution>repo</distribution>
+			<comments>NIST software License</comments>
+		</license>
+	</licenses>
 
-<organization>
-	<name>National Institute of Standards and Technology</name>
-	<url>https://www.nist.gov</url>
-</organization>
+	<organization>
+		<name>National Institute of Standards and Technology</name>
+		<url>https://www.nist.gov</url>
+	</organization>
 
-<developers>
-	<developer>
-		<id>david.waltermire@nist.gov</id>
-		<name>David Waltermire</name>
-		<email>david.waltermire@nist.gov</email>
-		<organization>National Institute of Standards and Technology</organization>
-		<roles>
-			<role>architect</role>
-			<role>developer</role>
-			<role>maintainer</role>
-		</roles>
-	</developer>
-</developers>
+	<developers>
+		<developer>
+			<id>david.waltermire@nist.gov</id>
+			<name>David Waltermire</name>
+			<email>david.waltermire@nist.gov</email>
+			<organization>National Institute of Standards and Technology</organization>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+	</developers>
 
-<mailingLists>
-	<mailingList>
-		<name>OSCAL NIST Team</name>
-		<post>oscal@nist.gov</post>
-	</mailingList>
-	<mailingList>
-		<name>OSCAL Project Development Discussion</name>
-		<post>oscal-dev@nist.gov</post>
-		<subscribe>oscal-dev-join@nist.gov</subscribe>
-		<unsubscribe>oscal-dev-leave@nist.gov</unsubscribe>
-	</mailingList>
-	<mailingList>
-		<name>OSCAL Project Updates</name>
-		<subscribe>oscal-updates-join@nist.gov</subscribe>
-		<unsubscribe>oscal-updates-leave@nist.gov</unsubscribe>
-	</mailingList>
-</mailingLists>
+	<mailingLists>
+		<mailingList>
+			<name>OSCAL NIST Team</name>
+			<post>oscal@nist.gov</post>
+		</mailingList>
+		<mailingList>
+			<name>OSCAL Project Development Discussion</name>
+			<post>oscal-dev@nist.gov</post>
+			<subscribe>oscal-dev-join@nist.gov</subscribe>
+			<unsubscribe>oscal-dev-leave@nist.gov</unsubscribe>
+		</mailingList>
+		<mailingList>
+			<name>OSCAL Project Updates</name>
+			<subscribe>oscal-updates-join@nist.gov</subscribe>
+			<unsubscribe>oscal-updates-leave@nist.gov</unsubscribe>
+		</mailingList>
+	</mailingLists>
 
 	<properties>
-				<!-- site configuration -->
-				<site.url>https://pages.nist.gov/metaschema-java/</site.url>
-				<scm.url>https://github.com/usnistgov/metaschema-java</scm.url>
-				<issueManagement.url>https://github.com/usnistgov/metaschema-java/issues</issueManagement.url>
-				<anchorJsVesrion>3.2.2</anchorJsVesrion>
+		<!-- site configuration -->
+		<site.url>https://pages.nist.gov/metaschema-java/</site.url>
+		<scm.url>https://github.com/usnistgov/metaschema-java</scm.url>
+		<issueManagement.url>https://github.com/usnistgov/metaschema-java/issues</issueManagement.url>
+		<anchorJsVesrion>3.2.2</anchorJsVesrion>
 		<bootstrapVersion>4.4.1</bootstrapVersion>
 		<bootswatchVersion>4.4.1</bootswatchVersion>
 		<highlightJsVersion>9.15.7</highlightJsVersion>
@@ -112,11 +113,13 @@
 		<dependency.everit-json.version>1.14.1</dependency.everit-json.version>
 		<dependency.jetbrains-annotation.version>23.0.0</dependency.jetbrains-annotation.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.liboscal-java.version>1.0.4.1</dependency.liboscal-java.version>
+		<dependency.liboscal-java.version>1.0.4.2-SNAPSHOT</dependency.liboscal-java.version>
 		<dependency.log4j2.version>2.18.0</dependency.log4j2.version>
-		<dependency.metaschema-framework.version>0.8.1</dependency.metaschema-framework.version>
+		<dependency.metaschema-framework.version>0.9.0-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.spotbugs-annotations.version>4.2.0</dependency.spotbugs-annotations.version>
 
 		<plugin.license.version>4.2.rc3</plugin.license.version>
+		<spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
 	</properties>
 
 	<repositories>
@@ -166,10 +169,11 @@
 				<version>${dependency.metaschema-framework.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jetbrains</groupId>
-				<artifactId>annotations</artifactId>
-				<version>${dependency.jetbrains-annotation.version}</version>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-annotations</artifactId>
+				<version>${dependency.spotbugs-annotations.version}</version>
 				<scope>provided</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<!-- For console log color -->
@@ -192,14 +196,19 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${dependency.commons-io.version}</version>
-			</dependency> <!-- <dependency> <groupId>org.jline</groupId> <artifactId>jline-terminal-jansi</artifactId> 
-				<version>${dependency.jline.version}</version> </dependency> -->
+			</dependency> <!-- <dependency> <groupId>org.jline</groupId> <artifactId>jline-terminal-jansi</artifactId> <version>${dependency.jline.version}</version> 
+				</dependency> -->
 			<dependency>
 				<groupId>com.github.erosb</groupId>
 				<artifactId>everit-json-schema</artifactId>
 				<version>${dependency.everit-json.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${dependency.log4j2.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-core</artifactId>
@@ -220,50 +229,50 @@
 					<artifactId>download-maven-plugin</artifactId>
 					<version>1.6.8</version>
 				</plugin>
-			<plugin>
-				<groupId>com.mycila</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>${plugin.license.version}</version>
-				<configuration>
-					<licenseSets>
-						<licenseSet>
-							<header>license/nist/license.txt</header>
-							<includes>
-								<include>src/**/*.java</include>
-							</includes>
-						</licenseSet>
-					</licenseSets>
-					<failIfMissing>true</failIfMissing>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<configuration>
-					<topSiteURL>${site.url}</topSiteURL>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<forkCount>1.5C</forkCount>
-					<reuseForks>true</reuseForks>
-					<argLine>-Xmx1024m</argLine>
-					<excludedEnvironmentVariables>
-						<excludedEnvironmentVariable>JAVA_TOOL_OPTIONS</excludedEnvironmentVariable>
-					</excludedEnvironmentVariables>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<failOnWarnings>false</failOnWarnings>
-				</configuration>
-			</plugin>
-		</plugins>
-	</pluginManagement>
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${plugin.license.version}</version>
+					<configuration>
+						<licenseSets>
+							<licenseSet>
+								<header>license/nist/license.txt</header>
+								<includes>
+									<include>src/**/*.java</include>
+								</includes>
+							</licenseSet>
+						</licenseSets>
+						<failIfMissing>true</failIfMissing>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<configuration>
+						<topSiteURL>${site.url}</topSiteURL>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<forkCount>1.5C</forkCount>
+						<reuseForks>true</reuseForks>
+						<argLine>-Xmx1024m</argLine>
+						<excludedEnvironmentVariables>
+							<excludedEnvironmentVariable>JAVA_TOOL_OPTIONS</excludedEnvironmentVariable>
+						</excludedEnvironmentVariables>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<failOnWarnings>false</failOnWarnings>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -333,8 +342,7 @@
 								<configuration>
 									<fail>true</fail>
 									<rules>
-										<!-- <reactorModuleConvergence> <ignoreModuleDependencies>true</ignoreModuleDependencies> 
-											</reactorModuleConvergence> -->
+										<!-- <reactorModuleConvergence> <ignoreModuleDependencies>true</ignoreModuleDependencies> </reactorModuleConvergence> -->
 										<banDuplicateClasses>
 											<scopes>
 												<scope>compile</scope>
@@ -436,7 +444,7 @@
 			</build>
 		</profile>
 	</profiles>
-  
+
 	<modules>
 		<module>cli-framework</module>
 		<module>cli-core</module>

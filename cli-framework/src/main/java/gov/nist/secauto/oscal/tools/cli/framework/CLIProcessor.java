@@ -47,10 +47,10 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.AnsiPrintStream;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,6 +60,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 // TODO: remove oscal specific strings
 public class CLIProcessor {
@@ -118,7 +121,7 @@ public class CLIProcessor {
    */
   public int process(String... args) {
     ExitStatus status = parseCommand(args);
-    return status.handle();
+    return status.getExitCode().getStatusCode();
   }
 
   private ExitStatus parseCommand(String... args) {
@@ -162,9 +165,12 @@ public class CLIProcessor {
     CommandResult commandResult = resolveCommand(commandArgs, commandCollection);
 
     ExitStatus retval;
+    boolean showStackTrace = false;
     if (commandResult.getCommands().isEmpty()) {
       Options options = newOptionsInstance();
       options.addOption(Option.builder().longOpt("version").desc("display the application version").build());
+      options.addOption(Option.builder().longOpt("show-stack-trace")
+          .desc("display the stack trace associated with an error").build());
 
       CommandLineParser parser = new DefaultParser();
       try {
@@ -175,6 +181,10 @@ public class CLIProcessor {
 
         if (cmdLine.hasOption(QUIET_OPTION_LONG_NAME)) {
           handleQuiet();
+        }
+
+        if (cmdLine.hasOption("show-stack-trace")) {
+          showStackTrace = true;
         }
 
         if (cmdLine.hasOption("version")) {
@@ -193,6 +203,7 @@ public class CLIProcessor {
     } else {
       retval = invokeCommand(commandResult);
     }
+    retval.generateMessage(showStackTrace);
     return retval;
   }
 
@@ -266,7 +277,7 @@ public class CLIProcessor {
     AnsiPrintStream out = AnsiConsole.out();
     int terminalWidth = Math.max(out.getTerminalWidth(), 40);
 
-    PrintWriter writer = new PrintWriter(out); // NOPMD - not owned
+    PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD - not owned
     formatter.printHelp(
         writer,
         terminalWidth,
@@ -366,55 +377,58 @@ public class CLIProcessor {
     return new CommandResult(currentCollection, commands, options, extraArgs);
   }
 
-  public class CommandResult { // NOPMD - is a data class
-    @NotNull
-    private final List<@NotNull String> options;
-    @NotNull
-    private final List<@NotNull Command> commands;
-    @NotNull
-    private final List<@NotNull String> extraArgs;
-    @NotNull
+  public static class CommandResult { // NOPMD - is a data class
+    @NonNull
+    private final List<String> options;
+    @NonNull
+    private final List<Command> commands;
+    @NonNull
+    private final List<String> extraArgs;
+    @NonNull
     private final CommandCollection targetCommand;
 
-    public CommandResult(@NotNull CommandCollection targetCommand) {
+    public CommandResult(@NonNull CommandCollection targetCommand) {
       this(targetCommand, Collections.emptyList());
     }
 
-    public CommandResult(@NotNull CommandCollection targetCommand, @NotNull List<Command> commands) {
+    public CommandResult(@NonNull CommandCollection targetCommand, @NonNull List<Command> commands) {
       this(targetCommand, commands, Collections.emptyList(), Collections.emptyList());
     }
 
     public CommandResult(
-        @NotNull CommandCollection targetCommand,
-        @NotNull List<@NotNull Command> commands,
-        @NotNull List<@NotNull String> options,
-        @NotNull List<@NotNull String> extraArgs) {
+        @NonNull CommandCollection targetCommand,
+        @NonNull List<Command> commands,
+        @NonNull List<String> options,
+        @NonNull List<String> extraArgs) {
       this.targetCommand = targetCommand;
-      this.commands = commands;
-      this.options = options;
-      this.extraArgs = extraArgs;
+      this.commands = Collections.unmodifiableList(commands);
+      this.options = Collections.unmodifiableList(options);
+      this.extraArgs = Collections.unmodifiableList(extraArgs);
     }
 
     public CommandCollection getTargetCommand() {
       return targetCommand;
     }
 
-    @NotNull
-    public List<@NotNull String> getOptions() {
+    @NonNull
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "list and item are unmutable")
+    public List<String> getOptions() {
       return options;
     }
 
-    @NotNull
-    public List<@NotNull Command> getCommands() {
+    @NonNull
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "list and item are unmutable")
+    public List<Command> getCommands() {
       return commands;
     }
 
-    @NotNull
-    public List<@NotNull String> getExtraArgs() {
+    @NonNull
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "list and item are unmutable")
+    public List<String> getExtraArgs() {
       return extraArgs;
     }
 
-    @NotNull
+    @NonNull
     public String[] getArgArray() {
       return Stream.concat(options.stream(), extraArgs.stream()).toArray(size -> new String[size]);
     }

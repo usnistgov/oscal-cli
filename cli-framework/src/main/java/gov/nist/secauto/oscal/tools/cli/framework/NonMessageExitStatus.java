@@ -26,7 +26,7 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-import org.jetbrains.annotations.NotNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class NonMessageExitStatus
     extends AbstractExitStatus {
@@ -34,7 +34,7 @@ public class NonMessageExitStatus
   /**
    * Construct a new message status.
    */
-  NonMessageExitStatus(@NotNull ExitCode code) {
+  NonMessageExitStatus(@NonNull ExitCode code) {
     super(code);
   }
 

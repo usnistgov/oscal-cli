@@ -36,19 +36,17 @@ import gov.nist.secauto.oscal.tools.cli.core.commands.profile.ProfileCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.ssp.SystemSecurityPlanCommand;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 
-import java.io.IOException;
-
 public class CLI { // NOPMD - intentional
 
   private final CLIProcessor cliProcessor;
 
-  public static void main(String... args) throws IOException {
+  public static void main(String... args) {
     System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
     int exitCode = new CLI().parse(args);
     System.exit(exitCode);
   }
 
-  public CLI() throws IOException {
+  public CLI() {
     this.cliProcessor = new CLIProcessor("oscal-cli", new Version());
     cliProcessor.addCommandHandler(new CatalogCommand());
     cliProcessor.addCommandHandler(new ProfileCommand());

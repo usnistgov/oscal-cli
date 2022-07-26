@@ -74,6 +74,8 @@ import java.util.Set;
 
 import javax.xml.transform.Source;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public abstract class AbstractValidationSubcommand
     extends AbstractTerminalCommand {
   private static final Logger LOGGER = LogManager.getLogger(AbstractValidationSubcommand.class);
@@ -100,6 +102,7 @@ public abstract class AbstractValidationSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
@@ -176,14 +179,18 @@ public abstract class AbstractValidationSubcommand
     IBoundLoader loader = bindingContext.newBoundLoader();
 
     List<String> extraArgs = context.getExtraArguments();
-    Path source = Paths.get(extraArgs.get(0));
+    Path source = resolvePathAgainstCWD(Paths.get(extraArgs.get(0)));
     Format asFormat;
     if (context.getCmdLine().hasOption("as")) {
       try {
         String toFormatText = context.getCmdLine().getOptionValue("as");
         asFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values())
+        return ExitCode.FAIL
+            .exitMessage("Invalid '--as' argument. The format must be one of: "
+                + Arrays.stream(Format.values())
+                    .map(format -> format.name())
+                    .collect(CustomCollectors.joiningWithOxfordComma("or")))
             .withThrowable(ex);
       }
     } else {
@@ -198,7 +205,9 @@ public abstract class AbstractValidationSubcommand
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL.exitMessage(
             "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-                + Format.values());
+                + Arrays.stream(Format.values())
+                    .map(format -> format.name())
+                    .collect(CustomCollectors.joiningWithOxfordComma("or")));
       }
     }
 
@@ -244,7 +253,7 @@ public abstract class AbstractValidationSubcommand
 
     try {
       IDocumentNodeItem nodeItem = loader.loadAsNodeItem(source);
-      validator.visit(nodeItem);
+      validator.validate(nodeItem);
       validator.finalizeValidation();
 
       if (!handler.isPassing()) {

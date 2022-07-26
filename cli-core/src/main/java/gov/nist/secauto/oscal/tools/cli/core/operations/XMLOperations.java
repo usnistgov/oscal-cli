@@ -28,6 +28,9 @@ package gov.nist.secauto.oscal.tools.cli.core.operations;
 
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -40,11 +43,12 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 public final class XMLOperations {
+  private static final Logger LOGGER = LogManager.getLogger(XMLOperations.class);
+
   private XMLOperations() {
     // disable construction
   }
 
-  // private static final Logger log = LogManager.getLogger(XMLOperations.class);
   public static Source getStreamSource(URL url) throws IOException {
     return new StreamSource(url.openStream(), url.toString());
   }
@@ -71,7 +75,9 @@ public final class XMLOperations {
           XMLOperations.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
       transformer.transform(new StreamSource(temp), new StreamResult(result));
     } finally {
-      temp.delete();
+      if (!temp.delete()) {
+        LOGGER.atError().log("failed to delete file: {}", temp);
+      }
     }
 
     // TransformerHandler resolverHandler = transfomerFactory.newTransformerHandler(resolver);

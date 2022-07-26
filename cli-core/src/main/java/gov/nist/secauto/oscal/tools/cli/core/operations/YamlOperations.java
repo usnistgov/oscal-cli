@@ -26,7 +26,6 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.operations;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;
@@ -42,6 +41,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public final class YamlOperations {
   private static final Yaml YAML_PARSER;
@@ -69,14 +70,14 @@ public final class YamlOperations {
   }
 
   @SuppressWarnings("unchecked")
-  @NotNull
+  @NonNull
   public static Map<String, Object> parseYaml(Path target) throws IOException {
     try (BufferedReader reader = Files.newBufferedReader(target.toAbsolutePath(), StandardCharsets.UTF_8)) {
       return (Map<String, Object>) YAML_PARSER.load(reader);
     }
   }
 
-  public static JSONObject yamlToJson(@NotNull Map<String, Object> map) throws JSONException {
+  public static JSONObject yamlToJson(@NonNull Map<String, Object> map) throws JSONException {
     return new JSONObject(map);
   }
 }

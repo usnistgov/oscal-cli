@@ -32,12 +32,15 @@ import org.apache.commons.cli.Options;
 import java.util.Collections;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class CommandContext {
   private final List<Command> callingCommands;
   private final List<String> extraArgs;
   private final Options options;
   private final CommandLine cmdLine;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "class is data holder")
   public CommandContext(List<Command> callingCommands, Options options, CommandLine cmdLine) {
     this.callingCommands = callingCommands;
     this.extraArgs = Collections.unmodifiableList(cmdLine.getArgList());
@@ -49,6 +52,7 @@ public class CommandContext {
     return Collections.unmodifiableList(callingCommands);
   }
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "list and item are unmutable")
   public List<String> getExtraArguments() {
     return extraArgs;
   }
@@ -57,6 +61,7 @@ public class CommandContext {
     return options;
   }
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "can't clone due to performance")
   public CommandLine getCmdLine() {
     return cmdLine;
   }

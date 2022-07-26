@@ -26,11 +26,11 @@
 
 package gov.nist.secauto.oscal.tools.cli.framework;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class MessageExitStatus
     extends AbstractExitStatus {
@@ -44,7 +44,7 @@ public class MessageExitStatus
    * @param messageArguments
    *          the arguments that can be passed to a formatted string to generate the message
    */
-  public MessageExitStatus(@NotNull ExitCode code, @NotNull Object... messageArguments) {
+  public MessageExitStatus(@NonNull ExitCode code, @NonNull Object... messageArguments) {
     super(code);
     if (messageArguments == null || messageArguments.length == 0) {
       this.messageArguments = Collections.emptyList();

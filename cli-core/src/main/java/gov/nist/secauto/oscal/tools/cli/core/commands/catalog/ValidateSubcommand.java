@@ -42,7 +42,7 @@ public class ValidateSubcommand
     extends AbstractValidationSubcommand {
   @Override
   public String getDescription() {
-    return "Check that the specified OSCAL Catalog is well-formed and valid to the Catalog model.";
+    return "Check that the specified OSCAL instance is well-formed and valid to the Catalog model.";
   }
 
   @Override

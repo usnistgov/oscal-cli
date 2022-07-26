@@ -26,6 +26,7 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
+import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
 import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
@@ -33,9 +34,10 @@ import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
 import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
 import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
-import gov.nist.secauto.oscal.lib.metapath.function.library.ResolveProfile;
 import gov.nist.secauto.oscal.lib.model.Catalog;
 import gov.nist.secauto.oscal.lib.model.Profile;
+import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;
+import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolver;
 import gov.nist.secauto.oscal.tools.cli.core.commands.Format;
 import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
@@ -48,8 +50,6 @@ import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,6 +64,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class ResolveSubcommand
     extends AbstractTerminalCommand {
   @Override
@@ -71,7 +73,6 @@ public class ResolveSubcommand
     return "Resolve the specified OSCAL Profile";
   }
 
-  private static final Logger LOGGER = LogManager.getLogger(ResolveSubcommand.class);
   private static final String COMMAND = "resolve";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
 
@@ -101,6 +102,7 @@ public class ResolveSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
@@ -148,10 +150,10 @@ public class ResolveSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
+    Path source = resolvePathAgainstCWD(Paths.get(extraArgs.get(0)));
 
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
-
-    Path source = Paths.get(extraArgs.get(0));
+    loader.disableFeature(DeserializationFeature.DESERIALIZE_VALIDATE_CONSTRAINTS);
 
     Format asFormat;
     // attempt to determine the format
@@ -160,7 +162,10 @@ public class ResolveSubcommand
         String asFormatText = context.getCmdLine().getOptionValue("as");
         asFormat = Format.valueOf(asFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.exitMessage("Invalid '--as' argument. The format must be one of: " + Format.values());
+        return ExitCode.FAIL
+            .exitMessage("Invalid '--as' argument. The format must be one of: " + Arrays.stream(Format.values())
+                .map(format -> format.name())
+                .collect(CustomCollectors.joiningWithOxfordComma("or")));
       }
     } else {
       // attempt to determine the format
@@ -174,9 +179,13 @@ public class ResolveSubcommand
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL.exitMessage(
             "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
-                + Format.values());
+                + Arrays.stream(Format.values())
+                    .map(format -> format.name())
+                    .collect(CustomCollectors.joiningWithOxfordComma("or")));
       }
     }
+
+    source = source.toAbsolutePath();
 
     String toFormatText = context.getCmdLine().getOptionValue("to");
     Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
@@ -198,32 +207,46 @@ public class ResolveSubcommand
           return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
-        try {
-          Files.createDirectories(destination.getParent());
-        } catch (IOException ex) {
-          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+        Path parent = destination.getParent();
+        if (parent != null) {
+          try {
+            Files.createDirectories(parent);
+          } catch (IOException ex) {
+            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+          }
         }
       }
     }
 
     IDocumentNodeItem document;
     try {
-      // TODO: support as format
-      document = loader.loadAsNodeItem(source);
+      document = loader.loadAsNodeItem(asFormat.getBindingFormat(), loader.toInputSource(source.toUri()));
     } catch (IOException ex) {
       return ExitCode.INPUT_ERROR.exit().withThrowable(ex);
     }
     Object object = document.getValue();
     if (object instanceof Catalog) {
+      // this is a catalog
       return ExitCode.FAIL.exitMessage("The target file is already a catalog");
     } else if (object instanceof Profile) {
+      // this is a profile
       StaticContext staticContext = new StaticContext();
       URI sourceUri = source.toUri();
       staticContext.setBaseUri(sourceUri);
       DynamicContext dynamicContext = staticContext.newDynamicContext();
       dynamicContext.setDocumentLoader(loader);
+      ProfileResolver resolver = new ProfileResolver();
+      resolver.setDynamicContext(dynamicContext);
 
-      IDocumentNodeItem resolvedProfile = ResolveProfile.resolveProfile(document, dynamicContext);
+      IDocumentNodeItem resolvedProfile;
+      try {
+        resolvedProfile = resolver.resolve(document);
+      } catch (IOException | ProfileResolutionException ex) {
+        return ExitCode.FAIL
+            .exitMessage(
+                String.format("Unable to resolve profile '%s'. %s", document.getDocumentUri(), ex.getMessage()))
+            .withThrowable(ex);
+      }
 
       // DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);
       // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);

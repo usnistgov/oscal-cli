@@ -51,8 +51,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -66,6 +64,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class GenerateSchemaSubcommand
     extends AbstractTerminalCommand {
@@ -105,6 +107,7 @@ public class GenerateSchemaSubcommand
   }
 
   @Override
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
@@ -116,7 +119,7 @@ public class GenerateSchemaSubcommand
       String toFormatText = context.getCmdLine().getOptionValue("as");
       SchemaFormat.valueOf(toFormatText.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException ex) {
-      throw new InvalidArgumentException(
+      throw new InvalidArgumentException( // NOPMD - intentional
           "Invalid '--as' argument. The format must be one of: "
               + Format.names().stream()
                   .collect(CustomCollectors.joiningWithOxfordComma("and")));
@@ -158,10 +161,13 @@ public class GenerateSchemaSubcommand
           return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
-        try {
-          Files.createDirectories(destination.getParent());
-        } catch (IOException ex) {
-          return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+        Path parent = destination.getParent();
+        if (parent != null) {
+          try {
+            Files.createDirectories(parent);
+          } catch (IOException ex) {
+            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+          }
         }
       }
     }
@@ -191,8 +197,8 @@ public class GenerateSchemaSubcommand
     return ExitCode.OK.exit();
   }
 
-  private void performGeneration(@NotNull Path metaschemaPath, @Nullable Path destination,
-      @NotNull SchemaFormat asFormat, @NotNull IConfiguration<SchemaGenerationFeature> configuration)
+  private void performGeneration(@NonNull Path metaschemaPath, @Nullable Path destination,
+      @NonNull SchemaFormat asFormat, @NonNull IConfiguration<SchemaGenerationFeature> configuration)
       throws MetaschemaException, IOException {
     ISchemaGenerator schemaGenerator;
     switch (asFormat) {
