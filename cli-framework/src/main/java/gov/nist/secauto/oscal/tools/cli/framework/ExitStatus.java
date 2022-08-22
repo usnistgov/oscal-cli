@@ -39,7 +39,9 @@ public interface ExitStatus {
 
   /**
    * Process the exit status.
-   * @param withThrowable include information about any associated throwable
+   * 
+   * @param withThrowable
+   *          include information about any associated throwable
    */
   void generateMessage(boolean withThrowable);
 

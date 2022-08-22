@@ -44,7 +44,7 @@ public abstract class AbstractTerminalCommand implements Command {
   public boolean isSubCommandRequired() {
     return false;
   }
-  
+
   protected static Path resolvePathAgainstCWD(@NonNull Path path) {
     return Paths.get("").toAbsolutePath().resolve(path).normalize();
   }
