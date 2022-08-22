@@ -34,7 +34,7 @@ jobs:
         cache: 'maven'
     - name: Initialize CodeQL
       if: github.event_name == 'push'
-      uses: github/codeql-action/init@2ca79b6fa8d3ec278944088b4aa5f46912db5d63 # v2.1.11
+      uses: github/codeql-action/init@7fee4ca032ac341c12486c4c06822c5221c76533 # v2.1.11
       with:
         languages: java
     # -------------------------
@@ -50,7 +50,7 @@ jobs:
         mvn -Prelease -Preporting verify
     - name: Perform CodeQL Analysis
       if: github.event_name == 'push'
-      uses: github/codeql-action/analyze@2ca79b6fa8d3ec278944088b4aa5f46912db5d63 # v2.1.11
+      uses: github/codeql-action/analyze@7fee4ca032ac341c12486c4c06822c5221c76533 # v2.1.11
   deploy-snapshot:
     name: Deploy SNAPSHOT Release
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'develop'
