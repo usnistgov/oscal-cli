@@ -68,10 +68,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class ResolveSubcommand
     extends AbstractTerminalCommand {
-  @Override
-  public String getDescription() {
-    return "Resolve the specified OSCAL Profile";
-  }
 
   private static final String COMMAND = "resolve";
   private static final List<ExtraArgument> EXTRA_ARGUMENTS;
@@ -89,14 +85,18 @@ public class ResolveSubcommand
   }
 
   @Override
+  public String getDescription() {
+    return "Resolve the specified OSCAL Profile";
+  }
+
+  @Override
   public void gatherOptions(Options options) {
-    // options.addOption(Option.builder()
-    // .longOpt("as")
-    // .hasArg().argName("FORMAT")
-    // .desc("source format: xml, json, or yaml").build());
+    options.addOption(Option.builder()
+        .longOpt("as")
+        .hasArg().argName("FORMAT")
+        .desc("source format: xml, json, or yaml").build());
     options.addOption(Option.builder("t")
         .longOpt("to")
-        .required()
         .hasArg().argName("FORMAT")
         .desc("convert to format: xml, json, or yaml").build());
   }
@@ -123,14 +123,16 @@ public class ResolveSubcommand
       }
     }
 
-    try {
-      String toFormatText = context.getCmdLine().getOptionValue("to");
-      Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
-    } catch (IllegalArgumentException ex) {
-      throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
-          + Arrays.asList(Format.values()).stream()
-              .map(format -> format.name())
-              .collect(CustomCollectors.joiningWithOxfordComma("and")));
+    if (context.getCmdLine().hasOption("to")) {
+      try {
+        String toFormatText = context.getCmdLine().getOptionValue("to");
+        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+      } catch (IllegalArgumentException ex) {
+        throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+            + Arrays.asList(Format.values()).stream()
+                .map(format -> format.name())
+                .collect(CustomCollectors.joiningWithOxfordComma("and")));
+      }
     }
 
     List<String> extraArgs = context.getExtraArguments();
@@ -187,8 +189,13 @@ public class ResolveSubcommand
 
     source = source.toAbsolutePath();
 
-    String toFormatText = context.getCmdLine().getOptionValue("to");
-    Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+    Format toFormat;
+    if (context.getCmdLine().hasOption("to")) {
+      String toFormatText = context.getCmdLine().getOptionValue("to");
+      toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+    } else {
+      toFormat = asFormat;
+    }
 
     Path destination;
     if (extraArgs.size() == 1) {

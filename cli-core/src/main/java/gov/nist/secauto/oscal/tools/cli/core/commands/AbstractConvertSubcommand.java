@@ -129,26 +129,23 @@ public abstract class AbstractConvertSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
 
-    String toFormatText = context.getCmdLine().getOptionValue("to");
-    Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
-
     List<String> extraArgs = context.getExtraArguments();
 
-    Path destination;
-    if (extraArgs.size() == 1) {
-      destination = null;
-    } else {
+    Path destination = null;
+    if (extraArgs.size() > 1) {
       destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
     }
 
     if (destination != null) {
       if (Files.exists(destination)) {
         if (!context.getCmdLine().hasOption("overwrite")) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
-              + "' already exists and the --overwrite option was not provided.");
+          return ExitCode.FAIL.exitMessage( // NOPMD readability
+              "The provided destination '" + destination
+                  + "' already exists and the --overwrite option was not provided.");
         }
         if (!Files.isWritable(destination)) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
+          return ExitCode.FAIL.exitMessage( // NOPMD readability
+              "The provided destination '" + destination + "' is not writable.");
         }
       } else {
         Path parent = destination.getParent();
@@ -156,17 +153,21 @@ public abstract class AbstractConvertSubcommand
           try {
             Files.createDirectories(parent);
           } catch (IOException ex) {
-            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+            return ExitCode.INVALID_TARGET.exit().withThrowable(ex); // NOPMD readability
           }
         }
       }
     }
 
     Path source = Paths.get(extraArgs.get(0));
+
+    String toFormatText = context.getCmdLine().getOptionValue("to");
+    Format toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
+
     try {
       performConvert(source, destination, toFormat);
     } catch (IOException | BindingException | IllegalArgumentException ex) {
-      return ExitCode.FAIL.exit().withThrowable(ex);
+      return ExitCode.FAIL.exit().withThrowable(ex); // NOPMD readability
     }
     if (destination != null && LOGGER.isInfoEnabled()) {
       LOGGER.info("Generated {} file: {}", toFormat.toString(), destination);

@@ -77,7 +77,16 @@ public final class YamlOperations {
     }
   }
 
-  public static JSONObject yamlToJson(@NonNull Map<String, Object> map) throws JSONException {
+  /**
+   * Converts the provided YAML {@code map} into JSON.
+   * 
+   * @param map
+   *          the YAML map
+   * @return the JSON object
+   * @throws JSONException
+   *           if an error occurred while building the JSON tree
+   */
+  public static JSONObject yamlToJson(@NonNull Map<String, Object> map) {
     return new JSONObject(map);
   }
 }

@@ -93,8 +93,9 @@ public abstract class AbstractExitStatus implements ExitStatus {
     }
 
     if (logBuilder != null) {
+      Throwable throwable = null;
       if (withThrowable) {
-        Throwable throwable = getThrowable();
+        throwable = getThrowable();
         if (throwable != null) {
           logBuilder.withThrowable(throwable);
         }
@@ -103,7 +104,7 @@ public abstract class AbstractExitStatus implements ExitStatus {
       String message = getMessage();
       if (message != null && !message.isEmpty()) {
         logBuilder.log(message);
-      } else {
+      } else if (throwable != null) {
         // log the throwable
         logBuilder.log();
       }

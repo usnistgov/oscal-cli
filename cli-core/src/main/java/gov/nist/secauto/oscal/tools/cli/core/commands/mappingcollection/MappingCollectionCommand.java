@@ -28,11 +28,11 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection;
 
 import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
 
-public class AssessmentPlanCommand
+public class MappingCollectionCommand
     extends AbstractParentCommand {
   private static final String COMMAND = "mapping-collection";
 
-  public AssessmentPlanCommand() {
+  public MappingCollectionCommand() {
     super();
     addCommandHandler(new ValidateSubcommand());
     // addCommandHandler(new RenderSubcommand());
@@ -46,6 +46,6 @@ public class AssessmentPlanCommand
 
   @Override
   public String getDescription() {
-    return "Perform an operation on an OSCAL Assessment Plan";
+    return "Perform an operation on an OSCAL mapping collection";
   }
 }

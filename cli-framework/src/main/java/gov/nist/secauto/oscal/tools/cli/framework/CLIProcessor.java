@@ -148,7 +148,7 @@ public class CLIProcessor {
   }
 
   public static void handleQuiet() {
-    LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    LoggerContext ctx = (LoggerContext) LogManager.getContext(false); // NOPMD not closable here
     Configuration config = ctx.getConfiguration();
     LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
     Level oldLevel = loggerConfig.getLevel();
@@ -274,7 +274,7 @@ public class CLIProcessor {
 
     HelpFormatter formatter = new HelpFormatter();
 
-    AnsiPrintStream out = AnsiConsole.out();
+    AnsiPrintStream out = AnsiConsole.out(); // NOPMD not closable
     int terminalWidth = Math.max(out.getTerminalWidth(), 40);
 
     PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD - not owned

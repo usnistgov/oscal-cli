@@ -142,23 +142,22 @@ public class GenerateSchemaSubcommand
   @Override
   public ExitStatus executeCommand(CLIProcessor cliProcessor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
-    Path input = Paths.get(extraArgs.get(0));
 
-    Path destination;
-    if (extraArgs.size() == 1) {
-      destination = null;
-    } else {
+    Path destination = null;
+    if (extraArgs.size() > 1) {
       destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
     }
 
     if (destination != null) {
       if (Files.exists(destination)) {
         if (!context.getCmdLine().hasOption("overwrite")) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
-              + "' already exists and the --overwrite option was not provided.");
+          return ExitCode.FAIL.exitMessage( // NOPMD readability
+              "The provided destination '" + destination
+                  + "' already exists and the --overwrite option was not provided.");
         }
         if (!Files.isWritable(destination)) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
+          return ExitCode.FAIL.exitMessage( // NOPMD readability
+              "The provided destination '" + destination + "' is not writable.");
         }
       } else {
         Path parent = destination.getParent();
@@ -166,7 +165,7 @@ public class GenerateSchemaSubcommand
           try {
             Files.createDirectories(parent);
           } catch (IOException ex) {
-            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);
+            return ExitCode.INVALID_TARGET.exit().withThrowable(ex); // NOPMD readability
           }
         }
       }
@@ -186,10 +185,11 @@ public class GenerateSchemaSubcommand
       }
     }
 
+    Path input = Paths.get(extraArgs.get(0));
     try {
       performGeneration(input, destination, asFormat, configuration);
     } catch (IOException | MetaschemaException ex) {
-      return ExitCode.FAIL.exit().withThrowable(ex);
+      return ExitCode.FAIL.exit().withThrowable(ex); // NOPMD readability
     }
     if (destination != null && LOGGER.isInfoEnabled()) {
       LOGGER.info("Generated {} schema file: {}", asFormat.toString(), destination);

@@ -112,9 +112,9 @@
 		<dependency.everit-json.version>1.14.1</dependency.everit-json.version>
 		<dependency.jetbrains-annotation.version>23.0.0</dependency.jetbrains-annotation.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.liboscal-java.version>1.0.4.2</dependency.liboscal-java.version>
+		<dependency.liboscal-java.version>1.0.4.3</dependency.liboscal-java.version>
 		<dependency.log4j2.version>2.18.0</dependency.log4j2.version>
-		<dependency.metaschema-framework.version>0.9.0</dependency.metaschema-framework.version>
+		<dependency.metaschema-framework.version>0.10.0</dependency.metaschema-framework.version>
 		<dependency.spotbugs-annotations.version>4.7.2</dependency.spotbugs-annotations.version>
 
 		<plugin.license.version>4.2.rc3</plugin.license.version>
