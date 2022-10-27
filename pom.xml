@@ -10,7 +10,7 @@
 
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-parent</artifactId>
-	<version>0.3.0</version>
+	<version>0.3.1-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -26,7 +26,7 @@
 		<url>https://github.com/usnistgov/oscal-cli/tree/main</url>
 		<connection>scm:git:git@github.com/usnistgov/oscal-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:usnistgov/oscal-cli.git</developerConnection>
-		<tag>v0.3.0</tag>
+		<tag>v0.2.0</tag>
 	</scm>
 
 	<distributionManagement>
