@@ -183,8 +183,6 @@ public abstract class AbstractConvertSubcommand
     Format fromFormat = Format.lookup(loader.detectFormat(source));
     if (fromFormat == null) {
       throw new BindingException(String.format("Unsupported source format for file '%s'", source));
-    } else if (fromFormat.equals(toFormat)) {
-      throw new IllegalArgumentException(String.format("Source and destination are the same format '%s'", toFormat));
     }
     convert(source, destination, fromFormat, toFormat, getLoadedClass(), context);
   }
