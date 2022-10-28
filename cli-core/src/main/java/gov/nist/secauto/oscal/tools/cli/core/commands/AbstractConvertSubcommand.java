@@ -186,7 +186,6 @@ public abstract class AbstractConvertSubcommand
     } else if (fromFormat.equals(toFormat)) {
       throw new IllegalArgumentException(String.format("Source and destination are the same format '%s'", toFormat));
     }
-
     convert(source, destination, fromFormat, toFormat, getLoadedClass(), context);
   }
 
