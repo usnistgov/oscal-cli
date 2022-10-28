@@ -46,7 +46,7 @@ public class MessageExitStatus
    */
   public MessageExitStatus(@NonNull ExitCode code, @NonNull Object... messageArguments) {
     super(code);
-    if (messageArguments == null || messageArguments.length == 0) {
+    if (messageArguments.length == 0) {
       this.messageArguments = Collections.emptyList();
     } else {
       this.messageArguments = Arrays.asList(messageArguments);

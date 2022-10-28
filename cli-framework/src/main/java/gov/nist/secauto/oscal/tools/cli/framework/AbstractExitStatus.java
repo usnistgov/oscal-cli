@@ -35,7 +35,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class AbstractExitStatus implements ExitStatus {
-  private static final Logger LOGGER = LogManager.getLogger(MessageExitStatus.class);
+  private static final Logger LOGGER = LogManager.getLogger(AbstractExitStatus.class);
 
   private final ExitCode exitCode;
 
@@ -61,7 +61,7 @@ public abstract class AbstractExitStatus implements ExitStatus {
    * 
    * @return the throwable or {@code null}
    */
-  @NonNull
+  @Nullable
   protected Throwable getThrowable() {
     return throwable;
   }
@@ -82,9 +82,9 @@ public abstract class AbstractExitStatus implements ExitStatus {
   protected abstract String getMessage();
 
   @Override
-  public void generateMessage(boolean withThrowable) {
+  public void generateMessage(boolean showStackTrace) {
     LogBuilder logBuilder = null;
-    if (ExitCode.OK.compareTo(getExitCode()) <= 0) {
+    if (getExitCode().getStatusCode() <= 0) {
       if (LOGGER.isInfoEnabled()) {
         logBuilder = LOGGER.atInfo();
       }
@@ -93,18 +93,19 @@ public abstract class AbstractExitStatus implements ExitStatus {
     }
 
     if (logBuilder != null) {
-      Throwable throwable = null;
-      if (withThrowable) {
-        throwable = getThrowable();
-        if (throwable != null) {
-          logBuilder.withThrowable(throwable);
-        }
+      Throwable throwable = getThrowable();
+      if (showStackTrace && throwable != null) {
+        logBuilder.withThrowable(throwable);
       }
 
       String message = getMessage();
+      if (message == null && throwable != null) {
+        message = throwable.getLocalizedMessage();
+      }
+      
       if (message != null && !message.isEmpty()) {
         logBuilder.log(message);
-      } else if (throwable != null) {
+      } else if (throwable != null && showStackTrace) {
         // log the throwable
         logBuilder.log();
       }
