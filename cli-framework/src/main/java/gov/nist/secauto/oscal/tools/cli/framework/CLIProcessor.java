@@ -103,12 +103,16 @@ public class CLIProcessor {
     this.commandToCommandHandlerMap.put(commandName, handler);
   }
 
-  private Options newOptionsInstance() {
+  @NonNull
+  private static Options newOptionsInstance() {
     Options retval = new Options();
     retval.addOption(Option.builder("h").longOpt("help").desc("display this help message").build());
     retval.addOption(Option.builder().longOpt("no-color").desc("do not colorize output").build());
     retval.addOption(
         Option.builder("q").longOpt(QUIET_OPTION_LONG_NAME).desc("minimize output to include only errors").build());
+    retval.addOption(Option.builder().longOpt("show-stack-trace")
+        .desc("display the stack trace associated with an error").build());
+    retval.addOption(Option.builder().longOpt("version").desc("display the application version").build());
     return retval;
   }
 
@@ -148,7 +152,8 @@ public class CLIProcessor {
   }
 
   public static void handleQuiet() {
-    LoggerContext ctx = (LoggerContext) LogManager.getContext(false); // NOPMD not closable here
+    @SuppressWarnings("resource") LoggerContext ctx = (LoggerContext) LogManager.getContext(false); // NOPMD not
+                                                                                                    // closable here
     Configuration config = ctx.getConfiguration();
     LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
     Level oldLevel = loggerConfig.getLevel();
@@ -158,78 +163,52 @@ public class CLIProcessor {
     }
   }
 
-  private ExitStatus processCommand(String[] args, CommandCollection commandCollection) {
+  @NonNull
+  private ExitStatus processCommand(
+      @NonNull String[] args,
+      @NonNull CommandCollection commandCollection) {
     // the first two arguments should be the <command> and <operation>, where <type> is the object type
     // the <operation> is performed against.
     List<String> commandArgs = Arrays.asList(args);
+    assert commandArgs != null;
     CommandResult commandResult = resolveCommand(commandArgs, commandCollection);
 
-    ExitStatus retval;
-    boolean showStackTrace = false;
+    Options options = newOptionsInstance();
+    String[] arguments;
     if (commandResult.getCommands().isEmpty()) {
-      Options options = newOptionsInstance();
-      options.addOption(Option.builder().longOpt("version").desc("display the application version").build());
-      options.addOption(Option.builder().longOpt("show-stack-trace")
-          .desc("display the stack trace associated with an error").build());
-
-      CommandLineParser parser = new DefaultParser();
-      try {
-        CommandLine cmdLine = parser.parse(options, args);
-        if (cmdLine.hasOption("no-color")) {
-          handleNoColor();
-        }
-
-        if (cmdLine.hasOption(QUIET_OPTION_LONG_NAME)) {
-          handleQuiet();
-        }
-
-        if (cmdLine.hasOption("show-stack-trace")) {
-          showStackTrace = true;
-        }
-
-        if (cmdLine.hasOption("version")) {
-          showVersion();
-          retval = ExitCode.OK.exit();
-        } else if (cmdLine.hasOption("help") || cmdLine.getArgList().isEmpty()) {
-          showHelp(options, commandResult.getTargetCommand(), commandResult.getCommands());
-          retval = ExitCode.OK.exit();
-        } else {
-          retval = handleInvalidCommand(commandResult, options,
-              "Invalid command arguments: " + cmdLine.getArgList().stream().collect(Collectors.joining(" ")));
-        }
-      } catch (ParseException ex) {
-        retval = handleInvalidCommand(commandResult, options, ex.getMessage());
-      }
+      assert args != null;
+      arguments = args;
     } else {
-      retval = invokeCommand(commandResult);
+      if (LOGGER.isDebugEnabled()) {
+        String commandChain = commandResult.getCommands().stream()
+            .map(command -> command.getName())
+            .collect(Collectors.joining(" -> "));
+        LOGGER.debug("Processing command chain: {}", commandChain);
+      }
+
+      for (Command cmd : commandResult.getCommands()) {
+        cmd.gatherOptions(options);
+      }
+
+      arguments = commandResult.getArgArray();
     }
-    retval.generateMessage(showStackTrace);
-    return retval;
+    return parseCommand(options, arguments, commandResult);
   }
 
-  @SuppressWarnings("PMD")
-  private ExitStatus invokeCommand(CommandResult commandResult) {
-
-    if (LOGGER.isDebugEnabled()) {
-      String commandChain = commandResult.getCommands().stream()
-          .map(command -> command.getName())
-          .collect(Collectors.joining(" -> "));
-      LOGGER.debug("Processing command chain: {}", commandChain);
-    }
-
-    Options options = newOptionsInstance();
-
-    for (Command cmd : commandResult.getCommands()) {
-      cmd.gatherOptions(options);
-    }
-
+  @NonNull
+  private ExitStatus parseCommand(
+      @NonNull Options options,
+      @NonNull String[] arguments,
+      @NonNull CommandResult commandResult) {
     CommandLineParser parser = new DefaultParser();
     CommandLine cmdLine;
     try {
-      cmdLine = parser.parse(options, commandResult.getArgArray());
+      cmdLine = parser.parse(options, arguments);
     } catch (ParseException ex) {
-      ExitStatus retval = handleInvalidCommand(commandResult, options, ex.getMessage());
-      return retval;
+      return handleInvalidCommand( // NOPMD readability
+          commandResult,
+          options,
+          ex.getMessage());
     }
 
     if (cmdLine.hasOption("no-color")) {
@@ -240,18 +219,40 @@ public class CLIProcessor {
       handleQuiet();
     }
 
-    if (cmdLine.hasOption("help")) {
+    ExitStatus retval = null;
+    if (cmdLine.hasOption("version")) {
+      showVersion();
+      retval = ExitCode.OK.exit();
+    } else if (cmdLine.hasOption("help") || cmdLine.getArgList().isEmpty()) {
       showHelp(options, commandResult.getTargetCommand(), commandResult.getCommands());
-      return ExitCode.OK.exit();
+      retval = ExitCode.OK.exit();
+      // } else {
+      // retval = handleInvalidCommand(commandResult, options,
+      // "Invalid command arguments: " + cmdLine.getArgList().stream().collect(Collectors.joining(" ")));
     }
 
-    CommandContext context = new CommandContext(commandResult.getCommands(), options, cmdLine);
+    if (retval == null) {
+      retval = invokeCommand(commandResult, options, cmdLine);
+    }
 
+    retval.generateMessage(cmdLine.hasOption("show-stack-trace"));
+    return retval;
+  }
+
+  private ExitStatus invokeCommand(
+      @NonNull CommandResult commandResult,
+      @NonNull Options options,
+      @NonNull CommandLine cmdLine) {
+
+    CommandContext context = new CommandContext(commandResult.getCommands(), options, cmdLine);
     for (Command cmd : commandResult.getCommands()) {
       try {
         cmd.validateOptions(this, context);
-      } catch (InvalidArgumentException e) {
-        return handleInvalidCommand(commandResult, options, e.getMessage());
+      } catch (InvalidArgumentException ex) {
+        return handleInvalidCommand( // NOPMD readability
+            commandResult,
+            options,
+            ex.getMessage());
       }
     }
 
@@ -262,6 +263,7 @@ public class CLIProcessor {
     return retval;
   }
 
+  @NonNull
   public ExitStatus handleInvalidCommand(CommandResult commandResult, Options options, String message) {
     showHelp(options, commandResult.getTargetCommand(), commandResult.getCommands());
     return ExitCode.INVALID_COMMAND.exitMessage(message);
@@ -277,7 +279,8 @@ public class CLIProcessor {
     AnsiPrintStream out = AnsiConsole.out(); // NOPMD not closable
     int terminalWidth = Math.max(out.getTerminalWidth(), 40);
 
-    PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD - not owned
+    @SuppressWarnings("resource") PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD -
+                                                                                                           // not owned
     formatter.printHelp(
         writer,
         terminalWidth,
@@ -293,7 +296,7 @@ public class CLIProcessor {
 
   protected void showVersion() {
     VersionInfo info = getVersionInfo();
-    PrintStream out = AnsiConsole.out(); // NOPMD - not owner
+    @SuppressWarnings("resource") PrintStream out = AnsiConsole.out(); // NOPMD - not owner
     out.println(ansi()
         .bold().a(getExec()).boldOff()
         .a(" version ")
@@ -352,7 +355,9 @@ public class CLIProcessor {
     }
   }
 
-  protected CommandResult resolveCommand(List<String> args, CommandCollection collection) {
+  protected CommandResult resolveCommand(
+      @NonNull List<String> args,
+      @NonNull CommandCollection collection) {
     CommandCollection currentCollection = collection;
     List<String> options = new LinkedList<>();
     List<Command> commands = new LinkedList<>();
@@ -387,14 +392,17 @@ public class CLIProcessor {
     @NonNull
     private final CommandCollection targetCommand;
 
+    @SuppressWarnings("null")
     public CommandResult(@NonNull CommandCollection targetCommand) {
       this(targetCommand, Collections.emptyList());
     }
 
+    @SuppressWarnings("null")
     public CommandResult(@NonNull CommandCollection targetCommand, @NonNull List<Command> commands) {
       this(targetCommand, commands, Collections.emptyList(), Collections.emptyList());
     }
 
+    @SuppressWarnings("null")
     public CommandResult(
         @NonNull CommandCollection targetCommand,
         @NonNull List<Command> commands,
@@ -428,6 +436,7 @@ public class CLIProcessor {
       return extraArgs;
     }
 
+    @SuppressWarnings("null")
     @NonNull
     public String[] getArgArray() {
       return Stream.concat(options.stream(), extraArgs.stream()).toArray(size -> new String[size]);

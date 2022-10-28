@@ -56,6 +56,7 @@ public enum ExitCode {
    * 
    * @return the exit status
    */
+  @NonNull
   public ExitStatus exit() {
     return new NonMessageExitStatus(this);
   }
@@ -65,6 +66,7 @@ public enum ExitCode {
    * 
    * @return the exit status
    */
+  @NonNull
   public ExitStatus exitMessage() {
     return new MessageExitStatus(this);
   }
@@ -77,6 +79,7 @@ public enum ExitCode {
    * 
    * @return the exit status
    */
+  @NonNull
   public ExitStatus exitMessage(@NonNull Object... messageArguments) {
     return new MessageExitStatus(this, messageArguments);
   }
