@@ -40,10 +40,11 @@ public interface ExitStatus {
   /**
    * Process the exit status.
    * 
-   * @param withThrowable
-   *          include information about any associated throwable
+   * @param showStackTrace
+   *          include the stack trace for the throwable, if associated
+   * @see #withThrowable(Throwable)
    */
-  void generateMessage(boolean withThrowable);
+  void generateMessage(boolean showStackTrace);
 
   /**
    * Associate a throwable with the exit status.
