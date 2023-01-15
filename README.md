@@ -43,6 +43,48 @@ git clone --recurse-submodules https://github.com/usnistgov/oscal-cli.git
 mvn install
 ```
 
+## Installing
+
+### Installing pre-built Java package
+
+1.  Make a directory to install oscal-cli and cd into it. The example below uses the directory `/opt/oscal-cli`. Use your preferred directory.
+```
+mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
+```
+NOTE: 
+
+2. Download the zipped oscal-cli Java package. Download your preferred version, in this case version v0.3.1.
+```
+wget -q https://github.com/usnistgov/oscal-cli/releases/download/v0.3.1/cli-core-0.3.1-oscal-cli.tar.bz2
+```
+
+3. Unzip oscal-cli into the directory.
+```
+tar -xvf cli-core-0.3.1-oscal-cli.tar.bz2
+```
+
+4. (Recommended) Add oscal-cli's directory to your path.
+```
+# temporarily add oscal-cli to your terminal's instance path
+PATH=$PATH:/opt/oscal-cli/bin
+
+# add oscla-cli to your environment (e.g., all terminals)
+export PATH=$PATH:/opt/oscal-cli/bin
+```
+NOTE: You can also add oscal-cli's directory to your path in shell profile to make oscal-cli permamently available.
+
+## Running 
+
+Run help to make sure everything work
+```
+# if oscal-cli directory added to your path
+oscal-cli --help
+
+# if you did not add oscal-cli directory to your path
+/opt/oscal-cli/bin/oscal-cli --help
+```
+
+
 ## Contact us
 
 Maintainer: [David Waltermire](https://www.nist.gov/people/david-waltermire) - [@david-waltermire-nist](https://github.com/david-waltermire-nist), [NIST](https://www.nist.gov/) [Information Technology Labratory](https://www.nist.gov/itl), [Computer Security Division](https://www.nist.gov/itl/csd), [Security Components and Mechanisms Group](https://www.nist.gov/itl/csd/security-components-and-mechanisms)
