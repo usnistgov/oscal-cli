@@ -53,12 +53,12 @@ mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
 ```
 NOTE: 
 
-2. Download the zipped oscal-cli Java package. Download your preferred version, in this case version v0.3.1.
+2. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release on the releases page](https://github.com/usnistgov/oscal-cli/releases).
 ```
 wget -q https://github.com/usnistgov/oscal-cli/releases/download/v0.3.1/cli-core-0.3.1-oscal-cli.tar.bz2
 ```
 
-3. Unzip oscal-cli into the directory.
+3. Extract oscal-cli into the directory.
 ```
 tar -xvf cli-core-0.3.1-oscal-cli.tar.bz2
 ```
@@ -68,7 +68,7 @@ tar -xvf cli-core-0.3.1-oscal-cli.tar.bz2
 # temporarily add oscal-cli to your terminal's instance path
 PATH=$PATH:/opt/oscal-cli/bin
 
-# add oscla-cli to your environment (e.g., all terminals)
+# add oscal-cli to your environment (e.g., all terminals)
 export PATH=$PATH:/opt/oscal-cli/bin
 ```
 NOTE: You can also add oscal-cli's directory to your path in shell profile to make oscal-cli permamently available.
@@ -87,7 +87,7 @@ oscal-cli --help
 
 ## Contact us
 
-Maintainer: [David Waltermire](https://www.nist.gov/people/david-waltermire) - [@david-waltermire-nist](https://github.com/david-waltermire-nist), [NIST](https://www.nist.gov/) [Information Technology Labratory](https://www.nist.gov/itl), [Computer Security Division](https://www.nist.gov/itl/csd), [Security Components and Mechanisms Group](https://www.nist.gov/itl/csd/security-components-and-mechanisms)
+Maintainer: [NIST OSCAL Team](https://pages.nist.gov/OSCAL/contact/) - [NIST](https://www.nist.gov/) [Information Technology Labratory](https://www.nist.gov/itl), [Computer Security Division](https://www.nist.gov/itl/csd)
 
 Email us: [oscal@nist.gov](mailto:oscal@nist.gov)
 
