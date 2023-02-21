@@ -113,7 +113,7 @@
 		<dependency.jetbrains-annotation.version>23.0.0</dependency.jetbrains-annotation.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
 		<dependency.liboscal-java.version>1.0.4.4</dependency.liboscal-java.version>
-		<dependency.log4j2.version>2.19.0</dependency.log4j2.version>
+		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
 		<dependency.metaschema-framework.version>0.10.0</dependency.metaschema-framework.version>
 		<dependency.spotbugs-annotations.version>4.7.2</dependency.spotbugs-annotations.version>
 
