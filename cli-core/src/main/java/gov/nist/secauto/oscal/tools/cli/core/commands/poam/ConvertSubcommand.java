@@ -26,7 +26,7 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
-import gov.nist.secauto.oscal.lib.model.AssessmentPlan;
+import gov.nist.secauto.oscal.lib.model.PlanOfActionAndMilestones;
 import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
 
 public class ConvertSubcommand
@@ -38,6 +38,6 @@ public class ConvertSubcommand
 
   @Override
   protected Class<?> getLoadedClass() {
-    return AssessmentPlan.class;
+    return PlanOfActionAndMilestones.class;
   }
 }
