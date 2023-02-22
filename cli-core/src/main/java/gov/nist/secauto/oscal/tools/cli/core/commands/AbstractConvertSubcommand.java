@@ -207,4 +207,8 @@ public abstract class AbstractConvertSubcommand
   }
 
   protected abstract Class<?> getLoadedClass();
+  
+  public String getLoadedClassSimpleName() {
+	  return getLoadedClass().getSimpleName();
+  };
 }

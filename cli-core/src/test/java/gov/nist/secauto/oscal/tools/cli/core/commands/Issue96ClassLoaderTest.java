@@ -24,20 +24,49 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
+package gov.nist.secauto.oscal.tools.cli.core.commands;
 
-import gov.nist.secauto.oscal.lib.model.PlanOfActionAndMilestones;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
-  @Override
-  public String getDescription() {
-    return "Convert the specified OSCAL Plan of Actions and Milestones to a different format";
-  }
+class Issue96ClassLoaderTest {
+	/**
+	 * Regression tests for usnistgov/oscal-cli#96. See information at this URL for more details.
+	 * https://github.com/usnistgov/oscal-cli/issues/96
+	 */
+	@Test
+	void testAssessmentPlanClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.ConvertSubcommand();
+		assertEquals("AssessmentPlan", subcommand.getLoadedClassSimpleName());		
+	}
 
-  @Override
-  protected Class<?> getLoadedClass() {
-    return PlanOfActionAndMilestones.class;
-  }
+	@Test
+	void testAssessmentResultsClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.ConvertSubcommand();
+		assertEquals("AssessmentResults", subcommand.getLoadedClassSimpleName());
+	}
+
+	@Test
+	void testCatalogClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.catalog.ConvertSubcommand();
+		assertEquals("Catalog", subcommand.getLoadedClassSimpleName());
+	}
+
+	@Test
+	void testMappingCollectionClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection.ConvertSubcommand();
+		assertEquals("MappingCollection", subcommand.getLoadedClassSimpleName());
+	}
+	
+	@Test
+	void testPoamClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.poam.ConvertSubcommand();
+		assertEquals("PlanOfActionAndMilestones", subcommand.getLoadedClassSimpleName());
+	}
+	
+	@Test
+	void testSspClassLoader() {
+		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.ssp.ConvertSubcommand();
+		assertEquals("SystemSecurityPlan", subcommand.getLoadedClassSimpleName());
+	}
 }
