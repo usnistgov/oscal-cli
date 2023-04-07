@@ -117,7 +117,7 @@
 		<dependency.metaschema-framework.version>0.10.0</dependency.metaschema-framework.version>
 		<dependency.spotbugs-annotations.version>4.7.2</dependency.spotbugs-annotations.version>
 
-		<plugin.license.version>4.2.rc3</plugin.license.version>
+		<plugin.license.version>4.2</plugin.license.version>
 		<spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
 	</properties>
 
