@@ -19,7 +19,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.0.2
+    - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.0.2
       with:
         token: ${{ github.token }}
         submodules: recursive
@@ -59,7 +59,7 @@ jobs:
     permissions:
       actions: read
     steps:
-    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.0.2
+    - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.0.2
       with:
         token: ${{ github.token }}
         submodules: recursive
