@@ -81,7 +81,7 @@ jobs:
     # -------------------------
     - name: Deploy Maven Artifact SNAPSHOTs
       run: |
-        mvn -s $GITHUB_WORKSPACE/settings.xml -Pgpg -Preporting deploy
+        mvn -s $GITHUB_WORKSPACE/settings.xml -Pgpg -Preporting -dmaven.deploy.skip=releases deploy
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
