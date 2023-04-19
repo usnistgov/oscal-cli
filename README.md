@@ -53,14 +53,17 @@ mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
 ```
 NOTE: 
 
-2. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release on the releases page](https://github.com/usnistgov/oscal-cli/releases).
+2. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release on the Maven Central repository](https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/).
 ```
-wget -q https://github.com/usnistgov/oscal-cli/releases/download/v0.3.1/cli-core-0.3.1-oscal-cli.tar.bz2
+wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/0.3.3/cli-core-0.3.3-oscal-cli.zip.asc # download the release signature
+wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/0.3.3/cli-core-0.3.3-oscal-cli.zip # download the release archive
+gpg --keyserver hkps://pgp.mit.edu:443 --recv-keys 0xE5C8BE7A12463927FDB562F9CAC75F72946C412C # import or re-import the release signing key for oscal-cli
+gpg --verify cli-core-0.3.3-oscal-cli.zip.asc # verify the signature for the release with signing key
 ```
 
 3. Extract oscal-cli into the directory.
 ```
-tar -xvf cli-core-0.3.1-oscal-cli.tar.bz2
+unzip cli-core-0.3.3-oscal-cli.unzip
 ```
 
 4. (Recommended) Add oscal-cli's directory to your path.
