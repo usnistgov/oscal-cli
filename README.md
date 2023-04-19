@@ -63,7 +63,7 @@ gpg --verify cli-core-0.3.3-oscal-cli.zip.asc # verify the signature for the rel
 
 3. Extract oscal-cli into the directory.
 ```
-unzip cli-core-0.3.3-oscal-cli.unzip
+unzip cli-core-0.3.3-oscal-cli.zip
 ```
 
 4. (Recommended) Add oscal-cli's directory to your path.
