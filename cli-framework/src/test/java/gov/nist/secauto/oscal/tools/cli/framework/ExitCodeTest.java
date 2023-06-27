@@ -42,44 +42,45 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Logging solution based on https://stackoverflow.com/questions/24205093/how-to-create-a-custom-appender-in-log4j2
+ * Logging solution based on
+ * https://stackoverflow.com/questions/24205093/how-to-create-a-custom-appender-in-log4j2
  */
 class ExitCodeTest {
   private static MockedAppender mockedAppender;
   private static Logger logger;
-  
+
   @BeforeEach
   public void setup() {
-      mockedAppender.events.clear();
+    mockedAppender.events.clear();
   }
 
   @BeforeAll
   public static void setupClass() {
-      mockedAppender = new MockedAppender();
-      logger = (Logger)LogManager.getLogger(AbstractExitStatus.class);
-      logger.addAppender(mockedAppender);
-//      logger.setLevel(Level.INFO);
-      mockedAppender.start();
+    mockedAppender = new MockedAppender();
+    logger = (Logger) LogManager.getLogger(AbstractExitStatus.class);
+    logger.addAppender(mockedAppender);
+    // logger.setLevel(Level.INFO);
+    mockedAppender.start();
   }
-  
+
   @Test
   void testExitMessage() {
     Throwable ex = new IllegalStateException("a message");
     ExitStatus exitStatus = ExitCode.FAIL.exit().withThrowable(ex);
     exitStatus.generateMessage(false);
-    
+
     List<LogEvent> events = mockedAppender.getEvents();
     assertAll(
         () -> assertEquals(1, events.size()),
         () -> assertEquals("a message", events.get(0).getMessage().getFormattedMessage()));
   }
-  
+
   @Test
   void testExitThrown() {
     Throwable ex = new IllegalStateException("a message");
     ExitStatus exitStatus = ExitCode.FAIL.exit().withThrowable(ex);
     exitStatus.generateMessage(true);
-    
+
     List<LogEvent> events = mockedAppender.getEvents();
     assertAll(
         () -> assertEquals(1, events.size()),
@@ -87,12 +88,13 @@ class ExitCodeTest {
         () -> assertEquals("a message", events.get(0).getMessage().getFormattedMessage()));
   }
 
-  private static class MockedAppender extends AbstractAppender {
+  private static class MockedAppender
+      extends AbstractAppender {
 
     private final List<LogEvent> events = new LinkedList<>();
 
     protected MockedAppender() {
-        super("MockedAppender", null, null, false, null);
+      super("MockedAppender", null, null, false, null);
     }
 
     public List<LogEvent> getEvents() {
@@ -101,7 +103,7 @@ class ExitCodeTest {
 
     @Override
     public void append(LogEvent event) {
-      synchronized(this) {
+      synchronized (this) {
         events.add(event.toImmutable());
       }
     }

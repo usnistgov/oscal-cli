@@ -102,7 +102,7 @@ public abstract class AbstractExitStatus implements ExitStatus {
       if (message == null && throwable != null) {
         message = throwable.getLocalizedMessage();
       }
-      
+
       if (message != null && !message.isEmpty()) {
         logBuilder.log(message);
       } else if (throwable != null && showStackTrace) {

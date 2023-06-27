@@ -152,8 +152,9 @@ public class CLIProcessor {
   }
 
   public static void handleQuiet() {
-    @SuppressWarnings("resource") LoggerContext ctx = (LoggerContext) LogManager.getContext(false); // NOPMD not
-                                                                                                    // closable here
+    @SuppressWarnings("resource")
+    LoggerContext ctx = (LoggerContext) LogManager.getContext(false); // NOPMD not
+                                                                      // closable here
     Configuration config = ctx.getConfiguration();
     LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
     Level oldLevel = loggerConfig.getLevel();
@@ -279,8 +280,9 @@ public class CLIProcessor {
     AnsiPrintStream out = AnsiConsole.out(); // NOPMD not closable
     int terminalWidth = Math.max(out.getTerminalWidth(), 40);
 
-    @SuppressWarnings("resource") PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD -
-                                                                                                           // not owned
+    @SuppressWarnings("resource")
+    PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8); // NOPMD -
+                                                                             // not owned
     formatter.printHelp(
         writer,
         terminalWidth,
@@ -296,7 +298,8 @@ public class CLIProcessor {
 
   protected void showVersion() {
     VersionInfo info = getVersionInfo();
-    @SuppressWarnings("resource") PrintStream out = AnsiConsole.out(); // NOPMD - not owner
+    @SuppressWarnings("resource")
+    PrintStream out = AnsiConsole.out(); // NOPMD - not owner
     out.println(ansi()
         .bold().a(getExec()).boldOff()
         .a(" version ")
@@ -326,7 +329,7 @@ public class CLIProcessor {
   // return status;
   // }
 
-  private class TopLevelCommandCollection implements CommandCollection {
+  private final class TopLevelCommandCollection implements CommandCollection {
     @Override
     public Command getCommandByName(String name) {
       return commandToCommandHandlerMap.get(name);

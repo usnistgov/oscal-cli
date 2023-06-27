@@ -6,13 +6,10 @@
 		<artifactId>cli-parent</artifactId>
 		<version>0.3.4-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>cli-core</artifactId>
 	<packaging>jar</packaging>
-
 	<name>OSCAL CLI Core</name>
 	<url>http://maven.apache.org</url>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -26,12 +23,10 @@
 			<groupId>gov.nist.secauto.metaschema</groupId>
 			<artifactId>metaschema-schema-generator</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 		</dependency>
-
 		<dependency>
 			<!-- For console log color -->
 			<groupId>org.fusesource.jansi</groupId>
@@ -44,6 +39,15 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlresolver</groupId>
+			<artifactId>xmlresolver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlresolver</groupId>
+			<artifactId>xmlresolver</artifactId>
+			<classifier>data</classifier>
 		</dependency>
 		<dependency>
 			<groupId>com.github.erosb</groupId>
@@ -64,12 +68,10 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<properties>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 	</properties>
-
 	<build>
 		<resources>
 			<resource>
@@ -107,7 +109,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
