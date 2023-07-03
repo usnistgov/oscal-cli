@@ -23,20 +23,34 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
-package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
-import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
-import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
+package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 
-import java.util.Set;
+import com.google.auto.service.AutoService;
 
-public abstract class AbstractOscalValidationSubcommand
-    extends AbstractValidateContentCommand {
+import gov.nist.secauto.metaschema.cli.commands.GenerateSchemaCommand;
+import gov.nist.secauto.metaschema.cli.commands.ValidateCommand;
+import gov.nist.secauto.metaschema.cli.processor.command.AbstractParentCommand;
+import gov.nist.secauto.metaschema.cli.processor.command.Command;
+
+@AutoService(Command.class)
+public class MetaschemaCommand
+    extends AbstractParentCommand {
+  private static final String COMMAND = "metaschema";
+
+  public MetaschemaCommand() {
+    super(true);
+    addCommandHandler(new GenerateSchemaCommand());
+    addCommandHandler(new ValidateCommand());
+  }
 
   @Override
-  protected IBindingContext getBindingContext(Set<IConstraintSet> constraintSets) {
-    return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+  public String getName() {
+    return COMMAND;
+  }
+
+  @Override
+  public String getDescription() {
+    return "Perform an operation on a Metaschema";
   }
 }
