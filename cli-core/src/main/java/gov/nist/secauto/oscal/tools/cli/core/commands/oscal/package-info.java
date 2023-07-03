@@ -24,26 +24,4 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
-
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
-
-public class MetaschemaCommand
-    extends AbstractParentCommand {
-  private static final String COMMAND = "metaschema";
-
-  public MetaschemaCommand() {
-    addCommandHandler(new GenerateSchemaSubcommand());
-    addCommandHandler(new ValidateSubcommand());
-  }
-
-  @Override
-  public String getName() {
-    return COMMAND;
-  }
-
-  @Override
-  public String getDescription() {
-    return "Perform an operation on a Metaschema";
-  }
-}
+package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;

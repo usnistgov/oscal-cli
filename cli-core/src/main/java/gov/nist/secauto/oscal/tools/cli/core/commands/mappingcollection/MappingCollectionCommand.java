@@ -26,14 +26,14 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection;
 
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
+import gov.nist.secauto.metaschema.cli.processor.command.AbstractParentCommand;
 
 public class MappingCollectionCommand
     extends AbstractParentCommand {
   private static final String COMMAND = "mapping-collection";
 
   public MappingCollectionCommand() {
-    super();
+    super(true);
     addCommandHandler(new ValidateSubcommand());
     // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());

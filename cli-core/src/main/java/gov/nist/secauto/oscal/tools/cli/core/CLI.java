@@ -26,6 +26,11 @@
 
 package gov.nist.secauto.oscal.tools.cli.core;
 
+import gov.nist.secauto.metaschema.cli.processor.CLIProcessor;
+import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
+import gov.nist.secauto.metaschema.model.MetaschemaVersion;
+import gov.nist.secauto.metaschema.model.common.util.IVersionInfo;
+import gov.nist.secauto.metaschema.model.common.util.MetaschemaJavaVersion;
 import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.AssessmentPlanCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.AssessmentResultsCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.catalog.CatalogCommand;
@@ -35,32 +40,37 @@ import gov.nist.secauto.oscal.tools.cli.core.commands.metaschema.MetaschemaComma
 import gov.nist.secauto.oscal.tools.cli.core.commands.poam.PlanOfActionsAndMilestonesCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.profile.ProfileCommand;
 import gov.nist.secauto.oscal.tools.cli.core.commands.ssp.SystemSecurityPlanCommand;
-import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
 
-public class CLI { // NOPMD - intentional
+import java.util.List;
 
-  private final CLIProcessor cliProcessor;
-
-  public static void main(String... args) {
+public final class CLI { // NOPMD - intentional
+  public static void main(String[] args) {
     System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
-    int exitCode = new CLI().parse(args);
+
+    ExitStatus status = runCli(args);
+    int exitCode = status.getExitCode().getStatusCode();
     System.exit(exitCode);
   }
 
-  public CLI() {
-    this.cliProcessor = new CLIProcessor("oscal-cli", new Version());
-    cliProcessor.addCommandHandler(new CatalogCommand());
-    cliProcessor.addCommandHandler(new ProfileCommand());
-    cliProcessor.addCommandHandler(new ComponentDefinitionCommand());
-    cliProcessor.addCommandHandler(new SystemSecurityPlanCommand());
-    cliProcessor.addCommandHandler(new MappingCollectionCommand());
-    cliProcessor.addCommandHandler(new AssessmentPlanCommand());
-    cliProcessor.addCommandHandler(new AssessmentResultsCommand());
-    cliProcessor.addCommandHandler(new PlanOfActionsAndMilestonesCommand());
-    cliProcessor.addCommandHandler(new MetaschemaCommand());
+  public static ExitStatus runCli(String... args) {
+    List<IVersionInfo> versions = List.of(
+        new OscalCliVersion(),
+        new MetaschemaJavaVersion(),
+        new MetaschemaVersion());
+    CLIProcessor processor = new CLIProcessor("oscal-cli",versions);
+    processor.addCommandHandler(new CatalogCommand());
+    processor.addCommandHandler(new ProfileCommand());
+    processor.addCommandHandler(new ComponentDefinitionCommand());
+    processor.addCommandHandler(new SystemSecurityPlanCommand());
+    processor.addCommandHandler(new MappingCollectionCommand());
+    processor.addCommandHandler(new AssessmentPlanCommand());
+    processor.addCommandHandler(new AssessmentResultsCommand());
+    processor.addCommandHandler(new PlanOfActionsAndMilestonesCommand());
+    processor.addCommandHandler(new MetaschemaCommand());
+    return processor.process(args);
   }
 
-  private int parse(String... args) {
-    return cliProcessor.process(args);
+  private CLI() {
+    // disable construction
   }
 }

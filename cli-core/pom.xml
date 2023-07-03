@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
@@ -12,17 +14,27 @@
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>cli-framework</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>gov.nist.secauto.oscal</groupId>
 			<artifactId>liboscal-java</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>cli-processor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>metaschema-cli</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
 			<artifactId>metaschema-schema-generator</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
@@ -83,7 +95,8 @@
 				<targetPath>${project.build.directory}/generated-distro</targetPath>
 			</resource>
 			<resource>
-				<directory>${project.build.directory}/generated-resources/license</directory>
+				<directory>
+					${project.build.directory}/generated-resources/license</directory>
 			</resource>
 		</resources>
 		<plugins>
@@ -94,7 +107,8 @@
 				<configuration>
 					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
 					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-					<generateGitPropertiesFilename>${project.build.directory}/git.properties</generateGitPropertiesFilename>
+					<generateGitPropertiesFilename>
+						${project.build.directory}/git.properties</generateGitPropertiesFilename>
 					<verbose>true</verbose>
 					<useNativeGit>false</useNativeGit>
 					<prefix>git</prefix>
@@ -123,7 +137,8 @@
 					<generateRepository>false</generateRepository>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-					<outputFileNameMapping>@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
+					<outputFileNameMapping>
+						@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
 					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
 						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
 					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
@@ -163,7 +178,8 @@
 							<addClasspath>true</addClasspath>
 							<!-- <classpathPrefix>lib/</classpathPrefix> -->
 							<classpathLayoutType>custom</classpathLayoutType>
-							<customClasspathLayout>${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
+							<customClasspathLayout>
+								${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
 						</manifest>
 					</archive>
 				</configuration>
@@ -180,7 +196,8 @@
 				</dependencies>
 				<executions>
 					<execution>
-						<id>make-assembly-bin</id> <!-- this is used for inheritance merges -->
+						<id>make-assembly-bin</id> <!-- this is used for
+						inheritance merges -->
 						<phase>package</phase> <!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
@@ -217,11 +234,14 @@
 							<goal>add-third-party</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
+							<outputDirectory>
+								${project.build.directory}/generated-distro</outputDirectory>
 							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
 							<licenseMerges>
-								<licenseMerge>The Apache Software License, Version 2.0|Apache
-									License, Version 2.0|Apache Public License 2.0</licenseMerge>
+								<licenseMerge>The Apache Software License,
+									Version 2.0|Apache
+									License, Version 2.0|Apache Public License
+									2.0</licenseMerge>
 							</licenseMerges>
 						</configuration>
 					</execution>

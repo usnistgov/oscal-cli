@@ -23,64 +23,52 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+package gov.nist.secauto.oscal.tools.cli.core;
 
-package gov.nist.secauto.oscal.tools.cli.framework.command;
+import gov.nist.secauto.metaschema.model.common.util.IVersionInfo;
 
-import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
-import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
+public class OscalCliVersion implements IVersionInfo {
 
-import org.apache.commons.cli.Options;
+  public static final String NAME = "oscal-cli";
+  public static final String BUILD_VERSION = "${project.version}";
+  public static final String BUILD_TIMESTAMP = "${timestamp}";
+  public static final String COMMIT = "@git.commit.id.abbrev@";
+  public static final String BRANCH = "@git.branch@";
+  public static final String CLOSEST_TAG = "@git.closest.tag.name@";
+  public static final String ORIGIN = "@git.remote.origin.url@";
 
-import java.util.Collections;
-import java.util.List;
-
-public interface Command extends CommandCollection {
-  String getName();
-
-  String getDescription();
-
-  default List<ExtraArgument> getExtraArguments() {
-    return Collections.emptyList();
-  }
-
-  default void gatherOptions(@SuppressWarnings("unused") Options options) {
-    // by default there are no options to handle
-  }
-
-  @SuppressWarnings("unused")
-  default void validateOptions(CLIProcessor cliProcessor, CommandContext context) throws InvalidArgumentException {
-    // by default there are no options to handle
+  @Override
+  public String getName() {
+    return NAME;
   }
 
   @Override
-  default Command getCommandByName(String name) {
-    return null;
+  public String getVersion() {
+    return BUILD_VERSION;
   }
 
   @Override
-  default String buildHelpCliSyntax(String exec, List<Command> calledCommands) {
+  public String getBuildTimestamp() {
+    return BUILD_TIMESTAMP;
+  }
 
-    StringBuilder builder = new StringBuilder(CommandCollection.super.buildHelpCliSyntax(exec, calledCommands));
+  @Override
+  public String getGitOriginUrl() {
+    return ORIGIN;
+  }
 
-    for (ExtraArgument argument : getExtraArguments()) {
-      builder.append(' ');
-      if (!argument.isRequired()) {
-        builder.append('[');
-      }
+  @Override
+  public String getGitCommit() {
+    return COMMIT;
+  }
 
-      builder.append('<');
-      builder.append(argument.getName());
-      builder.append('>');
+  @Override
+  public String getGitBranch() {
+    return BRANCH;
+  }
 
-      if (argument.getNumber() > 1) {
-        builder.append("...");
-      }
-
-      if (!argument.isRequired()) {
-        builder.append(']');
-      }
-    }
-
-    return builder.toString();
+  @Override
+  public String getGitClosestTag() {
+    return CLOSEST_TAG;
   }
 }

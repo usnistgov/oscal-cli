@@ -26,6 +26,8 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.operations;
 
+import gov.nist.secauto.metaschema.binding.io.xml.XmlUtil;
+
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +35,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -49,13 +50,9 @@ public final class XMLOperations {
     // disable construction
   }
 
-  public static Source getStreamSource(URL url) throws IOException {
-    return new StreamSource(url.openStream(), url.toString());
-  }
-
   public static void renderCatalogHTML(File input, File result) throws IOException, TransformerException {
     render(input, result,
-        XMLOperations.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
+        XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
   }
 
   public static void renderProfileHTML(File input, File result) throws IOException, TransformerException {
@@ -68,11 +65,11 @@ public final class XMLOperations {
 
     try {
       Transformer transformer = transfomerFactory
-          .newTransformer(XMLOperations.getStreamSource(XMLOperations.class.getResource("/xsl/profile-resolver.xsl")));
+          .newTransformer(XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/profile-resolver.xsl")));
       transformer.transform(new StreamSource(input), new StreamResult(temp));
 
       transformer = transfomerFactory.newTransformer(
-          XMLOperations.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
+          XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
       transformer.transform(new StreamSource(temp), new StreamResult(result));
     } finally {
       if (!temp.delete()) {
@@ -102,6 +99,7 @@ public final class XMLOperations {
     Transformer transformer = transfomerFactory.newTransformer(transform);
     transformer.transform(new StreamSource(input), new StreamResult(result));
   }
+
 
   // private static class LoggingURIResolver implements URIResolver {
   // private final URIResolver delegate;

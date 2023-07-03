@@ -26,14 +26,14 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition;
 
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractParentCommand;
+import gov.nist.secauto.metaschema.cli.processor.command.AbstractParentCommand;
 
 public class ComponentDefinitionCommand
     extends AbstractParentCommand {
   private static final String COMMAND = "component-definition";
 
   public ComponentDefinitionCommand() {
-    super();
+    super(true);
     addCommandHandler(new ValidateSubcommand());
     // addCommandHandler(new RenderSubcommand());
     addCommandHandler(new ConvertSubcommand());

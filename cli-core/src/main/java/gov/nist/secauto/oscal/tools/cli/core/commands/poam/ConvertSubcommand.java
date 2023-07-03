@@ -27,10 +27,10 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
 import gov.nist.secauto.oscal.lib.model.PlanOfActionAndMilestones;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
 
 public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
+    extends AbstractOscalConvertSubcommand {
   @Override
   public String getDescription() {
     return "Convert the specified OSCAL Plan of Actions and Milestones to a different format";

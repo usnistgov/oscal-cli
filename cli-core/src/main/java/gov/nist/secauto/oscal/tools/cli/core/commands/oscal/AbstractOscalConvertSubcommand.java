@@ -23,24 +23,17 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-package gov.nist.secauto.oscal.tools.cli.framework;
+import gov.nist.secauto.metaschema.binding.IBindingContext;
+import gov.nist.secauto.metaschema.cli.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-
-public class NonMessageExitStatus
-    extends AbstractExitStatus {
-
-  /**
-   * Construct a new message status.
-   */
-  NonMessageExitStatus(@NonNull ExitCode code) {
-    super(code);
-  }
+public abstract class AbstractOscalConvertSubcommand
+    extends AbstractConvertSubcommand {
 
   @Override
-  protected String getMessage() {
-    // always null
-    return null;
+  protected IBindingContext getBindingContext() {
+    return OscalBindingContext.instance();
   }
 }

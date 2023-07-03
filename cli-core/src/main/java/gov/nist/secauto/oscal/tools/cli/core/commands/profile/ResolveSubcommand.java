@@ -27,29 +27,30 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
 import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
+import gov.nist.secauto.metaschema.binding.io.Format;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
+import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
+import gov.nist.secauto.metaschema.cli.processor.ExitCode;
+import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
+import gov.nist.secauto.metaschema.cli.processor.InvalidArgumentException;
+import gov.nist.secauto.metaschema.cli.processor.OptionUtils;
+import gov.nist.secauto.metaschema.cli.processor.command.AbstractTerminalCommand;
+import gov.nist.secauto.metaschema.cli.processor.command.DefaultExtraArgument;
+import gov.nist.secauto.metaschema.cli.processor.command.ExtraArgument;
 import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
 import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
 import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
 import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
+import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.lib.model.Catalog;
 import gov.nist.secauto.oscal.lib.model.Profile;
 import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;
 import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolver;
-import gov.nist.secauto.oscal.tools.cli.core.commands.Format;
-import gov.nist.secauto.oscal.tools.cli.framework.CLIProcessor;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitCode;
-import gov.nist.secauto.oscal.tools.cli.framework.ExitStatus;
-import gov.nist.secauto.oscal.tools.cli.framework.InvalidArgumentException;
-import gov.nist.secauto.oscal.tools.cli.framework.command.AbstractTerminalCommand;
-import gov.nist.secauto.oscal.tools.cli.framework.command.CommandContext;
-import gov.nist.secauto.oscal.tools.cli.framework.command.DefaultExtraArgument;
-import gov.nist.secauto.oscal.tools.cli.framework.command.ExtraArgument;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,26 +59,38 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class ResolveSubcommand
     extends AbstractTerminalCommand {
 
+  @NonNull
   private static final String COMMAND = "resolve";
-  private static final List<ExtraArgument> EXTRA_ARGUMENTS;
-
-  static {
-    List<ExtraArgument> args = new ArrayList<>(1);
-    args.add(new DefaultExtraArgument("file to resolve", true));
-    args.add(new DefaultExtraArgument("destination file", false));
-    EXTRA_ARGUMENTS = Collections.unmodifiableList(args);
-  }
+  @NonNull
+  private static final List<ExtraArgument> EXTRA_ARGUMENTS = ObjectUtils.notNull(List.of(
+      new DefaultExtraArgument("file to resolve", true),
+      new DefaultExtraArgument("destination file", false)));
+  @NonNull
+  private static final Option AS_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("as")
+          .hasArg()
+          .argName("FORMAT")
+          .desc("source format: xml, json, or yaml")
+          .build());
+  @NonNull
+  private static final Option TO_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("to")
+          .required()
+          .hasArg().argName("FORMAT")
+          .desc("convert to format: xml, json, or yaml")
+          .build());
 
   @Override
   public String getName() {
@@ -90,53 +103,56 @@ public class ResolveSubcommand
   }
 
   @Override
-  public void gatherOptions(Options options) {
-    options.addOption(Option.builder()
-        .longOpt("as")
-        .hasArg().argName("FORMAT")
-        .desc("source format: xml, json, or yaml").build());
-    options.addOption(Option.builder("t")
-        .longOpt("to")
-        .hasArg().argName("FORMAT")
-        .desc("convert to format: xml, json, or yaml").build());
+  public Collection<? extends Option> gatherOptions() {
+    return List.of(
+        AS_OPTION,
+        TO_OPTION);
   }
 
   @Override
-  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")
   public List<ExtraArgument> getExtraArguments() {
     return EXTRA_ARGUMENTS;
   }
 
-  @SuppressWarnings("PMD")
+  @SuppressWarnings({
+      "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity" // reasonable
+  })
   @Override
-  public void validateOptions(CLIProcessor processor, CommandContext context) throws InvalidArgumentException {
-
-    if (context.getCmdLine().hasOption("as")) {
+  public void validateOptions(CallingContext callingContext, CommandLine cmdLine) throws InvalidArgumentException {
+    if (cmdLine.hasOption(AS_OPTION)) {
       try {
-        String toFormatText = context.getCmdLine().getOptionValue("as");
+        String toFormatText = cmdLine.getOptionValue(AS_OPTION);
         Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        throw new InvalidArgumentException(
-            "Invalid '--as' argument. The format must be one of: " + Arrays.asList(Format.values()).stream()
-                .map(format -> format.name())
-                .collect(CustomCollectors.joiningWithOxfordComma("and")));
+        InvalidArgumentException newEx = new InvalidArgumentException(
+            String.format("Invalid '%s' argument. The format must be one of: %s.",
+                OptionUtils.toArgument(AS_OPTION),
+                Arrays.asList(Format.values()).stream()
+                    .map(format -> format.name())
+                    .collect(CustomCollectors.joiningWithOxfordComma("and"))));
+        newEx.setOption(AS_OPTION);
+        newEx.addSuppressed(ex);
+        throw newEx;
       }
     }
 
-    if (context.getCmdLine().hasOption("to")) {
+    if (cmdLine.hasOption(TO_OPTION)) {
       try {
-        String toFormatText = context.getCmdLine().getOptionValue("to");
+        String toFormatText = cmdLine.getOptionValue(TO_OPTION);
         Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        throw new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+        InvalidArgumentException newEx = new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
             + Arrays.asList(Format.values()).stream()
                 .map(format -> format.name())
                 .collect(CustomCollectors.joiningWithOxfordComma("and")));
+        newEx.setOption(AS_OPTION);
+        newEx.addSuppressed(ex);
+        throw newEx;
       }
     }
 
-    List<String> extraArgs = context.getExtraArguments();
-    if (extraArgs.size() < 1) {
+    List<String> extraArgs = cmdLine.getArgList();
+    if (extraArgs.isEmpty()) {
       throw new InvalidArgumentException("The source to resolve must be provided.");
     }
 
@@ -149,9 +165,12 @@ public class ResolveSubcommand
     }
   }
 
+  @SuppressWarnings({
+      "PMD.OnlyOneReturn" // readability
+  })
   @Override
-  public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
-    List<String> extraArgs = context.getExtraArguments();
+  public ExitStatus executeCommand(CallingContext callingContext, CommandLine cmdLine) {
+    List<String> extraArgs = cmdLine.getArgList();
     Path source = resolvePathAgainstCWD(Paths.get(extraArgs.get(0)));
 
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
@@ -159,9 +178,9 @@ public class ResolveSubcommand
 
     Format asFormat;
     // attempt to determine the format
-    if (context.getCmdLine().hasOption("as")) {
+    if (cmdLine.hasOption(AS_OPTION)) {
       try {
-        String asFormatText = context.getCmdLine().getOptionValue("as");
+        String asFormatText = cmdLine.getOptionValue(AS_OPTION);
         asFormat = Format.valueOf(asFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
         return ExitCode.FAIL
@@ -172,7 +191,7 @@ public class ResolveSubcommand
     } else {
       // attempt to determine the format
       try {
-        asFormat = Format.lookup(loader.detectFormat(source));
+        asFormat = loader.detectFormat(source);
       } catch (FileNotFoundException ex) {
         // this case was already checked for
         return ExitCode.INPUT_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
@@ -190,23 +209,21 @@ public class ResolveSubcommand
     source = source.toAbsolutePath();
 
     Format toFormat;
-    if (context.getCmdLine().hasOption("to")) {
-      String toFormatText = context.getCmdLine().getOptionValue("to");
+    if (cmdLine.hasOption(TO_OPTION)) {
+      String toFormatText = cmdLine.getOptionValue(TO_OPTION);
       toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
     } else {
       toFormat = asFormat;
     }
 
-    Path destination;
-    if (extraArgs.size() == 1) {
-      destination = null;
-    } else {
+    Path destination = null;
+    if (extraArgs.size() == 2) {
       destination = Paths.get(extraArgs.get(1)).toAbsolutePath();
     }
 
     if (destination != null) {
       if (Files.exists(destination)) {
-        if (!context.getCmdLine().hasOption("overwrite")) {
+        if (!cmdLine.hasOption("overwrite")) {
           return ExitCode.FAIL.exitMessage("The provided destination '" + destination
               + "' already exists and the --overwrite option was not provided.");
         }
@@ -227,7 +244,7 @@ public class ResolveSubcommand
 
     IDocumentNodeItem document;
     try {
-      document = loader.loadAsNodeItem(asFormat.getBindingFormat(), loader.toInputSource(source.toUri()));
+      document = loader.loadAsNodeItem(asFormat, loader.toInputSource(source.toUri()));
     } catch (IOException ex) {
       return ExitCode.INPUT_ERROR.exit().withThrowable(ex);
     }
@@ -260,7 +277,7 @@ public class ResolveSubcommand
       // validator.finalizeValidation();
 
       ISerializer<Catalog> serializer
-          = OscalBindingContext.instance().newSerializer(toFormat.getBindingFormat(), Catalog.class);
+          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
       try {
         if (destination == null) {
           serializer.serialize((Catalog) resolvedProfile.getValue(), System.out);

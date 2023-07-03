@@ -23,36 +23,20 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-package gov.nist.secauto.oscal.tools.cli.framework;
+import gov.nist.secauto.metaschema.binding.IBindingContext;
+import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
+import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
+import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Set;
 
-public interface ExitStatus {
-  /**
-   * Get the exit code information associated with this exit status.
-   * 
-   * @return the exit code information
-   */
-  @NonNull
-  ExitCode getExitCode();
+public abstract class AbstractOscalValidationSubcommand
+    extends AbstractValidateContentCommand {
 
-  /**
-   * Process the exit status.
-   * 
-   * @param showStackTrace
-   *          include the stack trace for the throwable, if associated
-   * @see #withThrowable(Throwable)
-   */
-  void generateMessage(boolean showStackTrace);
-
-  /**
-   * Associate a throwable with the exit status.
-   * 
-   * @param throwable
-   *          the throwable
-   * @return this exit status
-   */
-  @NonNull
-  ExitStatus withThrowable(@NonNull Throwable throwable);
+  @Override
+  protected IBindingContext getBindingContext(Set<IConstraintSet> constraintSets) {
+    return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+  }
 }

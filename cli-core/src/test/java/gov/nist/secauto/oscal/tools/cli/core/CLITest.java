@@ -23,40 +23,42 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+package gov.nist.secauto.oscal.tools.cli.core;
 
-package gov.nist.secauto.oscal.tools.cli.framework.command;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class DefaultExtraArgument implements ExtraArgument {
-  private final String name;
-  private final boolean required;
-  private final int number;
+import gov.nist.secauto.metaschema.cli.processor.ExitCode;
+import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
 
-  public DefaultExtraArgument(String name, boolean required) {
-    this(name, required, 1);
+import org.junit.jupiter.api.Test;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+public class CLITest {
+
+
+  @Test
+  void testVersionInfo() {
+    String[] args = { "--version" };
+    evaluateResult(CLI.runCli(args), ExitCode.OK);
   }
 
-  public DefaultExtraArgument(String name, boolean required, int number) {
-    if (number < 1) {
-      throw new IllegalArgumentException("number must be a positive value");
-    }
-    this.name = name;
-    this.required = required;
-    this.number = number;
+  void evaluateResult(@NonNull ExitStatus status, @NonNull ExitCode expectedCode) {
+    status.generateMessage(true);
+    assertAll(
+        () -> assertEquals(expectedCode, status.getExitCode(), "exit code mismatch"),
+        () -> assertNull(status.getThrowable(), "expected null Throwable"));
   }
 
-  @Override
-  public String getName() {
-    return name;
+  void evaluateResult(@NonNull ExitStatus status, @NonNull ExitCode expectedCode,
+      @NonNull Class<? extends Throwable> thrownClass) {
+    status.generateMessage(true);
+    Throwable thrown = status.getThrowable();
+    assert thrown != null;
+    assertAll(
+        () -> assertEquals(expectedCode, status.getExitCode(), "exit code mismatch"),
+        () -> assertEquals(thrownClass, thrown.getClass(), "expected Throwable mismatch"));
   }
-
-  @Override
-  public boolean isRequired() {
-    return required;
-  }
-
-  @Override
-  public int getNumber() {
-    return number;
-  }
-
 }

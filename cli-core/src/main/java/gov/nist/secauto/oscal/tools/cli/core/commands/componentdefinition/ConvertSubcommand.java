@@ -27,10 +27,10 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition;
 
 import gov.nist.secauto.oscal.lib.model.ComponentDefinition;
-import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
 
 public class ConvertSubcommand
-    extends AbstractConvertSubcommand {
+    extends AbstractOscalConvertSubcommand {
   @Override
   public String getDescription() {
     return "Convert the specified OSCAL Component Definition to a different format";

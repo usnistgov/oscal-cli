@@ -101,6 +101,9 @@ public abstract class AbstractRenderSubcommand
     }
   }
 
+  @SuppressWarnings({
+    "PMD.OnlyOneReturn" // readability
+  })
   @Override
   public ExitStatus executeCommand(CLIProcessor processor, CommandContext context) {
     List<String> extraArgs = context.getExtraArguments();
