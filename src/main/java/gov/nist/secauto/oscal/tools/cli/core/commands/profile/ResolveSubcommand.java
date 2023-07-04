@@ -91,6 +91,11 @@ public class ResolveSubcommand
           .hasArg().argName("FORMAT")
           .desc("convert to format: xml, json, or yaml")
           .build());
+  @NonNull
+  private static final List<Option> OPTIONS = ObjectUtils.notNull(
+      List.of(
+          AS_OPTION,
+          TO_OPTION));
 
   @Override
   public String getName() {
@@ -104,9 +109,7 @@ public class ResolveSubcommand
 
   @Override
   public Collection<? extends Option> gatherOptions() {
-    return List.of(
-        AS_OPTION,
-        TO_OPTION);
+    return OPTIONS;
   }
 
   @Override
@@ -141,10 +144,11 @@ public class ResolveSubcommand
         String toFormatText = cmdLine.getOptionValue(TO_OPTION);
         Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        InvalidArgumentException newEx = new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
-            + Arrays.asList(Format.values()).stream()
-                .map(format -> format.name())
-                .collect(CustomCollectors.joiningWithOxfordComma("and")));
+        InvalidArgumentException newEx
+            = new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+                + Arrays.asList(Format.values()).stream()
+                    .map(format -> format.name())
+                    .collect(CustomCollectors.joiningWithOxfordComma("and")));
         newEx.setOption(AS_OPTION);
         newEx.addSuppressed(ex);
         throw newEx;
