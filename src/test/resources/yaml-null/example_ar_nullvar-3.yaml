@@ -1,0 +1,55 @@
+---
+assessment-results:
+  uuid: c93a9df5-df5b-45d5-978a-3b3d025e0697
+  metadata:
+    title: OSCAL Workflow Automated Assessment Results
+    last-modified: 2022-12-05T18:02:05.217748+00:00
+    version: 0.0.1-alpha
+    oscal-version: 1.0.4
+
+  import-ap:
+    href: ./assessment-plan.yaml
+
+  local-definitions: {}
+
+  results:
+    - uuid: c28da807-9964-4532-82be-42ea1887373c
+      title: Assessment Results for Testing of SYSTEM
+      description: >
+        These assessment results in OSCAL format are generated automatically
+        from an assessment plan in OSCAL format and processed in GitHub Actions.
+      start: 2022-12-05T18:02:05.217748+00:00
+      reviewed-controls:
+        control-objective-selections:
+        - include-objectives:
+          - objective-id: ac-8_obj.a.1
+          - objective-id: ac-8_obj.a.2
+          - objective-id: ac-8_obj.a.3
+          - objective-id: ac-8_obj.a.4
+        control-selections:
+        - include-controls:
+          - control-id: ac-8
+        remarks: Control objective selections are declared separately of the include-controls
+          directive, must be explicit here.
+
+      observations:
+      - collected: '2022-12-05T18:02:05.217748+00:00'
+        description: Check system use notification presence.
+        methods:
+        - TEST
+        props:
+        - name: assessment-plan-task-uuid
+          ns: https://www.nist.gov/itl/csd/ssag/blossom
+          value: 6b7e6a29-4588-46be-b242-a0bda0092eec
+        - name: assessment-plan-task-result
+          ns: https://www.nist.gov/itl/csd/ssag/blossom
+          value: 'True'
+        relevant-evidence:
+        - description: This observation is the result of automated testing in a run of a
+            GitHub Actions workflow. For detailed information, please review the run status
+            and detailed logging from its configuration, step inputs, and step outputs.
+          href: https://example.com/path/to/scan
+        title: Validate System Use Notification Presence from Python Script
+        uuid: 5e34f924-9e0f-4c60-a5a9-4b01c5c12c94
+
+      findings: NULL
