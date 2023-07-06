@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>21</version>
+		<version>24-SNAPSHOT</version>
 	</parent>
-
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
-	<artifactId>cli-parent</artifactId>
+	<artifactId>cli-core</artifactId>
 	<version>0.3.4-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 
 	<name>OSCAL CLI</name>
 	<url>${site.url}</url>
-
 	<issueManagement>
 		<url>https://github.com/usnistgov/oscal-cli/issues</url>
 		<system>GitHub Issues</system>
 	</issueManagement>
-
 	<scm>
 		<url>https://github.com/usnistgov/oscal-cli/tree/main</url>
 		<connection>scm:git:git@github.com/usnistgov/oscal-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:usnistgov/oscal-cli.git</developerConnection>
 		<tag>v0.2.0</tag>
 	</scm>
-
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -39,7 +36,6 @@
 			<url>${site.url}</url>
 		</site>
 	</distributionManagement>
-
 	<licenses>
 		<license>
 			<name>NIST License</name>
@@ -48,12 +44,10 @@
 			<comments>NIST software License</comments>
 		</license>
 	</licenses>
-
 	<organization>
 		<name>National Institute of Standards and Technology</name>
 		<url>https://www.nist.gov</url>
 	</organization>
-
 	<developers>
 		<developer>
 			<id>david.waltermire@nist.gov</id>
@@ -67,7 +61,6 @@
 			</roles>
 		</developer>
 	</developers>
-
 	<mailingLists>
 		<mailingList>
 			<name>OSCAL NIST Team</name>
@@ -85,8 +78,11 @@
 			<unsubscribe>oscal-updates-leave@nist.gov</unsubscribe>
 		</mailingList>
 	</mailingLists>
-
 	<properties>
+		<!-- metaschema dependencies -->
+		<dependency.metaschema-framework.version>0.11.0-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.liboscal-java.version>1.0.5.0-SNAPSHOT</dependency.liboscal-java.version>
+
 		<!-- site configuration -->
 		<site.url>https://pages.nist.gov/metaschema-java/</site.url>
 		<scm.url>https://github.com/usnistgov/metaschema-java</scm.url>
@@ -99,6 +95,12 @@
 		<jqueryVersion>3.4.1</jqueryVersion>
 		<fontawesomeVersion>5.12.1</fontawesomeVersion>
 		<popperVersion>1.16.0</popperVersion>
+
+		<!-- build timestamp settings for versions -->
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+		<!-- compiler settings -->
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.release>11</maven.compiler.release>
@@ -107,20 +109,19 @@
 		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+		<!-- other dependencies -->
+		<dependency.auto-service.version>1.0.1</dependency.auto-service.version>
 		<dependency.commons-cli.version>1.5.0</dependency.commons-cli.version>
 		<dependency.commons-io.version>2.13.0</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.2</dependency.everit-json.version>
-		<dependency.jetbrains-annotation.version>23.0.0</dependency.jetbrains-annotation.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.liboscal-java.version>1.0.4.4</dependency.liboscal-java.version>
 		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
-		<dependency.metaschema-framework.version>0.10.0</dependency.metaschema-framework.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
+		<dependency.saxon-he.version>12.3</dependency.saxon-he.version>
+		<dependency.xmlresolver.version>4.6.0</dependency.xmlresolver.version>
 
 		<plugin.license.version>4.2</plugin.license.version>
-		<spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
 	</properties>
-
 	<repositories>
 		<repository>
 			<name>Nexus Snapshots</name>
@@ -149,101 +150,113 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>gov.nist.secauto.oscal</groupId>
+			<artifactId>liboscal-java</artifactId>
+			<version>${dependency.liboscal-java.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>cli-processor</artifactId>
+			<version>${dependency.metaschema-framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>metaschema-cli</artifactId>
+			<version>${dependency.metaschema-framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.secauto.metaschema</groupId>
+			<artifactId>metaschema-schema-generator</artifactId>
+			<version>${dependency.metaschema-framework.version}</version>
+		</dependency>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>cli-framework</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>gov.nist.secauto.oscal</groupId>
-				<artifactId>liboscal-java</artifactId>
-				<version>${dependency.liboscal-java.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>gov.nist.secauto.metaschema</groupId>
-				<artifactId>metaschema-schema-generator</artifactId>
-				<version>${dependency.metaschema-framework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-annotations</artifactId>
-				<version>${dependency.spotbugs-annotations.version}</version>
-				<scope>provided</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<!-- For console log color -->
-				<groupId>org.fusesource.jansi</groupId>
-				<artifactId>jansi</artifactId>
-				<version>2.4.0</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>Saxon-HE</artifactId>
-				<version>12.3</version>
-			</dependency>
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
+			<version>${dependency.auto-service.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
-			<dependency>
-				<groupId>commons-cli</groupId>
-				<artifactId>commons-cli</artifactId>
-				<version>${dependency.commons-cli.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>${dependency.commons-io.version}</version>
-			</dependency> <!-- <dependency> <groupId>org.jline</groupId> <artifactId>jline-terminal-jansi</artifactId> <version>${dependency.jline.version}</version> 
-				</dependency> -->
-			<dependency>
-				<groupId>com.github.erosb</groupId>
-				<artifactId>everit-json-schema</artifactId>
-				<version>${dependency.everit-json.version}</version>
-			</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${dependency.log4j2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-jul</artifactId>
+			<version>${dependency.log4j2.version}</version>
+		</dependency>
 
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-api</artifactId>
-				<version>${dependency.log4j2.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-core</artifactId>
-				<version>${dependency.log4j2.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-jul</artifactId>
-				<version>${dependency.log4j2.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+		<dependency>
+			<!-- For console log color -->
+			<groupId>org.fusesource.jansi</groupId>
+			<artifactId>jansi</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${dependency.commons-io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>${dependency.saxon-he.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlresolver</groupId>
+			<artifactId>xmlresolver</artifactId>
+			<version>${dependency.xmlresolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlresolver</groupId>
+			<artifactId>xmlresolver</artifactId>
+			<classifier>data</classifier>
+			<version>${dependency.xmlresolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.erosb</groupId>
+			<artifactId>everit-json-schema</artifactId>
+			<version>${dependency.everit-json.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/distro</directory>
+				<filtering>true</filtering>
+				<targetPath>${project.build.directory}/generated-distro</targetPath>
+			</resource>
+			<resource>
+				<directory>
+					${project.build.directory}/generated-resources/license</directory>
+			</resource>
+		</resources>
+
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>com.googlecode.maven-download-plugin</groupId>
-					<artifactId>download-maven-plugin</artifactId>
-					<version>1.6.8</version>
-				</plugin>
-				<plugin>
-					<groupId>com.mycila</groupId>
-					<artifactId>license-maven-plugin</artifactId>
-					<version>${plugin.license.version}</version>
-					<configuration>
-						<licenseSets>
-							<licenseSet>
-								<header>license/nist/license.txt</header>
-								<includes>
-									<include>src/**/*.java</include>
-								</includes>
-							</licenseSet>
-						</licenseSets>
-						<failIfMissing>true</failIfMissing>
-					</configuration>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
@@ -264,15 +277,162 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
 					<configuration>
-						<failOnWarnings>false</failOnWarnings>
+						<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+				<version>5.0.0</version>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>
+						${project.build.directory}/git.properties</generateGitPropertiesFilename>
+					<verbose>true</verbose>
+					<useNativeGit>false</useNativeGit>
+					<prefix>git</prefix>
+				</configuration>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>2.1.0</version>
+				<configuration>
+					<programs>
+						<program>
+							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
+							<id>oscal-cli</id>
+						</program>
+					</programs>
+					<generateRepository>false</generateRepository>
+					<repositoryLayout>flat</repositoryLayout>
+					<repositoryName>lib</repositoryName>
+					<outputFileNameMapping>
+						@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
+					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
+						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
+					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
+					<includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
+				</configuration>
+				<executions>
+					<execution>
+						<id>exec-oscal-cli-windows</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+						<configuration>
+							<useWildcardClassPath>true</useWildcardClassPath>
+							<platforms>windows</platforms>
+						</configuration>
+					</execution>
+					<execution>
+						<id>exec-oscal-cli-bash</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+						<configuration>
+							<platforms>unix</platforms>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>gov.nist.secauto.oscal.tools.cli.core.CLI</mainClass>
+							<addClasspath>true</addClasspath>
+							<!-- <classpathPrefix>lib/</classpathPrefix> -->
+							<classpathLayoutType>custom</classpathLayoutType>
+							<customClasspathLayout>
+								${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>gov.nist.secauto.swid</groupId>
+						<artifactId>swid-maven-plugin</artifactId>
+						<version>0.7.0</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>make-assembly-bin</id> <!-- this is used for
+						inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/bin.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>templating-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<id>filter-src</id>
+						<goals>
+							<goal>filter-sources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.0.0</version>
+				<executions>
+					<execution>
+						<id>third-party-license</id>
+						<goals>
+							<goal>add-third-party</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/generated-distro</outputDirectory>
+							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
+							<licenseMerges>
+								<licenseMerge>The Apache Software License,
+									Version 2.0|Apache
+									License, Version 2.0|Apache Public License
+									2.0</licenseMerge>
+							</licenseMerges>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
@@ -289,13 +449,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -323,7 +479,8 @@
 									<rules>
 										<requireUpperBoundDeps>
 											<excludes>
-												<exclude>org.jetbrains:annotations</exclude>
+												<exclude>
+													org.jetbrains:annotations</exclude>
 											</excludes>
 										</requireUpperBoundDeps>
 										<dependencyConvergence>
@@ -341,7 +498,9 @@
 								<configuration>
 									<fail>true</fail>
 									<rules>
-										<!-- <reactorModuleConvergence> <ignoreModuleDependencies>true</ignoreModuleDependencies> </reactorModuleConvergence> -->
+										<!-- <reactorModuleConvergence>
+										<ignoreModuleDependencies>true</ignoreModuleDependencies>
+										</reactorModuleConvergence> -->
 										<banDuplicateClasses>
 											<scopes>
 												<scope>compile</scope>
@@ -443,9 +602,4 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<modules>
-		<module>cli-framework</module>
-		<module>cli-core</module>
-	</modules>
 </project>
