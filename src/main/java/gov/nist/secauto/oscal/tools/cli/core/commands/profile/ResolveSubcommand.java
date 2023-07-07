@@ -92,10 +92,17 @@ public class ResolveSubcommand
           .desc("convert to format: xml, json, or yaml")
           .build());
   @NonNull
+  private static final Option OVERWRITE_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("overwrite")
+          .desc("overwrite the destination if it exists")
+          .build());          
+  @NonNull
   private static final List<Option> OPTIONS = ObjectUtils.notNull(
       List.of(
           AS_OPTION,
-          TO_OPTION));
+          TO_OPTION,
+          OVERWRITE_OPTION));
 
   @Override
   public String getName() {
@@ -227,7 +234,7 @@ public class ResolveSubcommand
 
     if (destination != null) {
       if (Files.exists(destination)) {
-        if (!cmdLine.hasOption("overwrite")) {
+        if (!cmdLine.hasOption(OVERWRITE_OPTION)) {
           return ExitCode.FAIL.exitMessage("The provided destination '" + destination
               + "' already exists and the --overwrite option was not provided.");
         }
