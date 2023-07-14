@@ -23,20 +23,65 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
+import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
+import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
 import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
+import org.apache.commons.cli.CommandLine;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+
+import javax.xml.transform.Source;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public abstract class AbstractOscalValidationSubcommand
     extends AbstractValidateContentCommand {
 
+  @NonNull
+  protected abstract List<Source> getOscalXmlSchemas() throws IOException;
+
+  @NonNull
+  protected abstract JSONObject getOscalJsonSchema();
+
   @Override
-  protected IBindingContext getBindingContext(Set<IConstraintSet> constraintSets) {
-    return constraintSets == null || constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+  public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine commandLine) {
+    return new OscalCommandExecutor(callingContext, commandLine);
+  }
+
+  private class OscalCommandExecutor
+      extends AbstractValidationCommandExecutor {
+
+    private OscalCommandExecutor(
+        @NonNull CallingContext callingContext,
+        @NonNull CommandLine commandLine) {
+      super(callingContext, commandLine);
+    }
+
+    @Override
+    protected IBindingContext getBindingContext(@NonNull Set<IConstraintSet> constraintSets) {
+      return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+    }
+
+    @Override
+    @NonNull
+    public List<Source> getXmlSchemas() throws IOException {
+      return getOscalXmlSchemas();
+    }
+
+    @Override
+    @NonNull
+    public JSONObject getJsonSchema() {
+      return getOscalJsonSchema();
+    }
   }
 }

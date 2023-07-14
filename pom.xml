@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>24-SNAPSHOT</version>
+		<version>25-SNAPSHOT</version>
 	</parent>
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-core</artifactId>
@@ -80,7 +80,7 @@
 	</mailingLists>
 	<properties>
 		<!-- metaschema dependencies -->
-		<dependency.metaschema-framework.version>0.11.0-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.metaschema-framework.version>0.12.0-SNAPSHOT</dependency.metaschema-framework.version>
 		<dependency.liboscal-java.version>2.0.0-SNAPSHOT</dependency.liboscal-java.version>
 
 		<!-- site configuration -->
@@ -118,7 +118,7 @@
 		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.3</dependency.saxon-he.version>
-		<dependency.xmlresolver.version>4.6.0</dependency.xmlresolver.version>
+		<dependency.xmlresolver.version>5.2.0</dependency.xmlresolver.version>
 
 		<plugin.license.version>4.2</plugin.license.version>
 	</properties>
@@ -452,154 +452,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-enforcer-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>enforce-java</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>enforce</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>enforce-dependencies</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>enforce</goal>
-								</goals>
-								<configuration>
-									<fail>false</fail>
-									<rules>
-										<requireUpperBoundDeps>
-											<excludes>
-												<exclude>
-													org.jetbrains:annotations</exclude>
-											</excludes>
-										</requireUpperBoundDeps>
-										<dependencyConvergence>
-											<uniqueVersions>true</uniqueVersions>
-										</dependencyConvergence>
-									</rules>
-								</configuration>
-							</execution>
-							<execution>
-								<id>enforce-classes</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>enforce</goal>
-								</goals>
-								<configuration>
-									<fail>true</fail>
-									<rules>
-										<!-- <reactorModuleConvergence>
-										<ignoreModuleDependencies>true</ignoreModuleDependencies>
-										</reactorModuleConvergence> -->
-										<banDuplicateClasses>
-											<scopes>
-												<scope>compile</scope>
-												<scope>provided</scope>
-											</scopes>
-											<findAllDuplicates>true</findAllDuplicates>
-											<ignoreWhenIdentical>true</ignoreWhenIdentical>
-										</banDuplicateClasses>
-									</rules>
-								</configuration>
-							</execution>
-						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>org.codehaus.mojo</groupId>
-								<artifactId>extra-enforcer-rules</artifactId>
-								<version>1.6.2</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>reporting</id>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<configuration>
-							<excludePackageNames>:*.impl</excludePackageNames>
-						</configuration>
-						<reportSets>
-							<reportSet>
-								<id>aggregate</id>
-								<inherited>false</inherited>
-								<reports>
-									<report>aggregate</report>
-								</reports>
-							</reportSet>
-						</reportSets>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-project-info-reports-plugin</artifactId>
-						<reportSets>
-							<reportSet>
-								<id>default</id>
-								<reports>
-									<report>summary</report>
-									<report>licenses</report>
-									<report>modules</report>
-									<report>issue-management</report>
-									<report>dependencies</report>
-									<report>dependency-convergence</report>
-									<report>dependency-management</report>
-									<report>plugins</report>
-								</reports>
-							</reportSet>
-						</reportSets>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jxr-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-pmd-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</reporting>
-		</profile>
-		<profile>
-			<id>gpg</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<skip>false</skip>
-									<gpgArguments>
-										<arg>--pinentry-mode</arg>
-										<arg>loopback</arg>
-									</gpgArguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
