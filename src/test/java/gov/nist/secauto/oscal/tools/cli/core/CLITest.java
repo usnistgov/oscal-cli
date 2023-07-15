@@ -23,6 +23,7 @@
  * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
+
 package gov.nist.secauto.oscal.tools.cli.core;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class CLITest {
-
 
   @Test
   void testVersionInfo() {

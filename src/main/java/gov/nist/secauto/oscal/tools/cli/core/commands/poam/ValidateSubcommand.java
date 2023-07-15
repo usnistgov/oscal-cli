@@ -27,6 +27,8 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
 import gov.nist.secauto.metaschema.binding.io.xml.XmlUtil;
+import gov.nist.secauto.metaschema.model.common.util.CollectionUtil;
+import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
 import gov.nist.secauto.metaschema.model.common.validation.JsonSchemaContentValidator;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalValidationSubcommand;
@@ -34,7 +36,6 @@ import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalValidat
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,16 +50,19 @@ public class ValidateSubcommand
   }
 
   @Override
-  public List<Source> getXmlSchemas() throws IOException {
+  protected List<Source> getOscalXmlSchemas() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval
-        .add(XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_poam_schema.xsd")));
-    return Collections.unmodifiableList(retval);
+        .add(
+            ObjectUtils.requireNonNull(
+                XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_poam_schema.xsd"))));
+    return CollectionUtil.unmodifiableList(retval);
   }
 
   @Override
-  public JSONObject getJsonSchema() {
+  protected JSONObject getOscalJsonSchema() {
     return JsonSchemaContentValidator.toJsonObject(
-        OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_poam_schema.json"));
+        ObjectUtils.requireNonNull(
+            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_poam_schema.json")));
   }
 }

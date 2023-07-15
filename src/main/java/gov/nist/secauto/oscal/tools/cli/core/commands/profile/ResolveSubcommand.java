@@ -38,6 +38,7 @@ import gov.nist.secauto.metaschema.cli.processor.OptionUtils;
 import gov.nist.secauto.metaschema.cli.processor.command.AbstractTerminalCommand;
 import gov.nist.secauto.metaschema.cli.processor.command.DefaultExtraArgument;
 import gov.nist.secauto.metaschema.cli.processor.command.ExtraArgument;
+import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
 import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
 import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
 import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
@@ -96,7 +97,7 @@ public class ResolveSubcommand
       Option.builder()
           .longOpt("overwrite")
           .desc("overwrite the destination if it exists")
-          .build());          
+          .build());
   @NonNull
   private static final List<Option> OPTIONS = ObjectUtils.notNull(
       List.of(
@@ -125,7 +126,8 @@ public class ResolveSubcommand
   }
 
   @SuppressWarnings({
-      "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity" // reasonable
+      "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity", // reasonable
+      "PMD.PreserveStackTrace" // intended
   })
   @Override
   public void validateOptions(CallingContext callingContext, CommandLine cmdLine) throws InvalidArgumentException {
@@ -176,13 +178,20 @@ public class ResolveSubcommand
     }
   }
 
-  @SuppressWarnings({
-      "PMD.OnlyOneReturn" // readability
-  })
   @Override
-  public ExitStatus executeCommand(CallingContext callingContext, CommandLine cmdLine) {
+  public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine cmdLine) {
+    return ICommandExecutor.using(callingContext, cmdLine, this::executeCommand);
+  }
+
+  @SuppressWarnings({
+      "PMD.OnlyOneReturn", // readability
+      "unused"
+  })
+  protected ExitStatus executeCommand(
+      @NonNull CallingContext callingContext,
+      @NonNull CommandLine cmdLine) {
     List<String> extraArgs = cmdLine.getArgList();
-    Path source = resolvePathAgainstCWD(Paths.get(extraArgs.get(0)));
+    Path source = resolvePathAgainstCWD(ObjectUtils.notNull(Paths.get(extraArgs.get(0))));
 
     IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();
     loader.disableFeature(DeserializationFeature.DESERIALIZE_VALIDATE_CONSTRAINTS);
@@ -194,7 +203,7 @@ public class ResolveSubcommand
         String asFormatText = cmdLine.getOptionValue(AS_OPTION);
         asFormat = Format.valueOf(asFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL
+        return ExitCode.INVALID_ARGUMENTS
             .exitMessage("Invalid '--as' argument. The format must be one of: " + Arrays.stream(Format.values())
                 .map(format -> format.name())
                 .collect(CustomCollectors.joiningWithOxfordComma("or")));
@@ -202,14 +211,14 @@ public class ResolveSubcommand
     } else {
       // attempt to determine the format
       try {
-        asFormat = loader.detectFormat(source);
+        asFormat = loader.detectFormat(ObjectUtils.notNull(source));
       } catch (FileNotFoundException ex) {
         // this case was already checked for
-        return ExitCode.INPUT_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
+        return ExitCode.IO_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
       } catch (IOException ex) {
-        return ExitCode.FAIL.exit().withThrowable(ex);
+        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
       } catch (IllegalArgumentException ex) {
-        return ExitCode.FAIL.exitMessage(
+        return ExitCode.INVALID_ARGUMENTS.exitMessage(
             "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "
                 + Arrays.stream(Format.values())
                     .map(format -> format.name())
@@ -235,11 +244,11 @@ public class ResolveSubcommand
     if (destination != null) {
       if (Files.exists(destination)) {
         if (!cmdLine.hasOption(OVERWRITE_OPTION)) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination
+          return ExitCode.INVALID_ARGUMENTS.exitMessage("The provided destination '" + destination
               + "' already exists and the --overwrite option was not provided.");
         }
         if (!Files.isWritable(destination)) {
-          return ExitCode.FAIL.exitMessage("The provided destination '" + destination + "' is not writable.");
+          return ExitCode.IO_ERROR.exitMessage("The provided destination '" + destination + "' is not writable.");
         }
       } else {
         Path parent = destination.getParent();
@@ -255,18 +264,18 @@ public class ResolveSubcommand
 
     IDocumentNodeItem document;
     try {
-      document = loader.loadAsNodeItem(asFormat, loader.toInputSource(source.toUri()));
+      document = loader.loadAsNodeItem(asFormat, loader.toInputSource(ObjectUtils.notNull(source.toUri())));
     } catch (IOException ex) {
-      return ExitCode.INPUT_ERROR.exit().withThrowable(ex);
+      return ExitCode.IO_ERROR.exit().withThrowable(ex);
     }
     Object object = document.getValue();
     if (object instanceof Catalog) {
       // this is a catalog
-      return ExitCode.FAIL.exitMessage("The target file is already a catalog");
+      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target file is already a catalog");
     } else if (object instanceof Profile) {
       // this is a profile
       StaticContext staticContext = new StaticContext();
-      URI sourceUri = source.toUri();
+      URI sourceUri = ObjectUtils.notNull(source.toUri());
       staticContext.setBaseUri(sourceUri);
       DynamicContext dynamicContext = staticContext.newDynamicContext();
       dynamicContext.setDocumentLoader(loader);
@@ -277,7 +286,7 @@ public class ResolveSubcommand
       try {
         resolvedProfile = resolver.resolve(document);
       } catch (IOException | ProfileResolutionException ex) {
-        return ExitCode.FAIL
+        return ExitCode.PROCESSING_ERROR
             .exitMessage(
                 String.format("Unable to resolve profile '%s'. %s", document.getDocumentUri(), ex.getMessage()))
             .withThrowable(ex);
@@ -291,12 +300,12 @@ public class ResolveSubcommand
           = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
       try {
         if (destination == null) {
-          serializer.serialize((Catalog) resolvedProfile.getValue(), System.out);
+          serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));
         } else {
           serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
         }
       } catch (IOException ex) {
-        return ExitCode.FAIL.exit().withThrowable(ex);
+        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
       }
     }
     return ExitCode.OK.exit();

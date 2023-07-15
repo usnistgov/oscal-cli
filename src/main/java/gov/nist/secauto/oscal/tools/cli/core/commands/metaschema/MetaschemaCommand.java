@@ -29,11 +29,12 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.metaschema;
 import com.google.auto.service.AutoService;
 
 import gov.nist.secauto.metaschema.cli.commands.GenerateSchemaCommand;
-import gov.nist.secauto.metaschema.cli.commands.ValidateCommand;
+import gov.nist.secauto.metaschema.cli.commands.ValidateContentWithMetaschemaCommand;
+import gov.nist.secauto.metaschema.cli.commands.ValidateMetaschemaCommand;
 import gov.nist.secauto.metaschema.cli.processor.command.AbstractParentCommand;
-import gov.nist.secauto.metaschema.cli.processor.command.Command;
+import gov.nist.secauto.metaschema.cli.processor.command.ICommand;
 
-@AutoService(Command.class)
+@AutoService(ICommand.class)
 public class MetaschemaCommand
     extends AbstractParentCommand {
   private static final String COMMAND = "metaschema";
@@ -41,7 +42,8 @@ public class MetaschemaCommand
   public MetaschemaCommand() {
     super(true);
     addCommandHandler(new GenerateSchemaCommand());
-    addCommandHandler(new ValidateCommand());
+    addCommandHandler(new ValidateMetaschemaCommand());
+    addCommandHandler(new ValidateContentWithMetaschemaCommand());
   }
 
   @Override

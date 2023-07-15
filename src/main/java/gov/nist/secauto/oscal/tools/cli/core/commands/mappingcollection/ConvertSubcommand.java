@@ -37,7 +37,7 @@ public class ConvertSubcommand
   }
 
   @Override
-  protected Class<?> getLoadedClass() {
+  public Class<?> getOscalClass() {
     return MappingCollection.class;
   }
 }
