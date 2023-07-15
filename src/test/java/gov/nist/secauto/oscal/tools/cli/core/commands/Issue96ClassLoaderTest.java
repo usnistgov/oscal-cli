@@ -27,46 +27,62 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
+
 import org.junit.jupiter.api.Test;
 
 class Issue96ClassLoaderTest {
-	/**
-	 * Regression tests for usnistgov/oscal-cli#96. See information at this URL for more details.
-	 * https://github.com/usnistgov/oscal-cli/issues/96
-	 */
-	@Test
-	void testAssessmentPlanClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.ConvertSubcommand();
-		assertEquals("AssessmentPlan", subcommand.getLoadedClassSimpleName());		
-	}
+  /**
+   * Regression tests for usnistgov/oscal-cli#96. See information at this URL for more details.
+   * https://github.com/usnistgov/oscal-cli/issues/96
+   */
+  @Test
+  void testAssessmentPlanClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.ConvertSubcommand();
+    assertEquals("AssessmentPlan", subcommand.getOscalClass().getSimpleName());
+  }
 
-	@Test
-	void testAssessmentResultsClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.ConvertSubcommand();
-		assertEquals("AssessmentResults", subcommand.getLoadedClassSimpleName());
-	}
+  @Test
+  void testAssessmentResultsClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults.ConvertSubcommand();
+    assertEquals("AssessmentResults", subcommand.getOscalClass().getSimpleName());
+  }
 
-	@Test
-	void testCatalogClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.catalog.ConvertSubcommand();
-		assertEquals("Catalog", subcommand.getLoadedClassSimpleName());
-	}
+  @Test
+  void testCatalogClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.catalog.ConvertSubcommand();
+    assertEquals("Catalog", subcommand.getOscalClass().getSimpleName());
+  }
 
-	@Test
-	void testMappingCollectionClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection.ConvertSubcommand();
-		assertEquals("MappingCollection", subcommand.getLoadedClassSimpleName());
-	}
-	
-	@Test
-	void testPoamClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.poam.ConvertSubcommand();
-		assertEquals("PlanOfActionAndMilestones", subcommand.getLoadedClassSimpleName());
-	}
-	
-	@Test
-	void testSspClassLoader() {
-		var subcommand = new gov.nist.secauto.oscal.tools.cli.core.commands.ssp.ConvertSubcommand();
-		assertEquals("SystemSecurityPlan", subcommand.getLoadedClassSimpleName());
-	}
+  @Test
+  void testMappingCollectionClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection.ConvertSubcommand();
+    assertEquals("MappingCollection", subcommand.getOscalClass().getSimpleName());
+  }
+
+  @Test
+  void testPoamClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.poam.ConvertSubcommand();
+    assertEquals("PlanOfActionAndMilestones", subcommand.getOscalClass().getSimpleName());
+  }
+
+  @Test
+  void testSspClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.ssp.ConvertSubcommand();
+    assertEquals("SystemSecurityPlan", subcommand.getOscalClass().getSimpleName());
+  }
+
+  @Test
+  void testComponentDefinitionClassLoader() {
+    AbstractOscalConvertSubcommand subcommand
+        = new gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition.ConvertSubcommand();
+    assertEquals("ComponentDefinition", subcommand.getOscalClass().getSimpleName());
+  }
 }

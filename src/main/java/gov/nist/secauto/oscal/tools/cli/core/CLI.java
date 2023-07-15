@@ -31,6 +31,7 @@ import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
 import gov.nist.secauto.metaschema.model.MetaschemaVersion;
 import gov.nist.secauto.metaschema.model.common.util.IVersionInfo;
 import gov.nist.secauto.metaschema.model.common.util.MetaschemaJavaVersion;
+import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
 import gov.nist.secauto.oscal.lib.LibOscalVersion;
 import gov.nist.secauto.oscal.lib.OscalVersion;
 import gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan.AssessmentPlanCommand;
@@ -45,7 +46,10 @@ import gov.nist.secauto.oscal.tools.cli.core.commands.ssp.SystemSecurityPlanComm
 
 import java.util.List;
 
-public final class CLI { // NOPMD - intentional
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+@SuppressWarnings("PMD.ShortClassName")
+public final class CLI {
   public static void main(String[] args) {
     System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
 
@@ -54,14 +58,16 @@ public final class CLI { // NOPMD - intentional
     System.exit(exitCode);
   }
 
+  @NonNull
   public static ExitStatus runCli(String... args) {
-    List<IVersionInfo> versions = List.of(
-        new OscalCliVersion(),
-        new LibOscalVersion(),
-        new OscalVersion(),
-        new MetaschemaJavaVersion(),
-        new MetaschemaVersion());
-    CLIProcessor processor = new CLIProcessor("oscal-cli",versions);
+    List<IVersionInfo> versions = ObjectUtils.notNull(
+        List.of(
+            new OscalCliVersion(),
+            new LibOscalVersion(),
+            new OscalVersion(),
+            new MetaschemaJavaVersion(),
+            new MetaschemaVersion()));
+    CLIProcessor processor = new CLIProcessor("oscal-cli", versions);
     processor.addCommandHandler(new CatalogCommand());
     processor.addCommandHandler(new ProfileCommand());
     processor.addCommandHandler(new ComponentDefinitionCommand());

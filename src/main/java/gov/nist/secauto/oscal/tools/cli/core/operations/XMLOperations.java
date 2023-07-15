@@ -56,8 +56,7 @@ public final class XMLOperations {
   }
 
   public static void renderProfileHTML(File input, File result) throws IOException, TransformerException {
-    SaxonTransformerFactory transfomerFactory
-        = (SaxonTransformerFactory) net.sf.saxon.TransformerFactoryImpl.newInstance();
+    SaxonTransformerFactory transfomerFactory = (SaxonTransformerFactory) TransformerFactory.newInstance();
     // Templates resolver = transfomerFactory.newTemplates();
     // Templates renderer = transfomerFactory.newTemplates();
 
@@ -95,11 +94,11 @@ public final class XMLOperations {
   }
 
   public static void render(File input, File result, Source transform) throws TransformerException {
-    TransformerFactory transfomerFactory = net.sf.saxon.TransformerFactoryImpl.newInstance();
+    TransformerFactory transfomerFactory = TransformerFactory.newInstance();
+    assert transfomerFactory instanceof SaxonTransformerFactory;
     Transformer transformer = transfomerFactory.newTransformer(transform);
     transformer.transform(new StreamSource(input), new StreamResult(result));
   }
-
 
   // private static class LoggingURIResolver implements URIResolver {
   // private final URIResolver delegate;
