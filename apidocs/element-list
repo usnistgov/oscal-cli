@@ -1,0 +1,13 @@
+gov.nist.secauto.oscal.tools.cli.core
+gov.nist.secauto.oscal.tools.cli.core.commands
+gov.nist.secauto.oscal.tools.cli.core.commands.assessmentplan
+gov.nist.secauto.oscal.tools.cli.core.commands.assessmentresults
+gov.nist.secauto.oscal.tools.cli.core.commands.catalog
+gov.nist.secauto.oscal.tools.cli.core.commands.componentdefinition
+gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection
+gov.nist.secauto.oscal.tools.cli.core.commands.metaschema
+gov.nist.secauto.oscal.tools.cli.core.commands.oscal
+gov.nist.secauto.oscal.tools.cli.core.commands.poam
+gov.nist.secauto.oscal.tools.cli.core.commands.profile
+gov.nist.secauto.oscal.tools.cli.core.commands.ssp
+gov.nist.secauto.oscal.tools.cli.core.operations

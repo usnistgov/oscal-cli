@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">/*</a>
+<span class="sourceLineNo">002</span><a id="line.2"> * Portions of this software was developed by employees of the National Institute</a>
+<span class="sourceLineNo">003</span><a id="line.3"> * of Standards and Technology (NIST), an agency of the Federal Government and is</a>
+<span class="sourceLineNo">004</span><a id="line.4"> * being made available as a public service. Pursuant to title 17 United States</a>
+<span class="sourceLineNo">005</span><a id="line.5"> * Code Section 105, works of NIST employees are not subject to copyright</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * protection in the United States. This software may be subject to foreign</a>
+<span class="sourceLineNo">007</span><a id="line.7"> * copyright. Permission in the United States and in foreign countries, to the</a>
+<span class="sourceLineNo">008</span><a id="line.8"> * extent that NIST may hold copyright, to use, copy, modify, create derivative</a>
+<span class="sourceLineNo">009</span><a id="line.9"> * works, and distribute this software and its documentation without fee is hereby</a>
+<span class="sourceLineNo">010</span><a id="line.10"> * granted on a non-exclusive basis, provided that this notice and disclaimer</a>
+<span class="sourceLineNo">011</span><a id="line.11"> * of warranty appears in all copies.</a>
+<span class="sourceLineNo">012</span><a id="line.12"> *</a>
+<span class="sourceLineNo">013</span><a id="line.13"> * THE SOFTWARE IS PROVIDED 'AS IS' WITHOUT ANY WARRANTY OF ANY KIND, EITHER</a>
+<span class="sourceLineNo">014</span><a id="line.14"> * EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY</a>
+<span class="sourceLineNo">015</span><a id="line.15"> * THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY IMPLIED WARRANTIES OF</a>
+<span class="sourceLineNo">016</span><a id="line.16"> * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND FREEDOM FROM</a>
+<span class="sourceLineNo">017</span><a id="line.17"> * INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION WILL CONFORM TO THE</a>
+<span class="sourceLineNo">018</span><a id="line.18"> * SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE ERROR FREE.  IN NO EVENT</a>
+<span class="sourceLineNo">019</span><a id="line.19"> * SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING, BUT NOT LIMITED TO, DIRECT,</a>
+<span class="sourceLineNo">020</span><a id="line.20"> * INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES, ARISING OUT OF, RESULTING FROM,</a>
+<span class="sourceLineNo">021</span><a id="line.21"> * OR IN ANY WAY CONNECTED WITH THIS SOFTWARE, WHETHER OR NOT BASED UPON WARRANTY,</a>
+<span class="sourceLineNo">022</span><a id="line.22"> * CONTRACT, TORT, OR OTHERWISE, WHETHER OR NOT INJURY WAS SUSTAINED BY PERSONS OR</a>
+<span class="sourceLineNo">023</span><a id="line.23"> * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT</a>
+<span class="sourceLineNo">024</span><a id="line.24"> * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</a>
+<span class="sourceLineNo">025</span><a id="line.25"> */</a>
+<span class="sourceLineNo">026</span><a id="line.26"></a>
+<span class="sourceLineNo">027</span><a id="line.27">package gov.nist.secauto.oscal.tools.cli.core.commands;</a>
+<span class="sourceLineNo">028</span><a id="line.28"></a>
+<span class="sourceLineNo">029</span><a id="line.29">import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import gov.nist.secauto.metaschema.cli.processor.ExitCode;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import gov.nist.secauto.metaschema.cli.processor.ExitStatus;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import gov.nist.secauto.metaschema.cli.processor.InvalidArgumentException;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import gov.nist.secauto.metaschema.cli.processor.OptionUtils;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import gov.nist.secauto.metaschema.cli.processor.command.AbstractTerminalCommand;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import gov.nist.secauto.metaschema.cli.processor.command.DefaultExtraArgument;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import gov.nist.secauto.metaschema.cli.processor.command.ExtraArgument;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;</a>
+<span class="sourceLineNo">039</span><a id="line.39"></a>
+<span class="sourceLineNo">040</span><a id="line.40">import org.apache.commons.cli.CommandLine;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import org.apache.commons.cli.Option;</a>
+<span class="sourceLineNo">042</span><a id="line.42">import org.apache.logging.log4j.LogManager;</a>
+<span class="sourceLineNo">043</span><a id="line.43">import org.apache.logging.log4j.Logger;</a>
+<span class="sourceLineNo">044</span><a id="line.44"></a>
+<span class="sourceLineNo">045</span><a id="line.45">import java.io.File;</a>
+<span class="sourceLineNo">046</span><a id="line.46">import java.io.IOException;</a>
+<span class="sourceLineNo">047</span><a id="line.47">import java.nio.file.Files;</a>
+<span class="sourceLineNo">048</span><a id="line.48">import java.nio.file.Path;</a>
+<span class="sourceLineNo">049</span><a id="line.49">import java.nio.file.Paths;</a>
+<span class="sourceLineNo">050</span><a id="line.50">import java.util.Collection;</a>
+<span class="sourceLineNo">051</span><a id="line.51">import java.util.List;</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">import javax.xml.transform.TransformerException;</a>
+<span class="sourceLineNo">054</span><a id="line.54"></a>
+<span class="sourceLineNo">055</span><a id="line.55">import edu.umd.cs.findbugs.annotations.NonNull;</a>
+<span class="sourceLineNo">056</span><a id="line.56">import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">public abstract class AbstractRenderSubcommand</a>
+<span class="sourceLineNo">059</span><a id="line.59">    extends AbstractTerminalCommand {</a>
+<span class="sourceLineNo">060</span><a id="line.60">  private static final Logger LOGGER = LogManager.getLogger(AbstractRenderSubcommand.class);</a>
+<span class="sourceLineNo">061</span><a id="line.61"></a>
+<span class="sourceLineNo">062</span><a id="line.62">  @NonNull</a>
+<span class="sourceLineNo">063</span><a id="line.63">  private static final String COMMAND = "render";</a>
+<span class="sourceLineNo">064</span><a id="line.64">  @NonNull</a>
+<span class="sourceLineNo">065</span><a id="line.65">  private static final List&lt;ExtraArgument&gt; EXTRA_ARGUMENTS = ObjectUtils.notNull(List.of(</a>
+<span class="sourceLineNo">066</span><a id="line.66">      new DefaultExtraArgument("source file", true),</a>
+<span class="sourceLineNo">067</span><a id="line.67">      new DefaultExtraArgument("destination file", false)));</a>
+<span class="sourceLineNo">068</span><a id="line.68"></a>
+<span class="sourceLineNo">069</span><a id="line.69">  @NonNull</a>
+<span class="sourceLineNo">070</span><a id="line.70">  private static final Option OVERWRITE_OPTION = ObjectUtils.notNull(</a>
+<span class="sourceLineNo">071</span><a id="line.71">      Option.builder()</a>
+<span class="sourceLineNo">072</span><a id="line.72">          .longOpt("overwrite")</a>
+<span class="sourceLineNo">073</span><a id="line.73">          .desc("overwrite the destination if it exists")</a>
+<span class="sourceLineNo">074</span><a id="line.74">          .build());</a>
+<span class="sourceLineNo">075</span><a id="line.75"></a>
+<span class="sourceLineNo">076</span><a id="line.76">  @Override</a>
+<span class="sourceLineNo">077</span><a id="line.77">  public String getName() {</a>
+<span class="sourceLineNo">078</span><a id="line.78">    return COMMAND;</a>
+<span class="sourceLineNo">079</span><a id="line.79">  }</a>
+<span class="sourceLineNo">080</span><a id="line.80"></a>
+<span class="sourceLineNo">081</span><a id="line.81">  @SuppressWarnings("null")</a>
+<span class="sourceLineNo">082</span><a id="line.82">  @Override</a>
+<span class="sourceLineNo">083</span><a id="line.83">  public Collection&lt;? extends Option&gt; gatherOptions() {</a>
+<span class="sourceLineNo">084</span><a id="line.84">    return List.of(OVERWRITE_OPTION);</a>
+<span class="sourceLineNo">085</span><a id="line.85">  }</a>
+<span class="sourceLineNo">086</span><a id="line.86"></a>
+<span class="sourceLineNo">087</span><a id="line.87">  @Override</a>
+<span class="sourceLineNo">088</span><a id="line.88">  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "unmodifiable collection and immutable item")</a>
+<span class="sourceLineNo">089</span><a id="line.89">  public List&lt;ExtraArgument&gt; getExtraArguments() {</a>
+<span class="sourceLineNo">090</span><a id="line.90">    return EXTRA_ARGUMENTS;</a>
+<span class="sourceLineNo">091</span><a id="line.91">  }</a>
+<span class="sourceLineNo">092</span><a id="line.92"></a>
+<span class="sourceLineNo">093</span><a id="line.93">  @Override</a>
+<span class="sourceLineNo">094</span><a id="line.94">  public void validateOptions(CallingContext callingContext, CommandLine cmdLine) throws InvalidArgumentException {</a>
+<span class="sourceLineNo">095</span><a id="line.95">    List&lt;String&gt; extraArgs = cmdLine.getArgList();</a>
+<span class="sourceLineNo">096</span><a id="line.96">    if (extraArgs.size() != 2) {</a>
+<span class="sourceLineNo">097</span><a id="line.97">      throw new InvalidArgumentException("Both a source and destination argument must be provided.");</a>
+<span class="sourceLineNo">098</span><a id="line.98">    }</a>
+<span class="sourceLineNo">099</span><a id="line.99"></a>
+<span class="sourceLineNo">100</span><a id="line.100">    File source = new File(extraArgs.get(0));</a>
+<span class="sourceLineNo">101</span><a id="line.101">    if (!source.exists()) {</a>
+<span class="sourceLineNo">102</span><a id="line.102">      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' does not exist.");</a>
+<span class="sourceLineNo">103</span><a id="line.103">    }</a>
+<span class="sourceLineNo">104</span><a id="line.104">    if (!source.canRead()) {</a>
+<span class="sourceLineNo">105</span><a id="line.105">      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' is not readable.");</a>
+<span class="sourceLineNo">106</span><a id="line.106">    }</a>
+<span class="sourceLineNo">107</span><a id="line.107">  }</a>
+<span class="sourceLineNo">108</span><a id="line.108"></a>
+<span class="sourceLineNo">109</span><a id="line.109">  @Override</a>
+<span class="sourceLineNo">110</span><a id="line.110">  public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine cmdLine) {</a>
+<span class="sourceLineNo">111</span><a id="line.111">    return ICommandExecutor.using(callingContext, cmdLine, this::executeCommand);</a>
+<span class="sourceLineNo">112</span><a id="line.112">  }</a>
+<span class="sourceLineNo">113</span><a id="line.113"></a>
+<span class="sourceLineNo">114</span><a id="line.114">  @SuppressWarnings({</a>
+<span class="sourceLineNo">115</span><a id="line.115">      "PMD.OnlyOneReturn", // readability</a>
+<span class="sourceLineNo">116</span><a id="line.116">      "unused"</a>
+<span class="sourceLineNo">117</span><a id="line.117">  })</a>
+<span class="sourceLineNo">118</span><a id="line.118">  protected ExitStatus executeCommand(</a>
+<span class="sourceLineNo">119</span><a id="line.119">      @NonNull CallingContext callingContext,</a>
+<span class="sourceLineNo">120</span><a id="line.120">      @NonNull CommandLine cmdLine) {</a>
+<span class="sourceLineNo">121</span><a id="line.121">    List&lt;String&gt; extraArgs = cmdLine.getArgList();</a>
+<span class="sourceLineNo">122</span><a id="line.122">    Path destination = resolvePathAgainstCWD(ObjectUtils.notNull(Paths.get(extraArgs.get(1)))); // .toAbsolutePath();</a>
+<span class="sourceLineNo">123</span><a id="line.123"></a>
+<span class="sourceLineNo">124</span><a id="line.124">    if (Files.exists(destination)) {</a>
+<span class="sourceLineNo">125</span><a id="line.125">      if (!cmdLine.hasOption(OVERWRITE_OPTION)) {</a>
+<span class="sourceLineNo">126</span><a id="line.126">        return ExitCode.INVALID_ARGUMENTS.exitMessage(</a>
+<span class="sourceLineNo">127</span><a id="line.127">            String.format("The provided destination '%s' already exists and the '%s' option was not provided.",</a>
+<span class="sourceLineNo">128</span><a id="line.128">                destination,</a>
+<span class="sourceLineNo">129</span><a id="line.129">                OptionUtils.toArgument(OVERWRITE_OPTION)));</a>
+<span class="sourceLineNo">130</span><a id="line.130">      }</a>
+<span class="sourceLineNo">131</span><a id="line.131">      if (!Files.isWritable(destination)) {</a>
+<span class="sourceLineNo">132</span><a id="line.132">        return ExitCode.IO_ERROR.exitMessage("The provided destination '" + destination + "' is not writable.");</a>
+<span class="sourceLineNo">133</span><a id="line.133">      }</a>
+<span class="sourceLineNo">134</span><a id="line.134">    }</a>
+<span class="sourceLineNo">135</span><a id="line.135"></a>
+<span class="sourceLineNo">136</span><a id="line.136">    Path input = resolvePathAgainstCWD(ObjectUtils.notNull(Paths.get(extraArgs.get(0))));</a>
+<span class="sourceLineNo">137</span><a id="line.137">    try {</a>
+<span class="sourceLineNo">138</span><a id="line.138">      performRender(input, destination);</a>
+<span class="sourceLineNo">139</span><a id="line.139">    } catch (IOException | TransformerException ex) {</a>
+<span class="sourceLineNo">140</span><a id="line.140">      return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">141</span><a id="line.141">    }</a>
+<span class="sourceLineNo">142</span><a id="line.142"></a>
+<span class="sourceLineNo">143</span><a id="line.143">    if (LOGGER.isInfoEnabled()) {</a>
+<span class="sourceLineNo">144</span><a id="line.144">      LOGGER.info("Generated HTML file: " + destination.toString());</a>
+<span class="sourceLineNo">145</span><a id="line.145">    }</a>
+<span class="sourceLineNo">146</span><a id="line.146">    return ExitCode.OK.exit();</a>
+<span class="sourceLineNo">147</span><a id="line.147">  }</a>
+<span class="sourceLineNo">148</span><a id="line.148"></a>
+<span class="sourceLineNo">149</span><a id="line.149">  protected abstract void performRender(Path input, Path result) throws IOException, TransformerException;</a>
+<span class="sourceLineNo">150</span><a id="line.150">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

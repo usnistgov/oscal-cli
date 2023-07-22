@@ -1,0 +1,387 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">/*</a>
+<span class="sourceLineNo">002</span><a id="line.2"> * Portions of this software was developed by employees of the National Institute</a>
+<span class="sourceLineNo">003</span><a id="line.3"> * of Standards and Technology (NIST), an agency of the Federal Government and is</a>
+<span class="sourceLineNo">004</span><a id="line.4"> * being made available as a public service. Pursuant to title 17 United States</a>
+<span class="sourceLineNo">005</span><a id="line.5"> * Code Section 105, works of NIST employees are not subject to copyright</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * protection in the United States. This software may be subject to foreign</a>
+<span class="sourceLineNo">007</span><a id="line.7"> * copyright. Permission in the United States and in foreign countries, to the</a>
+<span class="sourceLineNo">008</span><a id="line.8"> * extent that NIST may hold copyright, to use, copy, modify, create derivative</a>
+<span class="sourceLineNo">009</span><a id="line.9"> * works, and distribute this software and its documentation without fee is hereby</a>
+<span class="sourceLineNo">010</span><a id="line.10"> * granted on a non-exclusive basis, provided that this notice and disclaimer</a>
+<span class="sourceLineNo">011</span><a id="line.11"> * of warranty appears in all copies.</a>
+<span class="sourceLineNo">012</span><a id="line.12"> *</a>
+<span class="sourceLineNo">013</span><a id="line.13"> * THE SOFTWARE IS PROVIDED 'AS IS' WITHOUT ANY WARRANTY OF ANY KIND, EITHER</a>
+<span class="sourceLineNo">014</span><a id="line.14"> * EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY</a>
+<span class="sourceLineNo">015</span><a id="line.15"> * THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY IMPLIED WARRANTIES OF</a>
+<span class="sourceLineNo">016</span><a id="line.16"> * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND FREEDOM FROM</a>
+<span class="sourceLineNo">017</span><a id="line.17"> * INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION WILL CONFORM TO THE</a>
+<span class="sourceLineNo">018</span><a id="line.18"> * SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE ERROR FREE.  IN NO EVENT</a>
+<span class="sourceLineNo">019</span><a id="line.19"> * SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING, BUT NOT LIMITED TO, DIRECT,</a>
+<span class="sourceLineNo">020</span><a id="line.20"> * INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES, ARISING OUT OF, RESULTING FROM,</a>
+<span class="sourceLineNo">021</span><a id="line.21"> * OR IN ANY WAY CONNECTED WITH THIS SOFTWARE, WHETHER OR NOT BASED UPON WARRANTY,</a>
+<span class="sourceLineNo">022</span><a id="line.22"> * CONTRACT, TORT, OR OTHERWISE, WHETHER OR NOT INJURY WAS SUSTAINED BY PERSONS OR</a>
+<span class="sourceLineNo">023</span><a id="line.23"> * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT</a>
+<span class="sourceLineNo">024</span><a id="line.24"> * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</a>
+<span class="sourceLineNo">025</span><a id="line.25"> */</a>
+<span class="sourceLineNo">026</span><a id="line.26"></a>
+<span class="sourceLineNo">027</span><a id="line.27">package gov.nist.secauto.oscal.tools.cli.core.commands.profile;</a>
+<span class="sourceLineNo">028</span><a id="line.28"></a>
+<span class="sourceLineNo">029</span><a id="line.29">import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import gov.nist.secauto.metaschema.binding.io.Format;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import gov.nist.secauto.metaschema.binding.io.IBoundLoader;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import gov.nist.secauto.metaschema.binding.io.ISerializer;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import gov.nist.secauto.metaschema.cli.processor.ExitCode;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import gov.nist.secauto.metaschema.cli.processor.ExitStatus;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import gov.nist.secauto.metaschema.cli.processor.InvalidArgumentException;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import gov.nist.secauto.metaschema.cli.processor.OptionUtils;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import gov.nist.secauto.metaschema.cli.processor.command.AbstractTerminalCommand;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import gov.nist.secauto.metaschema.cli.processor.command.DefaultExtraArgument;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import gov.nist.secauto.metaschema.cli.processor.command.ExtraArgument;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;</a>
+<span class="sourceLineNo">042</span><a id="line.42">import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;</a>
+<span class="sourceLineNo">043</span><a id="line.43">import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;</a>
+<span class="sourceLineNo">044</span><a id="line.44">import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;</a>
+<span class="sourceLineNo">045</span><a id="line.45">import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;</a>
+<span class="sourceLineNo">046</span><a id="line.46">import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;</a>
+<span class="sourceLineNo">047</span><a id="line.47">import gov.nist.secauto.oscal.lib.OscalBindingContext;</a>
+<span class="sourceLineNo">048</span><a id="line.48">import gov.nist.secauto.oscal.lib.model.Catalog;</a>
+<span class="sourceLineNo">049</span><a id="line.49">import gov.nist.secauto.oscal.lib.model.Profile;</a>
+<span class="sourceLineNo">050</span><a id="line.50">import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;</a>
+<span class="sourceLineNo">051</span><a id="line.51">import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolver;</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">import org.apache.commons.cli.CommandLine;</a>
+<span class="sourceLineNo">054</span><a id="line.54">import org.apache.commons.cli.Option;</a>
+<span class="sourceLineNo">055</span><a id="line.55"></a>
+<span class="sourceLineNo">056</span><a id="line.56">import java.io.File;</a>
+<span class="sourceLineNo">057</span><a id="line.57">import java.io.FileNotFoundException;</a>
+<span class="sourceLineNo">058</span><a id="line.58">import java.io.IOException;</a>
+<span class="sourceLineNo">059</span><a id="line.59">import java.net.URI;</a>
+<span class="sourceLineNo">060</span><a id="line.60">import java.nio.file.Files;</a>
+<span class="sourceLineNo">061</span><a id="line.61">import java.nio.file.Path;</a>
+<span class="sourceLineNo">062</span><a id="line.62">import java.nio.file.Paths;</a>
+<span class="sourceLineNo">063</span><a id="line.63">import java.util.Arrays;</a>
+<span class="sourceLineNo">064</span><a id="line.64">import java.util.Collection;</a>
+<span class="sourceLineNo">065</span><a id="line.65">import java.util.List;</a>
+<span class="sourceLineNo">066</span><a id="line.66">import java.util.Locale;</a>
+<span class="sourceLineNo">067</span><a id="line.67"></a>
+<span class="sourceLineNo">068</span><a id="line.68">import edu.umd.cs.findbugs.annotations.NonNull;</a>
+<span class="sourceLineNo">069</span><a id="line.69"></a>
+<span class="sourceLineNo">070</span><a id="line.70">public class ResolveSubcommand</a>
+<span class="sourceLineNo">071</span><a id="line.71">    extends AbstractTerminalCommand {</a>
+<span class="sourceLineNo">072</span><a id="line.72"></a>
+<span class="sourceLineNo">073</span><a id="line.73">  @NonNull</a>
+<span class="sourceLineNo">074</span><a id="line.74">  private static final String COMMAND = "resolve";</a>
+<span class="sourceLineNo">075</span><a id="line.75">  @NonNull</a>
+<span class="sourceLineNo">076</span><a id="line.76">  private static final List&lt;ExtraArgument&gt; EXTRA_ARGUMENTS = ObjectUtils.notNull(List.of(</a>
+<span class="sourceLineNo">077</span><a id="line.77">      new DefaultExtraArgument("file to resolve", true),</a>
+<span class="sourceLineNo">078</span><a id="line.78">      new DefaultExtraArgument("destination file", false)));</a>
+<span class="sourceLineNo">079</span><a id="line.79">  @NonNull</a>
+<span class="sourceLineNo">080</span><a id="line.80">  private static final Option AS_OPTION = ObjectUtils.notNull(</a>
+<span class="sourceLineNo">081</span><a id="line.81">      Option.builder()</a>
+<span class="sourceLineNo">082</span><a id="line.82">          .longOpt("as")</a>
+<span class="sourceLineNo">083</span><a id="line.83">          .hasArg()</a>
+<span class="sourceLineNo">084</span><a id="line.84">          .argName("FORMAT")</a>
+<span class="sourceLineNo">085</span><a id="line.85">          .desc("source format: xml, json, or yaml")</a>
+<span class="sourceLineNo">086</span><a id="line.86">          .build());</a>
+<span class="sourceLineNo">087</span><a id="line.87">  @NonNull</a>
+<span class="sourceLineNo">088</span><a id="line.88">  private static final Option TO_OPTION = ObjectUtils.notNull(</a>
+<span class="sourceLineNo">089</span><a id="line.89">      Option.builder()</a>
+<span class="sourceLineNo">090</span><a id="line.90">          .longOpt("to")</a>
+<span class="sourceLineNo">091</span><a id="line.91">          .required()</a>
+<span class="sourceLineNo">092</span><a id="line.92">          .hasArg().argName("FORMAT")</a>
+<span class="sourceLineNo">093</span><a id="line.93">          .desc("convert to format: xml, json, or yaml")</a>
+<span class="sourceLineNo">094</span><a id="line.94">          .build());</a>
+<span class="sourceLineNo">095</span><a id="line.95">  @NonNull</a>
+<span class="sourceLineNo">096</span><a id="line.96">  private static final Option OVERWRITE_OPTION = ObjectUtils.notNull(</a>
+<span class="sourceLineNo">097</span><a id="line.97">      Option.builder()</a>
+<span class="sourceLineNo">098</span><a id="line.98">          .longOpt("overwrite")</a>
+<span class="sourceLineNo">099</span><a id="line.99">          .desc("overwrite the destination if it exists")</a>
+<span class="sourceLineNo">100</span><a id="line.100">          .build());</a>
+<span class="sourceLineNo">101</span><a id="line.101">  @NonNull</a>
+<span class="sourceLineNo">102</span><a id="line.102">  private static final List&lt;Option&gt; OPTIONS = ObjectUtils.notNull(</a>
+<span class="sourceLineNo">103</span><a id="line.103">      List.of(</a>
+<span class="sourceLineNo">104</span><a id="line.104">          AS_OPTION,</a>
+<span class="sourceLineNo">105</span><a id="line.105">          TO_OPTION,</a>
+<span class="sourceLineNo">106</span><a id="line.106">          OVERWRITE_OPTION));</a>
+<span class="sourceLineNo">107</span><a id="line.107"></a>
+<span class="sourceLineNo">108</span><a id="line.108">  @Override</a>
+<span class="sourceLineNo">109</span><a id="line.109">  public String getName() {</a>
+<span class="sourceLineNo">110</span><a id="line.110">    return COMMAND;</a>
+<span class="sourceLineNo">111</span><a id="line.111">  }</a>
+<span class="sourceLineNo">112</span><a id="line.112"></a>
+<span class="sourceLineNo">113</span><a id="line.113">  @Override</a>
+<span class="sourceLineNo">114</span><a id="line.114">  public String getDescription() {</a>
+<span class="sourceLineNo">115</span><a id="line.115">    return "Resolve the specified OSCAL Profile";</a>
+<span class="sourceLineNo">116</span><a id="line.116">  }</a>
+<span class="sourceLineNo">117</span><a id="line.117"></a>
+<span class="sourceLineNo">118</span><a id="line.118">  @Override</a>
+<span class="sourceLineNo">119</span><a id="line.119">  public Collection&lt;? extends Option&gt; gatherOptions() {</a>
+<span class="sourceLineNo">120</span><a id="line.120">    return OPTIONS;</a>
+<span class="sourceLineNo">121</span><a id="line.121">  }</a>
+<span class="sourceLineNo">122</span><a id="line.122"></a>
+<span class="sourceLineNo">123</span><a id="line.123">  @Override</a>
+<span class="sourceLineNo">124</span><a id="line.124">  public List&lt;ExtraArgument&gt; getExtraArguments() {</a>
+<span class="sourceLineNo">125</span><a id="line.125">    return EXTRA_ARGUMENTS;</a>
+<span class="sourceLineNo">126</span><a id="line.126">  }</a>
+<span class="sourceLineNo">127</span><a id="line.127"></a>
+<span class="sourceLineNo">128</span><a id="line.128">  @SuppressWarnings({</a>
+<span class="sourceLineNo">129</span><a id="line.129">      "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity", // reasonable</a>
+<span class="sourceLineNo">130</span><a id="line.130">      "PMD.PreserveStackTrace" // intended</a>
+<span class="sourceLineNo">131</span><a id="line.131">  })</a>
+<span class="sourceLineNo">132</span><a id="line.132">  @Override</a>
+<span class="sourceLineNo">133</span><a id="line.133">  public void validateOptions(CallingContext callingContext, CommandLine cmdLine) throws InvalidArgumentException {</a>
+<span class="sourceLineNo">134</span><a id="line.134">    if (cmdLine.hasOption(AS_OPTION)) {</a>
+<span class="sourceLineNo">135</span><a id="line.135">      try {</a>
+<span class="sourceLineNo">136</span><a id="line.136">        String toFormatText = cmdLine.getOptionValue(AS_OPTION);</a>
+<span class="sourceLineNo">137</span><a id="line.137">        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));</a>
+<span class="sourceLineNo">138</span><a id="line.138">      } catch (IllegalArgumentException ex) {</a>
+<span class="sourceLineNo">139</span><a id="line.139">        InvalidArgumentException newEx = new InvalidArgumentException(</a>
+<span class="sourceLineNo">140</span><a id="line.140">            String.format("Invalid '%s' argument. The format must be one of: %s.",</a>
+<span class="sourceLineNo">141</span><a id="line.141">                OptionUtils.toArgument(AS_OPTION),</a>
+<span class="sourceLineNo">142</span><a id="line.142">                Arrays.asList(Format.values()).stream()</a>
+<span class="sourceLineNo">143</span><a id="line.143">                    .map(format -&gt; format.name())</a>
+<span class="sourceLineNo">144</span><a id="line.144">                    .collect(CustomCollectors.joiningWithOxfordComma("and"))));</a>
+<span class="sourceLineNo">145</span><a id="line.145">        newEx.setOption(AS_OPTION);</a>
+<span class="sourceLineNo">146</span><a id="line.146">        newEx.addSuppressed(ex);</a>
+<span class="sourceLineNo">147</span><a id="line.147">        throw newEx;</a>
+<span class="sourceLineNo">148</span><a id="line.148">      }</a>
+<span class="sourceLineNo">149</span><a id="line.149">    }</a>
+<span class="sourceLineNo">150</span><a id="line.150"></a>
+<span class="sourceLineNo">151</span><a id="line.151">    if (cmdLine.hasOption(TO_OPTION)) {</a>
+<span class="sourceLineNo">152</span><a id="line.152">      try {</a>
+<span class="sourceLineNo">153</span><a id="line.153">        String toFormatText = cmdLine.getOptionValue(TO_OPTION);</a>
+<span class="sourceLineNo">154</span><a id="line.154">        Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));</a>
+<span class="sourceLineNo">155</span><a id="line.155">      } catch (IllegalArgumentException ex) {</a>
+<span class="sourceLineNo">156</span><a id="line.156">        InvalidArgumentException newEx</a>
+<span class="sourceLineNo">157</span><a id="line.157">            = new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "</a>
+<span class="sourceLineNo">158</span><a id="line.158">                + Arrays.asList(Format.values()).stream()</a>
+<span class="sourceLineNo">159</span><a id="line.159">                    .map(format -&gt; format.name())</a>
+<span class="sourceLineNo">160</span><a id="line.160">                    .collect(CustomCollectors.joiningWithOxfordComma("and")));</a>
+<span class="sourceLineNo">161</span><a id="line.161">        newEx.setOption(AS_OPTION);</a>
+<span class="sourceLineNo">162</span><a id="line.162">        newEx.addSuppressed(ex);</a>
+<span class="sourceLineNo">163</span><a id="line.163">        throw newEx;</a>
+<span class="sourceLineNo">164</span><a id="line.164">      }</a>
+<span class="sourceLineNo">165</span><a id="line.165">    }</a>
+<span class="sourceLineNo">166</span><a id="line.166"></a>
+<span class="sourceLineNo">167</span><a id="line.167">    List&lt;String&gt; extraArgs = cmdLine.getArgList();</a>
+<span class="sourceLineNo">168</span><a id="line.168">    if (extraArgs.isEmpty()) {</a>
+<span class="sourceLineNo">169</span><a id="line.169">      throw new InvalidArgumentException("The source to resolve must be provided.");</a>
+<span class="sourceLineNo">170</span><a id="line.170">    }</a>
+<span class="sourceLineNo">171</span><a id="line.171"></a>
+<span class="sourceLineNo">172</span><a id="line.172">    File source = new File(extraArgs.get(0));</a>
+<span class="sourceLineNo">173</span><a id="line.173">    if (!source.exists()) {</a>
+<span class="sourceLineNo">174</span><a id="line.174">      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' does not exist.");</a>
+<span class="sourceLineNo">175</span><a id="line.175">    }</a>
+<span class="sourceLineNo">176</span><a id="line.176">    if (!source.canRead()) {</a>
+<span class="sourceLineNo">177</span><a id="line.177">      throw new InvalidArgumentException("The provided source '" + source.getPath() + "' is not readable.");</a>
+<span class="sourceLineNo">178</span><a id="line.178">    }</a>
+<span class="sourceLineNo">179</span><a id="line.179">  }</a>
+<span class="sourceLineNo">180</span><a id="line.180"></a>
+<span class="sourceLineNo">181</span><a id="line.181">  @Override</a>
+<span class="sourceLineNo">182</span><a id="line.182">  public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine cmdLine) {</a>
+<span class="sourceLineNo">183</span><a id="line.183">    return ICommandExecutor.using(callingContext, cmdLine, this::executeCommand);</a>
+<span class="sourceLineNo">184</span><a id="line.184">  }</a>
+<span class="sourceLineNo">185</span><a id="line.185"></a>
+<span class="sourceLineNo">186</span><a id="line.186">  @SuppressWarnings({</a>
+<span class="sourceLineNo">187</span><a id="line.187">      "PMD.OnlyOneReturn", // readability</a>
+<span class="sourceLineNo">188</span><a id="line.188">      "unused"</a>
+<span class="sourceLineNo">189</span><a id="line.189">  })</a>
+<span class="sourceLineNo">190</span><a id="line.190">  protected ExitStatus executeCommand(</a>
+<span class="sourceLineNo">191</span><a id="line.191">      @NonNull CallingContext callingContext,</a>
+<span class="sourceLineNo">192</span><a id="line.192">      @NonNull CommandLine cmdLine) {</a>
+<span class="sourceLineNo">193</span><a id="line.193">    List&lt;String&gt; extraArgs = cmdLine.getArgList();</a>
+<span class="sourceLineNo">194</span><a id="line.194">    Path source = resolvePathAgainstCWD(ObjectUtils.notNull(Paths.get(extraArgs.get(0))));</a>
+<span class="sourceLineNo">195</span><a id="line.195"></a>
+<span class="sourceLineNo">196</span><a id="line.196">    IBoundLoader loader = OscalBindingContext.instance().newBoundLoader();</a>
+<span class="sourceLineNo">197</span><a id="line.197">    loader.disableFeature(DeserializationFeature.DESERIALIZE_VALIDATE_CONSTRAINTS);</a>
+<span class="sourceLineNo">198</span><a id="line.198"></a>
+<span class="sourceLineNo">199</span><a id="line.199">    Format asFormat;</a>
+<span class="sourceLineNo">200</span><a id="line.200">    // attempt to determine the format</a>
+<span class="sourceLineNo">201</span><a id="line.201">    if (cmdLine.hasOption(AS_OPTION)) {</a>
+<span class="sourceLineNo">202</span><a id="line.202">      try {</a>
+<span class="sourceLineNo">203</span><a id="line.203">        String asFormatText = cmdLine.getOptionValue(AS_OPTION);</a>
+<span class="sourceLineNo">204</span><a id="line.204">        asFormat = Format.valueOf(asFormatText.toUpperCase(Locale.ROOT));</a>
+<span class="sourceLineNo">205</span><a id="line.205">      } catch (IllegalArgumentException ex) {</a>
+<span class="sourceLineNo">206</span><a id="line.206">        return ExitCode.INVALID_ARGUMENTS</a>
+<span class="sourceLineNo">207</span><a id="line.207">            .exitMessage("Invalid '--as' argument. The format must be one of: " + Arrays.stream(Format.values())</a>
+<span class="sourceLineNo">208</span><a id="line.208">                .map(format -&gt; format.name())</a>
+<span class="sourceLineNo">209</span><a id="line.209">                .collect(CustomCollectors.joiningWithOxfordComma("or")));</a>
+<span class="sourceLineNo">210</span><a id="line.210">      }</a>
+<span class="sourceLineNo">211</span><a id="line.211">    } else {</a>
+<span class="sourceLineNo">212</span><a id="line.212">      // attempt to determine the format</a>
+<span class="sourceLineNo">213</span><a id="line.213">      try {</a>
+<span class="sourceLineNo">214</span><a id="line.214">        asFormat = loader.detectFormat(ObjectUtils.notNull(source));</a>
+<span class="sourceLineNo">215</span><a id="line.215">      } catch (FileNotFoundException ex) {</a>
+<span class="sourceLineNo">216</span><a id="line.216">        // this case was already checked for</a>
+<span class="sourceLineNo">217</span><a id="line.217">        return ExitCode.IO_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");</a>
+<span class="sourceLineNo">218</span><a id="line.218">      } catch (IOException ex) {</a>
+<span class="sourceLineNo">219</span><a id="line.219">        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">220</span><a id="line.220">      } catch (IllegalArgumentException ex) {</a>
+<span class="sourceLineNo">221</span><a id="line.221">        return ExitCode.INVALID_ARGUMENTS.exitMessage(</a>
+<span class="sourceLineNo">222</span><a id="line.222">            "Source file has unrecognizable format. Use '--as' to specify the format. The format must be one of: "</a>
+<span class="sourceLineNo">223</span><a id="line.223">                + Arrays.stream(Format.values())</a>
+<span class="sourceLineNo">224</span><a id="line.224">                    .map(format -&gt; format.name())</a>
+<span class="sourceLineNo">225</span><a id="line.225">                    .collect(CustomCollectors.joiningWithOxfordComma("or")));</a>
+<span class="sourceLineNo">226</span><a id="line.226">      }</a>
+<span class="sourceLineNo">227</span><a id="line.227">    }</a>
+<span class="sourceLineNo">228</span><a id="line.228"></a>
+<span class="sourceLineNo">229</span><a id="line.229">    source = source.toAbsolutePath();</a>
+<span class="sourceLineNo">230</span><a id="line.230"></a>
+<span class="sourceLineNo">231</span><a id="line.231">    Format toFormat;</a>
+<span class="sourceLineNo">232</span><a id="line.232">    if (cmdLine.hasOption(TO_OPTION)) {</a>
+<span class="sourceLineNo">233</span><a id="line.233">      String toFormatText = cmdLine.getOptionValue(TO_OPTION);</a>
+<span class="sourceLineNo">234</span><a id="line.234">      toFormat = Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));</a>
+<span class="sourceLineNo">235</span><a id="line.235">    } else {</a>
+<span class="sourceLineNo">236</span><a id="line.236">      toFormat = asFormat;</a>
+<span class="sourceLineNo">237</span><a id="line.237">    }</a>
+<span class="sourceLineNo">238</span><a id="line.238"></a>
+<span class="sourceLineNo">239</span><a id="line.239">    Path destination = null;</a>
+<span class="sourceLineNo">240</span><a id="line.240">    if (extraArgs.size() == 2) {</a>
+<span class="sourceLineNo">241</span><a id="line.241">      destination = Paths.get(extraArgs.get(1)).toAbsolutePath();</a>
+<span class="sourceLineNo">242</span><a id="line.242">    }</a>
+<span class="sourceLineNo">243</span><a id="line.243"></a>
+<span class="sourceLineNo">244</span><a id="line.244">    if (destination != null) {</a>
+<span class="sourceLineNo">245</span><a id="line.245">      if (Files.exists(destination)) {</a>
+<span class="sourceLineNo">246</span><a id="line.246">        if (!cmdLine.hasOption(OVERWRITE_OPTION)) {</a>
+<span class="sourceLineNo">247</span><a id="line.247">          return ExitCode.INVALID_ARGUMENTS.exitMessage("The provided destination '" + destination</a>
+<span class="sourceLineNo">248</span><a id="line.248">              + "' already exists and the --overwrite option was not provided.");</a>
+<span class="sourceLineNo">249</span><a id="line.249">        }</a>
+<span class="sourceLineNo">250</span><a id="line.250">        if (!Files.isWritable(destination)) {</a>
+<span class="sourceLineNo">251</span><a id="line.251">          return ExitCode.IO_ERROR.exitMessage("The provided destination '" + destination + "' is not writable.");</a>
+<span class="sourceLineNo">252</span><a id="line.252">        }</a>
+<span class="sourceLineNo">253</span><a id="line.253">      } else {</a>
+<span class="sourceLineNo">254</span><a id="line.254">        Path parent = destination.getParent();</a>
+<span class="sourceLineNo">255</span><a id="line.255">        if (parent != null) {</a>
+<span class="sourceLineNo">256</span><a id="line.256">          try {</a>
+<span class="sourceLineNo">257</span><a id="line.257">            Files.createDirectories(parent);</a>
+<span class="sourceLineNo">258</span><a id="line.258">          } catch (IOException ex) {</a>
+<span class="sourceLineNo">259</span><a id="line.259">            return ExitCode.INVALID_TARGET.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">260</span><a id="line.260">          }</a>
+<span class="sourceLineNo">261</span><a id="line.261">        }</a>
+<span class="sourceLineNo">262</span><a id="line.262">      }</a>
+<span class="sourceLineNo">263</span><a id="line.263">    }</a>
+<span class="sourceLineNo">264</span><a id="line.264"></a>
+<span class="sourceLineNo">265</span><a id="line.265">    IDocumentNodeItem document;</a>
+<span class="sourceLineNo">266</span><a id="line.266">    try {</a>
+<span class="sourceLineNo">267</span><a id="line.267">      document = loader.loadAsNodeItem(asFormat, loader.toInputSource(ObjectUtils.notNull(source.toUri())));</a>
+<span class="sourceLineNo">268</span><a id="line.268">    } catch (IOException ex) {</a>
+<span class="sourceLineNo">269</span><a id="line.269">      return ExitCode.IO_ERROR.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">270</span><a id="line.270">    }</a>
+<span class="sourceLineNo">271</span><a id="line.271">    Object object = document.getValue();</a>
+<span class="sourceLineNo">272</span><a id="line.272">    if (object instanceof Catalog) {</a>
+<span class="sourceLineNo">273</span><a id="line.273">      // this is a catalog</a>
+<span class="sourceLineNo">274</span><a id="line.274">      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target file is already a catalog");</a>
+<span class="sourceLineNo">275</span><a id="line.275">    } else if (object instanceof Profile) {</a>
+<span class="sourceLineNo">276</span><a id="line.276">      // this is a profile</a>
+<span class="sourceLineNo">277</span><a id="line.277">      StaticContext staticContext = new StaticContext();</a>
+<span class="sourceLineNo">278</span><a id="line.278">      URI sourceUri = ObjectUtils.notNull(source.toUri());</a>
+<span class="sourceLineNo">279</span><a id="line.279">      staticContext.setBaseUri(sourceUri);</a>
+<span class="sourceLineNo">280</span><a id="line.280">      DynamicContext dynamicContext = staticContext.newDynamicContext();</a>
+<span class="sourceLineNo">281</span><a id="line.281">      dynamicContext.setDocumentLoader(loader);</a>
+<span class="sourceLineNo">282</span><a id="line.282">      ProfileResolver resolver = new ProfileResolver();</a>
+<span class="sourceLineNo">283</span><a id="line.283">      resolver.setDynamicContext(dynamicContext);</a>
+<span class="sourceLineNo">284</span><a id="line.284"></a>
+<span class="sourceLineNo">285</span><a id="line.285">      IDocumentNodeItem resolvedProfile;</a>
+<span class="sourceLineNo">286</span><a id="line.286">      try {</a>
+<span class="sourceLineNo">287</span><a id="line.287">        resolvedProfile = resolver.resolve(document);</a>
+<span class="sourceLineNo">288</span><a id="line.288">      } catch (IOException | ProfileResolutionException ex) {</a>
+<span class="sourceLineNo">289</span><a id="line.289">        return ExitCode.PROCESSING_ERROR</a>
+<span class="sourceLineNo">290</span><a id="line.290">            .exitMessage(</a>
+<span class="sourceLineNo">291</span><a id="line.291">                String.format("Unable to resolve profile '%s'. %s", document.getDocumentUri(), ex.getMessage()))</a>
+<span class="sourceLineNo">292</span><a id="line.292">            .withThrowable(ex);</a>
+<span class="sourceLineNo">293</span><a id="line.293">      }</a>
+<span class="sourceLineNo">294</span><a id="line.294"></a>
+<span class="sourceLineNo">295</span><a id="line.295">      // DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);</a>
+<span class="sourceLineNo">296</span><a id="line.296">      // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);</a>
+<span class="sourceLineNo">297</span><a id="line.297">      // validator.finalizeValidation();</a>
+<span class="sourceLineNo">298</span><a id="line.298"></a>
+<span class="sourceLineNo">299</span><a id="line.299">      ISerializer&lt;Catalog&gt; serializer</a>
+<span class="sourceLineNo">300</span><a id="line.300">          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);</a>
+<span class="sourceLineNo">301</span><a id="line.301">      try {</a>
+<span class="sourceLineNo">302</span><a id="line.302">        if (destination == null) {</a>
+<span class="sourceLineNo">303</span><a id="line.303">          serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));</a>
+<span class="sourceLineNo">304</span><a id="line.304">        } else {</a>
+<span class="sourceLineNo">305</span><a id="line.305">          serializer.serialize((Catalog) resolvedProfile.getValue(), destination);</a>
+<span class="sourceLineNo">306</span><a id="line.306">        }</a>
+<span class="sourceLineNo">307</span><a id="line.307">      } catch (IOException ex) {</a>
+<span class="sourceLineNo">308</span><a id="line.308">        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">309</span><a id="line.309">      }</a>
+<span class="sourceLineNo">310</span><a id="line.310">    }</a>
+<span class="sourceLineNo">311</span><a id="line.311">    return ExitCode.OK.exit();</a>
+<span class="sourceLineNo">312</span><a id="line.312">  }</a>
+<span class="sourceLineNo">313</span><a id="line.313">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

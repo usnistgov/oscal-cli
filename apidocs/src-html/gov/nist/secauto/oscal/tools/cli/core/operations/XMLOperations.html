@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">/*</a>
+<span class="sourceLineNo">002</span><a id="line.2"> * Portions of this software was developed by employees of the National Institute</a>
+<span class="sourceLineNo">003</span><a id="line.3"> * of Standards and Technology (NIST), an agency of the Federal Government and is</a>
+<span class="sourceLineNo">004</span><a id="line.4"> * being made available as a public service. Pursuant to title 17 United States</a>
+<span class="sourceLineNo">005</span><a id="line.5"> * Code Section 105, works of NIST employees are not subject to copyright</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * protection in the United States. This software may be subject to foreign</a>
+<span class="sourceLineNo">007</span><a id="line.7"> * copyright. Permission in the United States and in foreign countries, to the</a>
+<span class="sourceLineNo">008</span><a id="line.8"> * extent that NIST may hold copyright, to use, copy, modify, create derivative</a>
+<span class="sourceLineNo">009</span><a id="line.9"> * works, and distribute this software and its documentation without fee is hereby</a>
+<span class="sourceLineNo">010</span><a id="line.10"> * granted on a non-exclusive basis, provided that this notice and disclaimer</a>
+<span class="sourceLineNo">011</span><a id="line.11"> * of warranty appears in all copies.</a>
+<span class="sourceLineNo">012</span><a id="line.12"> *</a>
+<span class="sourceLineNo">013</span><a id="line.13"> * THE SOFTWARE IS PROVIDED 'AS IS' WITHOUT ANY WARRANTY OF ANY KIND, EITHER</a>
+<span class="sourceLineNo">014</span><a id="line.14"> * EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTY</a>
+<span class="sourceLineNo">015</span><a id="line.15"> * THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY IMPLIED WARRANTIES OF</a>
+<span class="sourceLineNo">016</span><a id="line.16"> * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND FREEDOM FROM</a>
+<span class="sourceLineNo">017</span><a id="line.17"> * INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION WILL CONFORM TO THE</a>
+<span class="sourceLineNo">018</span><a id="line.18"> * SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE ERROR FREE.  IN NO EVENT</a>
+<span class="sourceLineNo">019</span><a id="line.19"> * SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING, BUT NOT LIMITED TO, DIRECT,</a>
+<span class="sourceLineNo">020</span><a id="line.20"> * INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES, ARISING OUT OF, RESULTING FROM,</a>
+<span class="sourceLineNo">021</span><a id="line.21"> * OR IN ANY WAY CONNECTED WITH THIS SOFTWARE, WHETHER OR NOT BASED UPON WARRANTY,</a>
+<span class="sourceLineNo">022</span><a id="line.22"> * CONTRACT, TORT, OR OTHERWISE, WHETHER OR NOT INJURY WAS SUSTAINED BY PERSONS OR</a>
+<span class="sourceLineNo">023</span><a id="line.23"> * PROPERTY OR OTHERWISE, AND WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT</a>
+<span class="sourceLineNo">024</span><a id="line.24"> * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</a>
+<span class="sourceLineNo">025</span><a id="line.25"> */</a>
+<span class="sourceLineNo">026</span><a id="line.26"></a>
+<span class="sourceLineNo">027</span><a id="line.27">package gov.nist.secauto.oscal.tools.cli.core.operations;</a>
+<span class="sourceLineNo">028</span><a id="line.28"></a>
+<span class="sourceLineNo">029</span><a id="line.29">import gov.nist.secauto.metaschema.binding.io.xml.XmlUtil;</a>
+<span class="sourceLineNo">030</span><a id="line.30"></a>
+<span class="sourceLineNo">031</span><a id="line.31">import net.sf.saxon.jaxp.SaxonTransformerFactory;</a>
+<span class="sourceLineNo">032</span><a id="line.32"></a>
+<span class="sourceLineNo">033</span><a id="line.33">import org.apache.logging.log4j.LogManager;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import org.apache.logging.log4j.Logger;</a>
+<span class="sourceLineNo">035</span><a id="line.35"></a>
+<span class="sourceLineNo">036</span><a id="line.36">import java.io.File;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import java.io.IOException;</a>
+<span class="sourceLineNo">038</span><a id="line.38"></a>
+<span class="sourceLineNo">039</span><a id="line.39">import javax.xml.transform.Source;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import javax.xml.transform.Transformer;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import javax.xml.transform.TransformerException;</a>
+<span class="sourceLineNo">042</span><a id="line.42">import javax.xml.transform.TransformerFactory;</a>
+<span class="sourceLineNo">043</span><a id="line.43">import javax.xml.transform.stream.StreamResult;</a>
+<span class="sourceLineNo">044</span><a id="line.44">import javax.xml.transform.stream.StreamSource;</a>
+<span class="sourceLineNo">045</span><a id="line.45"></a>
+<span class="sourceLineNo">046</span><a id="line.46">public final class XMLOperations {</a>
+<span class="sourceLineNo">047</span><a id="line.47">  private static final Logger LOGGER = LogManager.getLogger(XMLOperations.class);</a>
+<span class="sourceLineNo">048</span><a id="line.48"></a>
+<span class="sourceLineNo">049</span><a id="line.49">  private XMLOperations() {</a>
+<span class="sourceLineNo">050</span><a id="line.50">    // disable construction</a>
+<span class="sourceLineNo">051</span><a id="line.51">  }</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">  public static void renderCatalogHTML(File input, File result) throws IOException, TransformerException {</a>
+<span class="sourceLineNo">054</span><a id="line.54">    render(input, result,</a>
+<span class="sourceLineNo">055</span><a id="line.55">        XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));</a>
+<span class="sourceLineNo">056</span><a id="line.56">  }</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">  public static void renderProfileHTML(File input, File result) throws IOException, TransformerException {</a>
+<span class="sourceLineNo">059</span><a id="line.59">    SaxonTransformerFactory transfomerFactory = (SaxonTransformerFactory) TransformerFactory.newInstance();</a>
+<span class="sourceLineNo">060</span><a id="line.60">    // Templates resolver = transfomerFactory.newTemplates();</a>
+<span class="sourceLineNo">061</span><a id="line.61">    // Templates renderer = transfomerFactory.newTemplates();</a>
+<span class="sourceLineNo">062</span><a id="line.62"></a>
+<span class="sourceLineNo">063</span><a id="line.63">    File temp = File.createTempFile("resolved-profile", ".xml");</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">    try {</a>
+<span class="sourceLineNo">066</span><a id="line.66">      Transformer transformer = transfomerFactory</a>
+<span class="sourceLineNo">067</span><a id="line.67">          .newTransformer(XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/profile-resolver.xsl")));</a>
+<span class="sourceLineNo">068</span><a id="line.68">      transformer.transform(new StreamSource(input), new StreamResult(temp));</a>
+<span class="sourceLineNo">069</span><a id="line.69"></a>
+<span class="sourceLineNo">070</span><a id="line.70">      transformer = transfomerFactory.newTransformer(</a>
+<span class="sourceLineNo">071</span><a id="line.71">          XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));</a>
+<span class="sourceLineNo">072</span><a id="line.72">      transformer.transform(new StreamSource(temp), new StreamResult(result));</a>
+<span class="sourceLineNo">073</span><a id="line.73">    } finally {</a>
+<span class="sourceLineNo">074</span><a id="line.74">      if (!temp.delete()) {</a>
+<span class="sourceLineNo">075</span><a id="line.75">        LOGGER.atError().log("failed to delete file: {}", temp);</a>
+<span class="sourceLineNo">076</span><a id="line.76">      }</a>
+<span class="sourceLineNo">077</span><a id="line.77">    }</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">    // TransformerHandler resolverHandler = transfomerFactory.newTransformerHandler(resolver);</a>
+<span class="sourceLineNo">080</span><a id="line.80">    // TransformerHandler rendererHandler = transfomerFactory.newTransformerHandler(renderer);</a>
+<span class="sourceLineNo">081</span><a id="line.81">    //</a>
+<span class="sourceLineNo">082</span><a id="line.82">    // resolverHandler.setResult(new SAXResult(rendererHandler));</a>
+<span class="sourceLineNo">083</span><a id="line.83">    // rendererHandler.setResult(new StreamResult(result));</a>
+<span class="sourceLineNo">084</span><a id="line.84">    //</a>
+<span class="sourceLineNo">085</span><a id="line.85">    // Transformer t = transfomerFactory.newTransformer();</a>
+<span class="sourceLineNo">086</span><a id="line.86">    // File sourceFile = input.getAbsoluteFile();</a>
+<span class="sourceLineNo">087</span><a id="line.87">    // StreamSource source = new StreamSource();</a>
+<span class="sourceLineNo">088</span><a id="line.88">    // String sourceSystemId = sourceFile.toURI().toASCIIString();</a>
+<span class="sourceLineNo">089</span><a id="line.89">    // log.info("Source: "+sourceSystemId);</a>
+<span class="sourceLineNo">090</span><a id="line.90">    // source.setSystemId(sourceSystemId);</a>
+<span class="sourceLineNo">091</span><a id="line.91">    // t.setURIResolver(new LoggingURIResolver(t.getURIResolver()));</a>
+<span class="sourceLineNo">092</span><a id="line.92">    // resolver.setParameter("document-uri", sourceSystemId);</a>
+<span class="sourceLineNo">093</span><a id="line.93">    // t.transform(source, new SAXResult(resolverHandler));</a>
+<span class="sourceLineNo">094</span><a id="line.94">  }</a>
+<span class="sourceLineNo">095</span><a id="line.95"></a>
+<span class="sourceLineNo">096</span><a id="line.96">  public static void render(File input, File result, Source transform) throws TransformerException {</a>
+<span class="sourceLineNo">097</span><a id="line.97">    TransformerFactory transfomerFactory = TransformerFactory.newInstance();</a>
+<span class="sourceLineNo">098</span><a id="line.98">    assert transfomerFactory instanceof SaxonTransformerFactory;</a>
+<span class="sourceLineNo">099</span><a id="line.99">    Transformer transformer = transfomerFactory.newTransformer(transform);</a>
+<span class="sourceLineNo">100</span><a id="line.100">    transformer.transform(new StreamSource(input), new StreamResult(result));</a>
+<span class="sourceLineNo">101</span><a id="line.101">  }</a>
+<span class="sourceLineNo">102</span><a id="line.102"></a>
+<span class="sourceLineNo">103</span><a id="line.103">  // private static class LoggingURIResolver implements URIResolver {</a>
+<span class="sourceLineNo">104</span><a id="line.104">  // private final URIResolver delegate;</a>
+<span class="sourceLineNo">105</span><a id="line.105">  //</a>
+<span class="sourceLineNo">106</span><a id="line.106">  //</a>
+<span class="sourceLineNo">107</span><a id="line.107">  // public LoggingURIResolver(URIResolver delegate) {</a>
+<span class="sourceLineNo">108</span><a id="line.108">  // super();</a>
+<span class="sourceLineNo">109</span><a id="line.109">  // this.delegate = delegate;</a>
+<span class="sourceLineNo">110</span><a id="line.110">  // }</a>
+<span class="sourceLineNo">111</span><a id="line.111">  //</a>
+<span class="sourceLineNo">112</span><a id="line.112">  //</a>
+<span class="sourceLineNo">113</span><a id="line.113">  // @Override</a>
+<span class="sourceLineNo">114</span><a id="line.114">  // public Source resolve(String href, String base) throws TransformerException {</a>
+<span class="sourceLineNo">115</span><a id="line.115">  // log.info("Resolve: base='{}', href='{}'", base, href);</a>
+<span class="sourceLineNo">116</span><a id="line.116">  // return delegate.resolve(href, base);</a>
+<span class="sourceLineNo">117</span><a id="line.117">  // }</a>
+<span class="sourceLineNo">118</span><a id="line.118">  //</a>
+<span class="sourceLineNo">119</span><a id="line.119">  // }</a>
+<span class="sourceLineNo">120</span><a id="line.120">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

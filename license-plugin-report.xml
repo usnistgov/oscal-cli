@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1689998949666">
+    <module artifactId="cli-core" groupId="gov.nist.secauto.oscal.tools.oscal-cli" version="0.3.4"/>
+    <files>
+        <file path="src/test/java/gov/nist/secauto/oscal/tools/cli/core/CLITest.java" result="NOOP"/>
+        <file path="src/test/java/gov/nist/secauto/oscal/tools/cli/core/NullYamlValuesTest.java" result="NOOP"/>
+        <file path="src/test/java/gov/nist/secauto/oscal/tools/cli/core/commands/Issue96ClassLoaderTest.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
