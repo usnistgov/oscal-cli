@@ -59,13 +59,6 @@ class Issue96ClassLoaderTest {
   }
 
   @Test
-  void testMappingCollectionClassLoader() {
-    AbstractOscalConvertSubcommand subcommand
-        = new gov.nist.secauto.oscal.tools.cli.core.commands.mappingcollection.ConvertSubcommand();
-    assertEquals("MappingCollection", subcommand.getOscalClass().getSimpleName());
-  }
-
-  @Test
   void testPoamClassLoader() {
     AbstractOscalConvertSubcommand subcommand
         = new gov.nist.secauto.oscal.tools.cli.core.commands.poam.ConvertSubcommand();
