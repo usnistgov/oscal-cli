@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-core</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -22,7 +22,7 @@
 		<url>https://github.com/usnistgov/oscal-cli/tree/main</url>
 		<connection>scm:git:git@github.com/usnistgov/oscal-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:usnistgov/oscal-cli.git</developerConnection>
-		<tag>v1.0.0</tag>
+		<tag>v0.2.0</tag>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
