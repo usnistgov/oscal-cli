@@ -26,10 +26,10 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.cli.commands.AbstractConvertSubcommand;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
+import gov.nist.secauto.metaschema.databind.IBindingContext;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
 import org.apache.commons.cli.CommandLine;

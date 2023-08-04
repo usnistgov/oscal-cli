@@ -26,16 +26,17 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
-import gov.nist.secauto.metaschema.binding.io.xml.XmlUtil;
-import gov.nist.secauto.metaschema.model.common.util.CollectionUtil;
-import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
-import gov.nist.secauto.metaschema.model.common.validation.JsonSchemaContentValidator;
+import gov.nist.secauto.metaschema.core.model.util.JsonUtil;
+import gov.nist.secauto.metaschema.core.model.util.XmlUtil;
+import gov.nist.secauto.metaschema.core.util.CollectionUtil;
+import gov.nist.secauto.metaschema.core.util.ObjectUtils;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalValidationSubcommand;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,15 +53,28 @@ public class ValidateSubcommand
   protected List<Source> getOscalXmlSchemas() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval.add(
+<<<<<<< HEAD
         ObjectUtils.requireNonNull(
             XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal-profile_schema.xsd"))));
+=======
+        XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
+            OscalBindingContext.class.getResource("/schema/xml/oscal_profile_schema.xsd"))));
+>>>>>>> d612448 (Integrated changes based on metaschema-java 1.0.0 refactoring.)
     return CollectionUtil.unmodifiableList(retval);
   }
 
   @Override
+<<<<<<< HEAD
   protected JSONObject getOscalJsonSchema() {
     return JsonSchemaContentValidator.toJsonObject(
         ObjectUtils.requireNonNull(
             OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-profile_schema.json")));
+=======
+  protected JSONObject getOscalJsonSchema() throws IOException {
+    try (InputStream is = ObjectUtils.requireNonNull(
+        OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_profile_schema.json"))) {
+      return JsonUtil.toJsonObject(is);
+    }
+>>>>>>> d612448 (Integrated changes based on metaschema-java 1.0.0 refactoring.)
   }
 }
