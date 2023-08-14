@@ -55,7 +55,7 @@ public class ValidateSubcommand
     retval
         .add(
             ObjectUtils.requireNonNull(
-                XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal_poam_schema.xsd"))));
+                XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal-poam_schema.xsd"))));
     return CollectionUtil.unmodifiableList(retval);
   }
 
@@ -63,6 +63,6 @@ public class ValidateSubcommand
   protected JSONObject getOscalJsonSchema() {
     return JsonSchemaContentValidator.toJsonObject(
         ObjectUtils.requireNonNull(
-            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_poam_schema.json")));
+            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-poam_schema.json")));
   }
 }
