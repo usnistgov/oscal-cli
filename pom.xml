@@ -78,8 +78,8 @@
 	</mailingLists>
 	<properties>
 		<!-- metaschema dependencies -->
-		<dependency.metaschema-framework.version>0.12.0</dependency.metaschema-framework.version>
-		<dependency.liboscal-java.version>3.0.1-SNAPSHOT</dependency.liboscal-java.version>
+		<dependency.metaschema-framework.version>0.12.1</dependency.metaschema-framework.version>
+		<dependency.liboscal-java.version>3.0.1</dependency.liboscal-java.version>
 
 		<!-- site configuration -->
 		<site.url>https://pages.nist.gov/metaschema-java/</site.url>
