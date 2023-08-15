@@ -16,6 +16,7 @@ jobs:
       with:
         token: ${{ github.token }}
         submodules: recursive
+        fetch-depth: 0
     # -------------------------
     # Java
     # -------------------------
