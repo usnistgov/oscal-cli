@@ -63,7 +63,7 @@
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>      retval
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>          .add(
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>              ObjectUtils.requireNonNull(
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>                  XmlUtil.getStreamSource(OscalBindingContext.<strong class="jxr_keyword">class</strong>.getResource(<span class="jxr_string">"/schema/xml/oscal_poam_schema.xsd"</span>))));
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>                  XmlUtil.getStreamSource(OscalBindingContext.<strong class="jxr_keyword">class</strong>.getResource(<span class="jxr_string">"/schema/xml/oscal-poam_schema.xsd"</span>))));
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>      <strong class="jxr_keyword">return</strong> CollectionUtil.unmodifiableList(retval);
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>    }
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
@@ -71,7 +71,7 @@
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>    <strong class="jxr_keyword">protected</strong> JSONObject getOscalJsonSchema() {
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>      <strong class="jxr_keyword">return</strong> JsonSchemaContentValidator.toJsonObject(
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>          ObjectUtils.requireNonNull(
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>              OscalBindingContext.<strong class="jxr_keyword">class</strong>.getResourceAsStream(<span class="jxr_string">"/schema/json/oscal_poam_schema.json"</span>)));
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>              OscalBindingContext.<strong class="jxr_keyword">class</strong>.getResourceAsStream(<span class="jxr_string">"/schema/json/oscal-poam_schema.json"</span>)));
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>    }
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>  }
 </pre>

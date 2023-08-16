@@ -63,7 +63,7 @@
 <span class="sourceLineNo">054</span><a id="line.54">    retval.add(</a>
 <span class="sourceLineNo">055</span><a id="line.55">        ObjectUtils.requireNonNull(</a>
 <span class="sourceLineNo">056</span><a id="line.56">            XmlUtil.getStreamSource(</a>
-<span class="sourceLineNo">057</span><a id="line.57">                OscalBindingContext.class.getResource("/schema/xml/oscal_assessment-plan_schema.xsd"))));</a>
+<span class="sourceLineNo">057</span><a id="line.57">                OscalBindingContext.class.getResource("/schema/xml/oscal-ap_schema.xsd"))));</a>
 <span class="sourceLineNo">058</span><a id="line.58">    return CollectionUtil.unmodifiableList(retval);</a>
 <span class="sourceLineNo">059</span><a id="line.59">  }</a>
 <span class="sourceLineNo">060</span><a id="line.60"></a>
@@ -71,7 +71,7 @@
 <span class="sourceLineNo">062</span><a id="line.62">  protected JSONObject getOscalJsonSchema() {</a>
 <span class="sourceLineNo">063</span><a id="line.63">    return JsonSchemaContentValidator.toJsonObject(</a>
 <span class="sourceLineNo">064</span><a id="line.64">        ObjectUtils.requireNonNull(</a>
-<span class="sourceLineNo">065</span><a id="line.65">            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_assessment-plan_schema.json")));</a>
+<span class="sourceLineNo">065</span><a id="line.65">            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-ap_schema.json")));</a>
 <span class="sourceLineNo">066</span><a id="line.66">  }</a>
 <span class="sourceLineNo">067</span><a id="line.67">}</a>
 
