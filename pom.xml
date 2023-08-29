@@ -113,6 +113,7 @@
 		<dependency.commons-io.version>2.14.0</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.3</dependency.everit-json.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
+		<dependency.json.version>20230618</dependency.json.version>
 		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.3</dependency.saxon-he.version>
@@ -221,6 +222,12 @@
 			<version>${dependency.everit-json.version}</version>
 		</dependency>
 		<dependency>
+			<!-- for dependency convergence -->
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${dependency.json.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.spotbugs</groupId>
 			<artifactId>spotbugs-annotations</artifactId>
 			<scope>provided</scope>
@@ -312,8 +319,7 @@
 							<addClasspath>true</addClasspath>
 							<!-- <classpathPrefix>lib/</classpathPrefix> -->
 							<classpathLayoutType>custom</classpathLayoutType>
-							<customClasspathLayout>
-								${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
+							<customClasspathLayout>${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
 						</manifest>
 					</archive>
 				</configuration>
@@ -332,10 +338,8 @@
 					<generateRepository>false</generateRepository>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-					<outputFileNameMapping>
-						@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
-					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
-						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
+					<outputFileNameMapping>@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
+					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8</extraJvmArguments>
 					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
 					<includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
 				</configuration>
@@ -413,14 +417,10 @@
 							<goal>add-third-party</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>
-								${project.build.directory}/generated-distro</outputDirectory>
+							<outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
 							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
 							<licenseMerges>
-								<licenseMerge>The Apache Software License,
-									Version 2.0|Apache
-									License, Version 2.0|Apache Public License
-									2.0</licenseMerge>
+								<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
 							</licenseMerges>
 						</configuration>
 					</execution>

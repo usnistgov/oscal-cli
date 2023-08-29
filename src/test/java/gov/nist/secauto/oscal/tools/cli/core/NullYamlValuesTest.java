@@ -53,7 +53,8 @@ public class NullYamlValuesTest {
   @SuppressWarnings("null")
   @Test
   void testLoadYamlNullVar1() throws IOException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
             ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-1.yaml")));
@@ -68,7 +69,8 @@ public class NullYamlValuesTest {
   @SuppressWarnings("null")
   @Test
   void testLoadYamlNullVar2() throws IOException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
             ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-2.yaml")));
@@ -83,7 +85,8 @@ public class NullYamlValuesTest {
   @SuppressWarnings("null")
   @Test
   void testLoadYamlNullVar3() throws IOException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
             ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-3.yaml")));
