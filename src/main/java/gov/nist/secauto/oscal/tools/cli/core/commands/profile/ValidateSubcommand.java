@@ -53,28 +53,16 @@ public class ValidateSubcommand
   protected List<Source> getOscalXmlSchemas() throws IOException {
     List<Source> retval = new LinkedList<>();
     retval.add(
-<<<<<<< HEAD
-        ObjectUtils.requireNonNull(
-            XmlUtil.getStreamSource(OscalBindingContext.class.getResource("/schema/xml/oscal-profile_schema.xsd"))));
-=======
         XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
-            OscalBindingContext.class.getResource("/schema/xml/oscal_profile_schema.xsd"))));
->>>>>>> d612448 (Integrated changes based on metaschema-java 1.0.0 refactoring.)
+            OscalBindingContext.class.getResource("/schema/xml/oscal-profile_schema.xsd"))));
     return CollectionUtil.unmodifiableList(retval);
   }
 
   @Override
-<<<<<<< HEAD
-  protected JSONObject getOscalJsonSchema() {
-    return JsonSchemaContentValidator.toJsonObject(
-        ObjectUtils.requireNonNull(
-            OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-profile_schema.json")));
-=======
   protected JSONObject getOscalJsonSchema() throws IOException {
     try (InputStream is = ObjectUtils.requireNonNull(
-        OscalBindingContext.class.getResourceAsStream("/schema/json/oscal_profile_schema.json"))) {
+        OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-profile_schema.json"))) {
       return JsonUtil.toJsonObject(is);
     }
->>>>>>> d612448 (Integrated changes based on metaschema-java 1.0.0 refactoring.)
   }
 }
