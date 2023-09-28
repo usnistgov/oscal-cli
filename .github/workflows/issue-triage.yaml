@@ -1,0 +1,18 @@
+name: Triage Board Management
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+      - transferred
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/add-to-project@31b3f3ccdc584546fc445612dec3f38ff5edb41c
+        with:
+          project-url: https://github.com/orgs/usnistgov/projects/25
+          github-token: ${{ secrets.COMMIT_TOKEN }}
