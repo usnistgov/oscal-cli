@@ -284,7 +284,7 @@ public class ResolveSubcommand
       DynamicContext dynamicContext = StaticContext.builder()
           .baseUri(sourceUri)
           .build()
-          .newDynamicContext();
+          .dynamicContext();
       dynamicContext.setDocumentLoader(loader);
       ProfileResolver resolver = new ProfileResolver();
       resolver.setDynamicContext(dynamicContext);

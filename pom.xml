@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>27-SNAPSHOT</version>
+		<version>28-SNAPSHOT</version>
 	</parent>
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-core</artifactId>
@@ -78,7 +78,7 @@
 	</mailingLists>
 	<properties>
 		<!-- metaschema dependencies -->
-		<dependency.metaschema-framework.version>1.0.0-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.metaschema-framework.version>1.0.0-M2-SNAPSHOT</dependency.metaschema-framework.version>
 		<dependency.liboscal-java.version>3.0.3-SNAPSHOT</dependency.liboscal-java.version>
 
 		<!-- site configuration -->
