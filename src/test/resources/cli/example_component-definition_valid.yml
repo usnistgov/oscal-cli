@@ -1,0 +1,39 @@
+---
+component-definition:
+  uuid: 798721e5-8e19-42f1-8155-4a4391f86043
+  metadata:
+    title: Valid OSCAL Document
+    last-modified: 2023-10-24T00:00:00Z
+    version: "1.0"
+    oscal-version: 1.1.1
+    roles:
+    - id: maintainer
+      title: Maintainer of oscal-cli
+    parties:
+    - uuid: 4ba3f2b7-e894-48d7-b940-91c68661df55
+      type: person
+      name: NIST ITL CSD Developer
+    responsible-parties:
+    - role-id: maintainer
+      party-uuids:
+      - 4ba3f2b7-e894-48d7-b940-91c68661df55
+  components:
+  - uuid: cc215481-bfb2-4537-b5b0-f46914656975
+    type: software
+    title: Example Component 1
+    description: This description is an explanation of the example component.
+    control-implementations:
+    - uuid: 84964fa9-4e81-4193-8949-20257f5699e7
+      source: '#dce50e70-62c6-423a-bee2-7dceafeadd0e'
+      description: This description is an explanation of how the component generally supports control implementations for controls from a source catalog.
+      implemented-requirements:
+      - uuid: 975b0e00-b5e2-482e-bff1-8f97e8027573
+        control-id: control-1
+        description: This description is an explanation of how this component supports the control implementation specifically for Example Catalog Control 1.
+  back-matter:
+    resources:
+    - uuid: dce50e70-62c6-423a-bee2-7dceafeadd0e
+      rlinks:
+      - href: example_ap_valid.xml
+      - href: example_ap_valid.json
+      - href: example_ap_valid.yaml

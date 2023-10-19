@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://github.com/usnistgov/OSCAL/releases/download/v1.1.1/oscal_complete_schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<plan-of-action-and-milestones xmlns="http://csrc.nist.gov/ns/oscal/1.0" uuid="5405cf0f-87a2-4bfb-a334-57a8d62bf945">
+    <metadata>
+        <title>Invalid OSCAL Document</title>
+        <last-modified>2023-10-24T00:00:00.000000-00:00</last-modified>
+        <version>1.0</version>
+        <oscal-version>1.1.1</oscal-version>
+        <role id="maintainer">
+            <title>Maintainer of oscal-cli</title>
+        </role>
+        <party uuid="4ba3f2b7-e894-48d7-b940-91c68661df55" type="person">
+            <name>NIST ITL CSD Developer</name>
+        </party>
+        <responsible-party role-id="maintainer">
+            <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+        </responsible-party>
+    </metadata>
+    <import-ssp href="#20b9606d-08bd-42d2-b684-3c8e57ab5c44"/>
+    <back-matter>
+        <resource uuid="20b9606d-08bd-42d2-b684-3c8e57ab5c44">
+            <rlink href="example_ssp_invalid.xml"/>
+            <rlink href="example_ssp_invalid.json"/>
+            <rlink href="example_ssp_invalid.yaml"/>
+        </resource>
+    </back-matter>
+</plan-of-action-and-milestones>

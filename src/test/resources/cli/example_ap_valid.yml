@@ -1,0 +1,31 @@
+---
+assessment-plan:
+  uuid: 948a30b0-a706-43b0-ac5a-4c64fda1c3d0
+  metadata:
+    title: Valid OSCAL Document
+    last-modified: 2023-10-24T00:00:00Z
+    version: "1.0"
+    oscal-version: 1.1.1
+    roles:
+    - id: maintainer
+      title: Maintainer of oscal-cli
+    parties:
+    - uuid: 4ba3f2b7-e894-48d7-b940-91c68661df55
+      type: person
+      name: NIST ITL CSD Developer
+    responsible-parties:
+    - role-id: maintainer
+      party-uuids:
+      - 4ba3f2b7-e894-48d7-b940-91c68661df55
+  import-ssp:
+    href: '#4a8f42e8-1357-4664-bd88-aac54cb9aeb8'
+  reviewed-controls:
+    control-selections:
+    - include-all: {}
+  back-matter:
+    resources:
+    - uuid: 4a8f42e8-1357-4664-bd88-aac54cb9aeb8
+      rlinks:
+      - href: example_ssp_valid.xml
+      - href: example_ssp_valid.json
+      - href: example_ssp_valid.yaml

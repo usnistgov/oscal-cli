@@ -1,0 +1,43 @@
+{
+  "catalog" : {
+    "uuid" : "cabcd8ed-bf29-4e63-b15c-7a559ffa2426",
+    "metadata" : {
+      "title" : "Valid OSCAL Document",
+      "last-modified" : "2023-10-24T00:00:00Z",
+      "version" : "1.0",
+      "oscal-version" : "1.1.1",
+      "roles" : [ {
+        "id" : "maintainer",
+        "title" : "Maintainer of oscal-cli"
+      } ],
+      "parties" : [ {
+        "uuid" : "4ba3f2b7-e894-48d7-b940-91c68661df55",
+        "type" : "person",
+        "name" : "NIST ITL CSD Developer"
+      } ],
+      "responsible-parties" : [ {
+        "role-id" : "maintainer",
+        "party-uuids" : [ "4ba3f2b7-e894-48d7-b940-91c68661df55" ]
+      } ]
+    },
+    "groups" : [ {
+      "id" : "eg1",
+      "title" : "Example Group 1",
+      "controls" : [ {
+        "id" : "control-1",
+        "title" : "Control 1",
+        "parts" : [ {
+          "name" : "statement",
+          "prose" : "This statement is a requirement for Control 1."
+        } ]
+      }, {
+        "id" : "control-2",
+        "title" : "Control 2",
+        "parts" : [ {
+          "name" : "statement",
+          "prose" : "This statement is a requirement for Control 2."
+        } ]
+      } ]
+    } ]
+  }
+}

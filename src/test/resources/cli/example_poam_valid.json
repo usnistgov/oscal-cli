@@ -1,0 +1,44 @@
+{
+  "plan-of-action-and-milestones" : {
+    "uuid" : "51657392-cc1f-4e77-977c-91528f690be2",
+    "metadata" : {
+      "title" : "Valid OSCAL Document",
+      "last-modified" : "2023-10-24T00:00:00Z",
+      "version" : "1.0",
+      "oscal-version" : "1.1.1",
+      "roles" : [ {
+        "id" : "maintainer",
+        "title" : "Maintainer of oscal-cli"
+      } ],
+      "parties" : [ {
+        "uuid" : "4ba3f2b7-e894-48d7-b940-91c68661df55",
+        "type" : "person",
+        "name" : "NIST ITL CSD Developer"
+      } ],
+      "responsible-parties" : [ {
+        "role-id" : "maintainer",
+        "party-uuids" : [ "4ba3f2b7-e894-48d7-b940-91c68661df55" ]
+      } ]
+    },
+    "import-ssp" : {
+      "href" : "#788cfb28-cca0-45dc-8f3e-65fe0345ea6a"
+    },
+    "poam-items" : [ {
+      "uuid" : "c8d39ca5-7563-45d8-b90b-969f8c38bb48",
+      "title" : "Example PO\\&M Entry 1",
+      "description" : "This description is an explanation of the action or milestone planned to remediate an issue for the system documented in the example SSP."
+    } ],
+    "back-matter" : {
+      "resources" : [ {
+        "uuid" : "e3249cf0-1115-41db-8660-760b9cf89d9e",
+        "rlinks" : [ {
+          "href" : "example_ssp_valid.xml"
+        }, {
+          "href" : "example_ssp_valid.json"
+        }, {
+          "href" : "example_ssp_valid.yaml"
+        } ]
+      } ]
+    }
+  }
+}

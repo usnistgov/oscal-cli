@@ -1,0 +1,139 @@
+{
+  "system-security-plan" : {
+    "uuid" : "971bdd00-c808-41fb-ad3b-2aa674e54b68",
+    "metadata" : {
+      "title" : "Valid OSCAL Document",
+      "last-modified" : "2023-10-24T00:00:00Z",
+      "version" : "1.0",
+      "oscal-version" : "1.1.1",
+      "roles" : [ {
+        "id" : "maintainer",
+        "title" : "Maintainer of oscal-cli"
+      } ],
+      "parties" : [ {
+        "uuid" : "4ba3f2b7-e894-48d7-b940-91c68661df55",
+        "type" : "person",
+        "name" : "NIST ITL CSD Developer"
+      } ],
+      "responsible-parties" : [ {
+        "role-id" : "maintainer",
+        "party-uuids" : [ "4ba3f2b7-e894-48d7-b940-91c68661df55" ]
+      } ]
+    },
+    "import-profile" : {
+      "href" : "#2891ef24-9089-4be5-b848-8293f6fa269b"
+    },
+    "system-characteristics" : {
+      "system-ids" : [ {
+        "identifier-type" : "http://ietf.org/rfc/rfc4122",
+        "id" : "8101e04d-8305-4e73-bb95-6b59f645b143"
+      } ],
+      "system-name" : "Example System",
+      "description" : "This is a description of an example system.",
+      "security-sensitivity-level" : "moderate",
+      "system-information" : {
+        "information-types" : [ {
+          "uuid" : "bccfbb65-a7f3-41ac-989f-01d96eddfdc7",
+          "title" : "Example Information Type",
+          "description" : "This description is for an example information type.",
+          "categorizations" : [ {
+            "system" : "https://doi.org/10.6028/NIST.SP.800-60v2r1",
+            "information-type-ids" : [ "C.2.8.12" ]
+          } ],
+          "confidentiality-impact" : {
+            "base" : "fips-199-low"
+          },
+          "integrity-impact" : {
+            "base" : "fips-199-low",
+            "selected" : "fips-199-moderate",
+            "adjustment-justification" : "Maliciously modified links are a concern"
+          },
+          "availability-impact" : {
+            "base" : "fips-199-low"
+          }
+        } ]
+      },
+      "security-impact-level" : {
+        "security-objective-confidentiality" : "low",
+        "security-objective-integrity" : "medium",
+        "security-objective-availability" : "low"
+      },
+      "status" : {
+        "state" : "under-development"
+      },
+      "authorization-boundary" : {
+        "description" : "This description is an explanation of the authorization boundary."
+      }
+    },
+    "system-implementation" : {
+      "users" : [ {
+        "uuid" : "00d323d3-dc3f-4d93-900f-f13430e094d3",
+        "title" : "System Administrator",
+        "description" : "This is a description of a user type.",
+        "role-ids" : [ "maintainer" ],
+        "authorized-privileges" : [ {
+          "title" : "System Administrator Privilege",
+          "functions-performed" : [ "administration" ]
+        } ]
+      } ],
+      "components" : [ {
+        "uuid" : "551b9706-d6a4-4d25-8207-f2ccec548b89",
+        "type" : "this-system",
+        "title" : "Example System Core Component",
+        "description" : "This description is an explanation of the this-system component.",
+        "status" : {
+          "state" : "under-development"
+        },
+        "responsible-roles" : [ {
+          "role-id" : "maintainer",
+          "party-uuids" : [ "4ba3f2b7-e894-48d7-b940-91c68661df55" ]
+        } ]
+      } ],
+      "inventory-items" : [ {
+        "uuid" : "cd39f700-23ab-4574-a17e-c9c8f073cbec",
+        "description" : "This description is an explanation of the inventory.",
+        "props" : [ {
+          "name" : "asset-id",
+          "value" : "instance-abcd1234"
+        }, {
+          "name" : "ipv4-address",
+          "value" : "172.1.2.3"
+        } ],
+        "implemented-components" : [ {
+          "component-uuid" : "551b9706-d6a4-4d25-8207-f2ccec548b89",
+          "props" : [ {
+            "name" : "asset-id",
+            "value" : "EXAMPLE-SYSTEM-123"
+          } ]
+        } ]
+      } ]
+    },
+    "control-implementation" : {
+      "description" : "This description is an explanation of the system's control implementation.",
+      "implemented-requirements" : [ {
+        "uuid" : "d5f9b263-965d-440b-99e7-77f5df670a11",
+        "control-id" : "control-1",
+        "by-components" : [ {
+          "component-uuid" : "551b9706-d6a4-4d25-8207-f2ccec548b89",
+          "uuid" : "a4c2d318-26a9-49df-9818-ee0acaf066f2",
+          "description" : "This description is an explanation of the component that implements this requirement.",
+          "implementation-status" : {
+            "state" : "not-implemented"
+          }
+        } ]
+      } ]
+    },
+    "back-matter" : {
+      "resources" : [ {
+        "uuid" : "2891ef24-9089-4be5-b848-8293f6fa269b",
+        "rlinks" : [ {
+          "href" : "example_profile_valid.xml"
+        }, {
+          "href" : "example_profile_valid.json"
+        }, {
+          "href" : "example_profile_valid.yaml"
+        } ]
+      } ]
+    }
+  }
+}

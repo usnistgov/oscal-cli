@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://github.com/usnistgov/OSCAL/releases/download/v1.1.1/oscal_complete_schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<system-security-plan xmlns="http://csrc.nist.gov/ns/oscal/1.0" uuid="971bdd00-c808-41fb-ad3b-2aa674e54b68">
+    <metadata>
+        <title>Valid OSCAL Document</title>
+        <last-modified>2023-10-24T00:00:00.000000-00:00</last-modified>
+        <version>1.0</version>
+        <oscal-version>1.1.1</oscal-version>
+        <role id="maintainer">
+            <title>Maintainer of oscal-cli</title>
+        </role>
+        <party uuid="4ba3f2b7-e894-48d7-b940-91c68661df55" type="person">
+            <name>NIST ITL CSD Developer</name>
+        </party>
+        <responsible-party role-id="maintainer">
+            <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+        </responsible-party>
+    </metadata>
+    <import-profile href="#2891ef24-9089-4be5-b848-8293f6fa269b"/>
+    <system-characteristics>
+        <system-id identifier-type="http://ietf.org/rfc/rfc4122">8101e04d-8305-4e73-bb95-6b59f645b143</system-id>
+        <system-name>Example System</system-name>
+        <description>
+            <p>This is a description of an example system.</p>
+        </description>
+        <security-sensitivity-level>moderate</security-sensitivity-level>
+        <system-information>
+            <information-type uuid="bccfbb65-a7f3-41ac-989f-01d96eddfdc7">
+                <title>Example Information Type</title>
+                <description>
+                    <p>This description is for an example information type.</p>
+                </description>
+                <categorization system="https://doi.org/10.6028/NIST.SP.800-60v2r1">
+                    <information-type-id>C.2.8.12</information-type-id>
+                </categorization>
+                <confidentiality-impact>
+                    <base>fips-199-low</base>
+                </confidentiality-impact>
+                <integrity-impact>
+                    <base>fips-199-low</base>
+                    <selected>fips-199-moderate</selected>
+                    <adjustment-justification>
+                        <p>Maliciously modified links are a concern</p>
+                    </adjustment-justification>
+                </integrity-impact>
+                <availability-impact>
+                    <base>fips-199-low</base>
+                </availability-impact>
+            </information-type>
+        </system-information>
+        <security-impact-level>
+            <security-objective-confidentiality>low</security-objective-confidentiality>
+            <security-objective-integrity>medium</security-objective-integrity>
+            <security-objective-availability>low</security-objective-availability>
+        </security-impact-level>
+        <status state="under-development"/>
+        <authorization-boundary>
+            <description>
+                <p>This description is an explanation of the authorization boundary.</p>
+            </description>
+        </authorization-boundary>
+    </system-characteristics>
+    <system-implementation>
+        <user uuid="00d323d3-dc3f-4d93-900f-f13430e094d3">
+            <title>System Administrator</title>
+            <description>
+                <p>This is a description of a user type.</p>
+            </description>
+            <role-id>maintainer</role-id>
+            <authorized-privilege>
+                <title>System Administrator Privilege</title>
+                <function-performed>administration</function-performed>
+            </authorized-privilege>
+        </user>
+        <component uuid="551b9706-d6a4-4d25-8207-f2ccec548b89" type="this-system">
+            <title>Example System Core Component</title>
+            <description>
+                <p>This description is an explanation of the this-system component.</p>
+            </description>
+            <status state="under-development"/>
+            <responsible-role role-id="maintainer">
+                <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+            </responsible-role>
+        </component>
+        <inventory-item uuid="cd39f700-23ab-4574-a17e-c9c8f073cbec">
+            <description>
+                <p>This description is an explanation of the inventory.</p>
+            </description>
+            <prop name="asset-id" value="instance-abcd1234"/>
+            <prop name="ipv4-address" value="172.1.2.3"/>
+            <implemented-component component-uuid="551b9706-d6a4-4d25-8207-f2ccec548b89">
+                <prop name="asset-id" value="EXAMPLE-SYSTEM-123"/>
+            </implemented-component>
+        </inventory-item>
+    </system-implementation>
+    <control-implementation>
+        <description>
+            <p>This description is an explanation of the system's control implementation.</p>
+        </description>
+        <implemented-requirement uuid="d5f9b263-965d-440b-99e7-77f5df670a11" control-id="control-1">
+            <by-component component-uuid="551b9706-d6a4-4d25-8207-f2ccec548b89" uuid="a4c2d318-26a9-49df-9818-ee0acaf066f2">
+                <description>
+                    <p>This description is an explanation of the component that implements this requirement.</p>
+                </description>
+                <implementation-status state="not-implemented"/>
+            </by-component>
+        </implemented-requirement>        
+    </control-implementation>
+    <back-matter>
+        <resource uuid="2891ef24-9089-4be5-b848-8293f6fa269b">
+            <rlink href="example_profile_valid.xml"/>
+            <rlink href="example_profile_valid.json"/>
+            <rlink href="example_profile_valid.yaml"/>
+        </resource>
+    </back-matter>
+</system-security-plan>
