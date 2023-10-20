@@ -113,8 +113,8 @@
 		<dependency.commons-io.version>2.14.0</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.3</dependency.everit-json.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.json.version>20230618</dependency.json.version>
-		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
+		<dependency.json.version>20231013</dependency.json.version>
+		<dependency.log4j2.version>2.21.0</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.3</dependency.saxon-he.version>
 		<dependency.xmlresolver.version>5.2.0</dependency.xmlresolver.version>
