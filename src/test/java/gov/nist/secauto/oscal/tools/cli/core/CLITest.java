@@ -30,24 +30,19 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import gov.nist.secauto.metaschema.binding.io.Format;
 import gov.nist.secauto.metaschema.cli.processor.ExitCode;
 import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
 import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;
 
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -81,6 +76,8 @@ public class CLITest {
         () -> assertEquals(thrownClass, thrown.getClass(), "expected Throwable mismatch"));
   }
 
+  
+
   @Test
   void testValidateSubcommandsHelp() {
     for (String cmd : MODEL_COMMANDS) {
@@ -99,12 +96,11 @@ public class CLITest {
   }
 
   @Test
-  void testValidateSubCommandInvalidFile() throws IOException, URISyntaxException {
+  void testValidateSubCommandInvalidFile() {
     for (String cmd : MODEL_COMMANDS) {
       for (Format format : Format.values()) {
-        URL url = getClass().getResource("/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
-        String path = Path.of(url.toURI()).toString();
-        String[] args = { cmd, "validate", path };
+        Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
+        String[] args = { cmd, "validate", path.toString() };
         ExitStatus result = CLI.runCli(args);
         evaluateResult(result, ExitCode.FAIL);
       }
@@ -112,12 +108,11 @@ public class CLITest {
   }
 
   @Test
-  void testValidateSubCommandValidFile() throws IOException, URISyntaxException {
+  void testValidateSubCommandValidFile() {
     for (String cmd : MODEL_COMMANDS) {
       for (Format format : Format.values()) {
-        URL url = getClass().getResource("/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
-        String path = Path.of(url.toURI()).toString();
-        String[] args = { cmd, "validate", path };
+        Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
+        String[] args = { cmd, "validate", path.toString() };
         ExitStatus result = CLI.runCli(args);
         evaluateResult(result, ExitCode.OK);
       }
@@ -125,18 +120,17 @@ public class CLITest {
   }
 
   @Test
-  void testConvertSubCommandValidFile() throws IOException, URISyntaxException {
+  void testConvertSubCommandValidFile() {
     for (String cmd : MODEL_COMMANDS) {
       for (Entry<Format, List<Format>> entry : FORMAT_ENTRIES.entrySet()) {
         Format sourceFormat = entry.getKey();
         List<Format> targetFormats = entry.getValue();
         for (Format targetFormat : targetFormats) {
-          URL url = getClass().getResource("/cli/example_" + cmd + "_valid" + sourceFormat.getDefaultExtension());
-          String path = Path.of(url.toURI()).toString();
+          Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + sourceFormat.getDefaultExtension());
           String outputPath
-              = path.replace(sourceFormat.getDefaultExtension(), "_converted" + targetFormat.getDefaultExtension());
+              = path.toString().replace(sourceFormat.getDefaultExtension(), "_converted" + targetFormat.getDefaultExtension());
           String[] args
-              = { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(), path, outputPath, "--overwrite" };
+              = { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(), path.toString(), outputPath, "--overwrite" };
           ExitStatus result = CLI.runCli(args);
           evaluateResult(result, ExitCode.OK);
         }
@@ -145,22 +139,20 @@ public class CLITest {
   }
 
   @Test
-  void testResolveSubCommandValidFile() throws IOException, URISyntaxException {
+  void testResolveSubCommandValidFile() {
     for (Format format : Format.values()) {
-      URL url = getClass().getResource("/cli/example_profile_valid" + format.getDefaultExtension());
-      String path = Path.of(url.toURI()).toString();
-      String[] args = { "profile", "resolve", "--to=" + format.name().toLowerCase(), path };
+      Path path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
+      String[] args = { "profile", "resolve", "--to=" + format.name().toLowerCase(), path.toString() };
       ExitStatus result = CLI.runCli(args);
       evaluateResult(result, ExitCode.OK);
     }
   }
 
   @Test
-  void testResolveSubCommandInvalidFile() throws IOException, URISyntaxException {
+  void testResolveSubCommandInvalidFile() {
     // TODO: Test all data formats once usnistgov/oscal-cli#216 fix merged.
-    URL url = getClass().getResource("/cli/example_profile_invalid" + Format.XML.getDefaultExtension());
-    String path = Path.of(url.toURI()).toString();
-    String[] args = { "profile", "resolve", "--to=" + Format.XML.name().toLowerCase(), path };
+    Path path = Paths.get("src/test/resources/cli/example_profile_invalid" + Format.XML.getDefaultExtension());
+    String[] args = { "profile", "resolve", "--to=" + Format.XML.name().toLowerCase(), path.toString() };
     ExitStatus result = CLI.runCli(args);
     evaluateResult(result, ExitCode.PROCESSING_ERROR, ProfileResolutionException.class);
   }
