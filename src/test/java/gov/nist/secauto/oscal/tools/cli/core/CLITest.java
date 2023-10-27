@@ -35,30 +35,21 @@ import gov.nist.secauto.metaschema.cli.processor.ExitCode;
 import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
 import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class CLITest {
-  static final String[] MODEL_COMMANDS = { "ap", "ar", "catalog", "component-definition", "profile", "poam", "ssp" };
-  static final Map<Format, List<Format>> FORMAT_ENTRIES = Map.of(
-      Format.XML, Arrays.asList(Format.JSON, Format.YAML),
-      Format.JSON, Arrays.asList(Format.XML, Format.JSON),
-      Format.YAML, Arrays.asList(Format.XML, Format.JSON));
-
-  @Test
-  void testVersionInfo() {
-    String[] args = { "--version" };
-    evaluateResult(CLI.runCli(args), ExitCode.OK);
-  }
-
   void evaluateResult(@NonNull ExitStatus status, @NonNull ExitCode expectedCode) {
     status.generateMessage(true);
     assertAll(
@@ -76,84 +67,66 @@ public class CLITest {
         () -> assertEquals(thrownClass, thrown.getClass(), "expected Throwable mismatch"));
   }
 
-  
+  private static Stream<Arguments> providesValues() {
+    final String[] commands = { "ap", "ar", "catalog", "component-definition", "profile", "poam", "ssp" };
+    final Map<Format, List<Format>> formatEntries = Map.of(
+        Format.XML, Arrays.asList(Format.JSON, Format.YAML),
+        Format.JSON, Arrays.asList(Format.XML, Format.JSON),
+        Format.YAML, Arrays.asList(Format.XML, Format.JSON));
+    List<Arguments> values = new ArrayList<>();
 
-  @Test
-  void testValidateSubcommandsHelp() {
-    for (String cmd : MODEL_COMMANDS) {
-      String[] args = { cmd, "validate", "-h" };
-      evaluateResult(CLI.runCli(args), ExitCode.OK);
-    }
-  }
+    values.add(Arguments.of(new String[] { "--version" }, ExitCode.OK, null));
+    // TODO: Test all data formats once usnistgov/oscal-cli#216 fix merged.
+    Path path = Paths.get("src/test/resources/cli/example_profile_invalid" + Format.XML.getDefaultExtension());
+    values.add(
+        Arguments.of(new String[] { "profile", "resolve", "--to=" + Format.XML.name().toLowerCase(), path.toString() },
+            ExitCode.PROCESSING_ERROR, ProfileResolutionException.class));
 
-  @Test
-  void testConvertSubcommandsHelp() {
-    for (String cmd : MODEL_COMMANDS) {
-      String[] args = { cmd, "convert", "-h" };
+    for (String cmd : commands) {
+      values.add(Arguments.of(new String[] { cmd, "validate", "-h" }, ExitCode.OK, null));
       // TODO: Update when usnistgov/oscal-cli#210 fix merged.
-      evaluateResult(CLI.runCli(args), ExitCode.INVALID_COMMAND);
-    }
-  }
+      values.add(Arguments.of(new String[] { cmd, "convert", "-h" }, ExitCode.INVALID_COMMAND, null));
 
-  @Test
-  void testValidateSubCommandInvalidFile() {
-    for (String cmd : MODEL_COMMANDS) {
       for (Format format : Format.values()) {
-        Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
-        String[] args = { cmd, "validate", path.toString() };
-        ExitStatus result = CLI.runCli(args);
-        evaluateResult(result, ExitCode.FAIL);
-      }
-    }
-  }
-
-  @Test
-  void testValidateSubCommandValidFile() {
-    for (String cmd : MODEL_COMMANDS) {
-      for (Format format : Format.values()) {
-        Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
-        String[] args = { cmd, "validate", path.toString() };
-        ExitStatus result = CLI.runCli(args);
-        evaluateResult(result, ExitCode.OK);
-      }
-    }
-  }
-
-  @Test
-  void testConvertSubCommandValidFile() {
-    for (String cmd : MODEL_COMMANDS) {
-      for (Entry<Format, List<Format>> entry : FORMAT_ENTRIES.entrySet()) {
-        Format sourceFormat = entry.getKey();
-        List<Format> targetFormats = entry.getValue();
+        path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
+        values.add(Arguments.of(new String[] { cmd, "validate", path.toString() }, ExitCode.FAIL, null));
+        path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
+        values.add(Arguments.of(new String[] { cmd, "validate", path.toString() }, ExitCode.OK, null));
+        path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
+        List<Format> targetFormats = formatEntries.get(format);
         for (Format targetFormat : targetFormats) {
-          Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + sourceFormat.getDefaultExtension());
-          String outputPath
-              = path.toString().replace(sourceFormat.getDefaultExtension(), "_converted" + targetFormat.getDefaultExtension());
-          String[] args
-              = { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(), path.toString(), outputPath, "--overwrite" };
-          ExitStatus result = CLI.runCli(args);
-          evaluateResult(result, ExitCode.OK);
+          path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
+          String outputPath = path.toString().replace(format.getDefaultExtension(),
+              "_converted" + targetFormat.getDefaultExtension());
+          values.add(Arguments.of(new String[] { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(),
+              path.toString(), outputPath, "--overwrite" }, ExitCode.OK, null));
+          // TODO: Update when usnistgov/oscal#217 fix merged.
+          path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
+          outputPath = path.toString().replace(format.getDefaultExtension(),
+              "_converted" + targetFormat.getDefaultExtension());
+          values.add(Arguments.of(new String[] { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(),
+              path.toString(), outputPath, "--overwrite" }, ExitCode.OK, null));
+        }
+        if (cmd == "profile") {
+          path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
+          values
+              .add(Arguments.of(new String[] { cmd, "resolve", "--to=" + format.name().toLowerCase(), path.toString() },
+                  ExitCode.OK, null));
         }
       }
     }
+
+    return values.stream();
   }
 
-  @Test
-  void testResolveSubCommandValidFile() {
-    for (Format format : Format.values()) {
-      Path path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
-      String[] args = { "profile", "resolve", "--to=" + format.name().toLowerCase(), path.toString() };
-      ExitStatus result = CLI.runCli(args);
-      evaluateResult(result, ExitCode.OK);
+  @ParameterizedTest
+  @MethodSource("providesValues")
+  void testAllSubCommands(@NonNull String[] args, @NonNull ExitCode expectedExitCode,
+      Class<? extends Throwable> expectedThrownClass) {
+    if (expectedThrownClass == null) {
+      evaluateResult(CLI.runCli(args), expectedExitCode);
+    } else {
+      evaluateResult(CLI.runCli(args), expectedExitCode, expectedThrownClass);
     }
-  }
-
-  @Test
-  void testResolveSubCommandInvalidFile() {
-    // TODO: Test all data formats once usnistgov/oscal-cli#216 fix merged.
-    Path path = Paths.get("src/test/resources/cli/example_profile_invalid" + Format.XML.getDefaultExtension());
-    String[] args = { "profile", "resolve", "--to=" + Format.XML.name().toLowerCase(), path.toString() };
-    ExitStatus result = CLI.runCli(args);
-    evaluateResult(result, ExitCode.PROCESSING_ERROR, ProfileResolutionException.class);
   }
 }
