@@ -30,6 +30,8 @@ import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
 import gov.nist.secauto.metaschema.core.model.constraint.IConstraintSet;
+import gov.nist.secauto.metaschema.core.model.xml.ExternalConstraintsModulePostProcessor;
+import gov.nist.secauto.metaschema.core.util.CollectionUtil;
 import gov.nist.secauto.metaschema.databind.IBindingContext;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
@@ -69,7 +71,16 @@ public abstract class AbstractOscalValidationSubcommand
 
     @Override
     protected IBindingContext getBindingContext(@NonNull Set<IConstraintSet> constraintSets) {
-      return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+      IBindingContext retval;
+      if (constraintSets.isEmpty()) {
+        retval = OscalBindingContext.instance();
+      } else {
+        ExternalConstraintsModulePostProcessor postProcessor
+            = new ExternalConstraintsModulePostProcessor(constraintSets);
+
+        retval = new OscalBindingContext(CollectionUtil.singletonList(postProcessor));
+      }
+      return retval;
     }
 
     @Override
