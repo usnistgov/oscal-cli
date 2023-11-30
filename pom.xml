@@ -116,7 +116,7 @@
 		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.3</dependency.saxon-he.version>
-		<dependency.xmlresolver.version>5.2.0</dependency.xmlresolver.version>
+		<dependency.xmlresolver.version>5.2.2</dependency.xmlresolver.version>
 
 		<plugin.license.version>4.2</plugin.license.version>
 	</properties>
