@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://github.com/usnistgov/OSCAL/releases/download/v1.1.1/oscal_complete_schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<catalog xmlns="http://csrc.nist.gov/ns/oscal/1.0" uuid="cabcd8ed-bf29-4e63-b15c-7a559ffa2426">
+    <metadata>
+        <title>Valid OSCAL Document</title>
+        <last-modified>2023-10-24T00:00:00.000000-00:00</last-modified>
+        <version>1.0</version>
+        <oscal-version>1.1.1</oscal-version>
+        <role id="maintainer">
+            <title>Maintainer of oscal-cli</title>
+        </role>
+        <party uuid="4ba3f2b7-e894-48d7-b940-91c68661df55" type="person">
+            <name>NIST ITL CSD Developer</name>
+        </party>
+        <responsible-party role-id="maintainer">
+            <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+        </responsible-party>
+    </metadata>
+    <!-- 
+        The wrapper group can be removed from this example once a code fix is released for the issue below.
+        https://github.com/usnistgov/oscal-cli/issues/200
+    -->
+    <group id="eg1">
+        <title>Example Group 1</title>
+        <control id="control-1">
+            <title>Control 1</title>
+            <part name="statement">
+                <p>This statement is a requirement for Control 1.</p>
+            </part>
+        </control>
+        <control id="control-2">
+            <title>Control 2</title>
+            <part name="statement">
+                <p>This statement is a requirement for Control 2.</p>
+            </part>
+        </control>
+    </group>   
+</catalog>

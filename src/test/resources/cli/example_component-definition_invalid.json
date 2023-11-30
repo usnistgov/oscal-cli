@@ -1,0 +1,37 @@
+{
+  "component-definition" : {
+    "uuid" : "8f5341ba-9cca-488e-866f-99a502e5dc60",
+    "metadata" : {
+      "title" : "Invalid OSCAL Document",
+      "last-modified" : "2023-10-24T00:00:00Z",
+      "version" : "1.0",
+      "oscal-version" : "1.1.1",
+      "roles" : [ {
+        "id" : "maintainer",
+        "title" : "Maintainer of oscal-cli"
+      } ],
+      "parties" : [ {
+        "uuid" : "4ba3f2b7-e894-48d7-b940-91c68661df55",
+        "type" : "person",
+        "name" : "NIST ITL CSD Developer"
+      } ],
+      "responsible-parties" : [ {
+        "role-id" : "maintainer",
+        "party-uuids" : [ "4ba3f2b7-e894-48d7-b940-91c68661df55" ]
+      } ]
+    },
+    "components" : [ { } ],
+    "back-matter" : {
+      "resources" : [ {
+        "uuid" : "8d99e4fb-02a8-4dc6-9beb-d15f74a423ba",
+        "rlinks" : [ {
+          "href" : "example_ap_invalid.xml"
+        }, {
+          "href" : "example_ap_invalid.json"
+        }, {
+          "href" : "example_ap_invalid.yaml"
+        } ]
+      } ]
+    }
+  }
+}

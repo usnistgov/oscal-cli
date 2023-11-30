@@ -1,0 +1,37 @@
+---
+assessment-results:
+  uuid: 11525219-b63c-4fae-a33b-569f5d7c6edb
+  metadata:
+    title: Valid OSCAL Document
+    last-modified: 2023-10-24T00:00:00Z
+    version: "1.0"
+    oscal-version: 1.1.1
+    roles:
+    - id: maintainer
+      title: Maintainer of oscal-cli
+    parties:
+    - uuid: 4ba3f2b7-e894-48d7-b940-91c68661df55
+      type: person
+      name: NIST ITL CSD Developer
+    responsible-parties:
+    - role-id: maintainer
+      party-uuids:
+      - 4ba3f2b7-e894-48d7-b940-91c68661df55
+  import-ap:
+    href: '#e5a5688d-24b2-4dd1-b3dd-ef35321eafed'
+  results:
+  - uuid: 2c22eb69-7c4b-4a00-a1c0-5f88e8b70288
+    title: Example Result Entry 1 from Example Valid Assessment
+    description: This description is an explanation of the assessment plan's results.
+    start: 2023-10-22T00:00:00Z
+    end: 2023-10-22T00:00:00Z
+    reviewed-controls:
+      control-selections:
+      - include-all: {}
+  back-matter:
+    resources:
+    - uuid: e5a5688d-24b2-4dd1-b3dd-ef35321eafed
+      rlinks:
+      - href: example_ap_valid.xml
+      - href: example_ap_valid.json
+      - href: example_ap_valid.yaml

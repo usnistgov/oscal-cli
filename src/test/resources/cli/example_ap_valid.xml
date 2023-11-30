@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://github.com/usnistgov/OSCAL/releases/download/v1.1.1/oscal_complete_schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<assessment-plan xmlns="http://csrc.nist.gov/ns/oscal/1.0" uuid="948a30b0-a706-43b0-ac5a-4c64fda1c3d0">
+    <metadata>
+        <title>Valid OSCAL Document</title>
+        <last-modified>2023-10-24T00:00:00.000000-00:00</last-modified>
+        <version>1.0</version>
+        <oscal-version>1.1.1</oscal-version>
+        <role id="maintainer">
+            <title>Maintainer of oscal-cli</title>
+        </role>
+        <party uuid="4ba3f2b7-e894-48d7-b940-91c68661df55" type="person">
+            <name>NIST ITL CSD Developer</name>
+        </party>
+        <responsible-party role-id="maintainer">
+            <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+        </responsible-party>
+    </metadata>
+    <import-ssp href="#4a8f42e8-1357-4664-bd88-aac54cb9aeb8"/>
+    <reviewed-controls>
+        <control-selection>
+            <include-all />
+        </control-selection>
+    </reviewed-controls>
+    <back-matter>
+        <resource uuid="4a8f42e8-1357-4664-bd88-aac54cb9aeb8">
+            <rlink href="example_ssp_valid.xml"/>
+            <rlink href="example_ssp_valid.json"/>
+            <rlink href="example_ssp_valid.yaml"/>
+        </resource>
+    </back-matter>
+</assessment-plan>

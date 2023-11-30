@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://github.com/usnistgov/OSCAL/releases/download/v1.1.1/oscal_complete_schema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<component-definition xmlns="http://csrc.nist.gov/ns/oscal/1.0" uuid="798721e5-8e19-42f1-8155-4a4391f86043">
+    <metadata>
+        <title>Valid OSCAL Document</title>
+        <last-modified>2023-10-24T00:00:00.000000-00:00</last-modified>
+        <version>1.0</version>
+        <oscal-version>1.1.1</oscal-version>
+        <role id="maintainer">
+            <title>Maintainer of oscal-cli</title>
+        </role>
+        <party uuid="4ba3f2b7-e894-48d7-b940-91c68661df55" type="person">
+            <name>NIST ITL CSD Developer</name>
+        </party>
+        <responsible-party role-id="maintainer">
+            <party-uuid>4ba3f2b7-e894-48d7-b940-91c68661df55</party-uuid>
+        </responsible-party>
+    </metadata>
+    <component uuid="cc215481-bfb2-4537-b5b0-f46914656975" type="software">
+        <title>Example Component 1</title>
+        <description>
+            <p>This description is an explanation of the example component.</p>
+        </description>
+        <control-implementation uuid="84964fa9-4e81-4193-8949-20257f5699e7" source="#dce50e70-62c6-423a-bee2-7dceafeadd0e">
+            <description>
+                <p>This description is an explanation of how the component generally supports control implementations for controls from a source catalog.</p>
+            </description>
+            <implemented-requirement uuid="975b0e00-b5e2-482e-bff1-8f97e8027573" control-id="control-1">
+                <description>
+                    <p>This description is an explanation of how this component supports the control implementation specifically for Example Catalog Control 1.</p>
+                </description>
+            </implemented-requirement>
+        </control-implementation>
+    </component>
+    <back-matter>
+        <resource uuid="dce50e70-62c6-423a-bee2-7dceafeadd0e">
+            <rlink href="example_ap_valid.xml"/>
+            <rlink href="example_ap_valid.json"/>
+            <rlink href="example_ap_valid.yaml"/>
+        </resource>
+    </back-matter>    
+</component-definition>
