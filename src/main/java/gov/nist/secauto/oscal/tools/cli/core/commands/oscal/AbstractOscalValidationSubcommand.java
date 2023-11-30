@@ -26,11 +26,13 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
-import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
+import gov.nist.secauto.metaschema.core.model.constraint.IConstraintSet;
+import gov.nist.secauto.metaschema.core.model.xml.ExternalConstraintsModulePostProcessor;
+import gov.nist.secauto.metaschema.core.util.CollectionUtil;
+import gov.nist.secauto.metaschema.databind.IBindingContext;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
 import org.apache.commons.cli.CommandLine;
@@ -51,7 +53,7 @@ public abstract class AbstractOscalValidationSubcommand
   protected abstract List<Source> getOscalXmlSchemas() throws IOException;
 
   @NonNull
-  protected abstract JSONObject getOscalJsonSchema();
+  protected abstract JSONObject getOscalJsonSchema() throws IOException;
 
   @Override
   public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine commandLine) {
@@ -69,7 +71,16 @@ public abstract class AbstractOscalValidationSubcommand
 
     @Override
     protected IBindingContext getBindingContext(@NonNull Set<IConstraintSet> constraintSets) {
-      return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
+      IBindingContext retval;
+      if (constraintSets.isEmpty()) {
+        retval = OscalBindingContext.instance();
+      } else {
+        ExternalConstraintsModulePostProcessor postProcessor
+            = new ExternalConstraintsModulePostProcessor(constraintSets);
+
+        retval = new OscalBindingContext(CollectionUtil.singletonList(postProcessor));
+      }
+      return retval;
     }
 
     @Override
@@ -80,7 +91,7 @@ public abstract class AbstractOscalValidationSubcommand
 
     @Override
     @NonNull
-    public JSONObject getJsonSchema() {
+    public JSONObject getJsonSchema() throws IOException {
       return getOscalJsonSchema();
     }
   }

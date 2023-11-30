@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>26</version>
+		<version>28-SNAPSHOT</version>
 	</parent>
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-core</artifactId>
@@ -78,8 +78,8 @@
 	</mailingLists>
 	<properties>
 		<!-- metaschema dependencies -->
-		<dependency.metaschema-framework.version>0.12.2</dependency.metaschema-framework.version>
-		<dependency.liboscal-java.version>3.0.2</dependency.liboscal-java.version>
+		<dependency.metaschema-framework.version>1.0.0-M2-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.liboscal-java.version>3.0.3-SNAPSHOT</dependency.liboscal-java.version>
 
 		<!-- site configuration -->
 		<site.url>https://pages.nist.gov/metaschema-java/</site.url>
@@ -113,7 +113,8 @@
 		<dependency.commons-io.version>2.15.1</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.3</dependency.everit-json.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
+		<dependency.json.version>20231013</dependency.json.version>
+		<dependency.log4j2.version>2.21.0</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.4</dependency.saxon-he.version>
 		<dependency.xmlresolver.version>5.2.2</dependency.xmlresolver.version>
@@ -221,6 +222,12 @@
 			<version>${dependency.everit-json.version}</version>
 		</dependency>
 		<dependency>
+			<!-- for dependency convergence -->
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${dependency.json.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.spotbugs</groupId>
 			<artifactId>spotbugs-annotations</artifactId>
 			<scope>provided</scope>
@@ -228,12 +235,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -322,8 +324,7 @@
 							<addClasspath>true</addClasspath>
 							<!-- <classpathPrefix>lib/</classpathPrefix> -->
 							<classpathLayoutType>custom</classpathLayoutType>
-							<customClasspathLayout>
-								${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
+							<customClasspathLayout>${artifact.groupId}.${artifact.artifactId}-$${artifact.version}.${artifact.extension}</customClasspathLayout>
 						</manifest>
 					</archive>
 				</configuration>
@@ -342,10 +343,8 @@
 					<generateRepository>false</generateRepository>
 					<repositoryLayout>flat</repositoryLayout>
 					<repositoryName>lib</repositoryName>
-					<outputFileNameMapping>
-						@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
-					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8
-						-Dsun.stderr.encoding=UTF-8</extraJvmArguments>
+					<outputFileNameMapping>@{groupId}@.@{artifactId}@-@{version}@.@{extension}@</outputFileNameMapping>
+					<extraJvmArguments>-Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8</extraJvmArguments>
 					<projectArtifactFirstInClassPath>true</projectArtifactFirstInClassPath>
 					<includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
 				</configuration>
@@ -423,14 +422,10 @@
 							<goal>add-third-party</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>
-								${project.build.directory}/generated-distro</outputDirectory>
+							<outputDirectory>${project.build.directory}/generated-distro</outputDirectory>
 							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
 							<licenseMerges>
-								<licenseMerge>The Apache Software License,
-									Version 2.0|Apache
-									License, Version 2.0|Apache Public License
-									2.0</licenseMerge>
+								<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
 							</licenseMerges>
 						</configuration>
 					</execution>

@@ -28,9 +28,9 @@ package gov.nist.secauto.oscal.tools.cli.core;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.secauto.metaschema.binding.io.Format;
-import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
-import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
+import gov.nist.secauto.metaschema.core.util.ObjectUtils;
+import gov.nist.secauto.metaschema.databind.io.Format;
+import gov.nist.secauto.metaschema.databind.io.IBoundLoader;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.lib.model.AssessmentResults;
 
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 public class NullYamlValuesTest {
   private static OscalBindingContext bindingContext;
@@ -52,11 +52,12 @@ public class NullYamlValuesTest {
 
   @SuppressWarnings("null")
   @Test
-  void testLoadYamlNullVar1() throws IOException, URISyntaxException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+  void testLoadYamlNullVar1() throws IOException {
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
-            ObjectUtils.requireNonNull(NullYamlValuesTest.class.getResource("/yaml-null/example_ar_nullvar-1.yaml")));
+            ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-1.yaml")));
 
     bindingContext.newSerializer(Format.XML, AssessmentResults.class).serialize(data, System.out);
     bindingContext.newSerializer(Format.JSON, AssessmentResults.class).serialize(data, System.out);
@@ -67,11 +68,12 @@ public class NullYamlValuesTest {
 
   @SuppressWarnings("null")
   @Test
-  void testLoadYamlNullVar2() throws IOException, URISyntaxException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+  void testLoadYamlNullVar2() throws IOException {
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
-            ObjectUtils.requireNonNull(NullYamlValuesTest.class.getResource("/yaml-null/example_ar_nullvar-2.yaml")));
+            ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-2.yaml")));
 
     bindingContext.newSerializer(Format.XML, AssessmentResults.class).serialize(data, System.out);
     bindingContext.newSerializer(Format.JSON, AssessmentResults.class).serialize(data, System.out);
@@ -82,11 +84,12 @@ public class NullYamlValuesTest {
 
   @SuppressWarnings("null")
   @Test
-  void testLoadYamlNullVar3() throws IOException, URISyntaxException {
-    // the YAML catalog is currently malformed, this will create a proper one for this test
+  void testLoadYamlNullVar3() throws IOException {
+    // the YAML catalog is currently malformed, this will create a proper one for
+    // this test
     AssessmentResults data
         = loader.load(
-            ObjectUtils.requireNonNull(NullYamlValuesTest.class.getResource("/yaml-null/example_ar_nullvar-3.yaml")));
+            ObjectUtils.requireNonNull(Paths.get("src/test/resources/yaml-null/example_ar_nullvar-3.yaml")));
 
     bindingContext.newSerializer(Format.XML, AssessmentResults.class).serialize(data, System.out);
     bindingContext.newSerializer(Format.JSON, AssessmentResults.class).serialize(data, System.out);
