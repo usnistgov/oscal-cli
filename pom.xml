@@ -113,7 +113,7 @@
 		<dependency.commons-io.version>2.15.1</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.3</dependency.everit-json.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
+		<dependency.log4j2.version>2.22.1</dependency.log4j2.version>
 		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.4</dependency.saxon-he.version>
 		<dependency.xmlresolver.version>5.2.2</dependency.xmlresolver.version>
