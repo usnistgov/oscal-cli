@@ -301,25 +301,26 @@
 <span class="sourceLineNo">292</span><a id="line.292">            .withThrowable(ex);</a>
 <span class="sourceLineNo">293</span><a id="line.293">      }</a>
 <span class="sourceLineNo">294</span><a id="line.294"></a>
-<span class="sourceLineNo">295</span><a id="line.295">      // DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);</a>
-<span class="sourceLineNo">296</span><a id="line.296">      // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);</a>
-<span class="sourceLineNo">297</span><a id="line.297">      // validator.finalizeValidation();</a>
-<span class="sourceLineNo">298</span><a id="line.298"></a>
-<span class="sourceLineNo">299</span><a id="line.299">      ISerializer&lt;Catalog&gt; serializer</a>
-<span class="sourceLineNo">300</span><a id="line.300">          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);</a>
-<span class="sourceLineNo">301</span><a id="line.301">      try {</a>
-<span class="sourceLineNo">302</span><a id="line.302">        if (destination == null) {</a>
-<span class="sourceLineNo">303</span><a id="line.303">          serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));</a>
-<span class="sourceLineNo">304</span><a id="line.304">        } else {</a>
-<span class="sourceLineNo">305</span><a id="line.305">          serializer.serialize((Catalog) resolvedProfile.getValue(), destination);</a>
-<span class="sourceLineNo">306</span><a id="line.306">        }</a>
-<span class="sourceLineNo">307</span><a id="line.307">      } catch (IOException ex) {</a>
-<span class="sourceLineNo">308</span><a id="line.308">        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);</a>
-<span class="sourceLineNo">309</span><a id="line.309">      }</a>
-<span class="sourceLineNo">310</span><a id="line.310">    }</a>
-<span class="sourceLineNo">311</span><a id="line.311">    return ExitCode.OK.exit();</a>
-<span class="sourceLineNo">312</span><a id="line.312">  }</a>
-<span class="sourceLineNo">313</span><a id="line.313">}</a>
+<span class="sourceLineNo">295</span><a id="line.295">      // DefaultConstraintValidator validator = new</a>
+<span class="sourceLineNo">296</span><a id="line.296">      // DefaultConstraintValidator(dynamicContext);</a>
+<span class="sourceLineNo">297</span><a id="line.297">      // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);</a>
+<span class="sourceLineNo">298</span><a id="line.298">      // validator.finalizeValidation();</a>
+<span class="sourceLineNo">299</span><a id="line.299"></a>
+<span class="sourceLineNo">300</span><a id="line.300">      ISerializer&lt;Catalog&gt; serializer</a>
+<span class="sourceLineNo">301</span><a id="line.301">          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);</a>
+<span class="sourceLineNo">302</span><a id="line.302">      try {</a>
+<span class="sourceLineNo">303</span><a id="line.303">        if (destination == null) {</a>
+<span class="sourceLineNo">304</span><a id="line.304">          serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));</a>
+<span class="sourceLineNo">305</span><a id="line.305">        } else {</a>
+<span class="sourceLineNo">306</span><a id="line.306">          serializer.serialize((Catalog) resolvedProfile.getValue(), destination);</a>
+<span class="sourceLineNo">307</span><a id="line.307">        }</a>
+<span class="sourceLineNo">308</span><a id="line.308">      } catch (IOException ex) {</a>
+<span class="sourceLineNo">309</span><a id="line.309">        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);</a>
+<span class="sourceLineNo">310</span><a id="line.310">      }</a>
+<span class="sourceLineNo">311</span><a id="line.311">    }</a>
+<span class="sourceLineNo">312</span><a id="line.312">    return ExitCode.OK.exit();</a>
+<span class="sourceLineNo">313</span><a id="line.313">  }</a>
+<span class="sourceLineNo">314</span><a id="line.314">}</a>
 
 
 

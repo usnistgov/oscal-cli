@@ -300,27 +300,28 @@
 <a class="jxr_linenumber" name="L292" href="#L292">292</a>             .withThrowable(ex);
 <a class="jxr_linenumber" name="L293" href="#L293">293</a>       }
 <a class="jxr_linenumber" name="L294" href="#L294">294</a> 
-<a class="jxr_linenumber" name="L295" href="#L295">295</a>       <em class="jxr_comment">// DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);</em>
-<a class="jxr_linenumber" name="L296" href="#L296">296</a>       <em class="jxr_comment">// ((IBoundXdmNodeItem)resolvedProfile).validate(validator);</em>
-<a class="jxr_linenumber" name="L297" href="#L297">297</a>       <em class="jxr_comment">// validator.finalizeValidation();</em>
-<a class="jxr_linenumber" name="L298" href="#L298">298</a> 
-<a class="jxr_linenumber" name="L299" href="#L299">299</a>       ISerializer&lt;Catalog&gt; serializer
-<a class="jxr_linenumber" name="L300" href="#L300">300</a>           = OscalBindingContext.instance().newSerializer(toFormat, Catalog.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L301" href="#L301">301</a>       <strong class="jxr_keyword">try</strong> {
-<a class="jxr_linenumber" name="L302" href="#L302">302</a>         <strong class="jxr_keyword">if</strong> (destination == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L303" href="#L303">303</a>           serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));
-<a class="jxr_linenumber" name="L304" href="#L304">304</a>         } <strong class="jxr_keyword">else</strong> {
-<a class="jxr_linenumber" name="L305" href="#L305">305</a>           serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
-<a class="jxr_linenumber" name="L306" href="#L306">306</a>         }
-<a class="jxr_linenumber" name="L307" href="#L307">307</a>       } <strong class="jxr_keyword">catch</strong> (IOException ex) {
-<a class="jxr_linenumber" name="L308" href="#L308">308</a>         <strong class="jxr_keyword">return</strong> ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
-<a class="jxr_linenumber" name="L309" href="#L309">309</a>       }
-<a class="jxr_linenumber" name="L310" href="#L310">310</a>     }
-<a class="jxr_linenumber" name="L311" href="#L311">311</a>     <strong class="jxr_keyword">return</strong> ExitCode.OK.exit();
-<a class="jxr_linenumber" name="L312" href="#L312">312</a>   }
-<a class="jxr_linenumber" name="L313" href="#L313">313</a> }
+<a class="jxr_linenumber" name="L295" href="#L295">295</a>       <em class="jxr_comment">// DefaultConstraintValidator validator = new</em>
+<a class="jxr_linenumber" name="L296" href="#L296">296</a>       <em class="jxr_comment">// DefaultConstraintValidator(dynamicContext);</em>
+<a class="jxr_linenumber" name="L297" href="#L297">297</a>       <em class="jxr_comment">// ((IBoundXdmNodeItem)resolvedProfile).validate(validator);</em>
+<a class="jxr_linenumber" name="L298" href="#L298">298</a>       <em class="jxr_comment">// validator.finalizeValidation();</em>
+<a class="jxr_linenumber" name="L299" href="#L299">299</a> 
+<a class="jxr_linenumber" name="L300" href="#L300">300</a>       ISerializer&lt;Catalog&gt; serializer
+<a class="jxr_linenumber" name="L301" href="#L301">301</a>           = OscalBindingContext.instance().newSerializer(toFormat, Catalog.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L302" href="#L302">302</a>       <strong class="jxr_keyword">try</strong> {
+<a class="jxr_linenumber" name="L303" href="#L303">303</a>         <strong class="jxr_keyword">if</strong> (destination == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L304" href="#L304">304</a>           serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));
+<a class="jxr_linenumber" name="L305" href="#L305">305</a>         } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L306" href="#L306">306</a>           serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
+<a class="jxr_linenumber" name="L307" href="#L307">307</a>         }
+<a class="jxr_linenumber" name="L308" href="#L308">308</a>       } <strong class="jxr_keyword">catch</strong> (IOException ex) {
+<a class="jxr_linenumber" name="L309" href="#L309">309</a>         <strong class="jxr_keyword">return</strong> ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
+<a class="jxr_linenumber" name="L310" href="#L310">310</a>       }
+<a class="jxr_linenumber" name="L311" href="#L311">311</a>     }
+<a class="jxr_linenumber" name="L312" href="#L312">312</a>     <strong class="jxr_keyword">return</strong> ExitCode.OK.exit();
+<a class="jxr_linenumber" name="L313" href="#L313">313</a>   }
+<a class="jxr_linenumber" name="L314" href="#L314">314</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2023 <a href="https://www.nist.gov">National Institute of Standards and Technology</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2024 <a href="https://www.nist.gov">National Institute of Standards and Technology</a>. All rights reserved.</div>
 </body>
 </html>
