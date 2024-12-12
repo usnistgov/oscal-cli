@@ -1,0 +1,53 @@
+name: Generate Profile Oscal 
+on: 
+  workflow_dispatch:
+    inputs:
+      maven-version:
+        description: 'The version of Maven to use'
+        required: true
+        default: '3.9.3'
+
+
+jobs:
+  download-artifacts: 
+    name: Build Java Artifacts
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Create Directory
+        run: mkdir -p /opt/oscal-cli
+      - name: Download Release Signature
+        working-directory: /opt/oscal-cli
+        run: |
+          wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/1.0.1/cli-core-1.0.1-oscal-cli.zip.asc
+
+      - name: Download Release Archive
+        working-directory: /opt/oscal-cli
+        run: |
+          wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/1.0.1/cli-core-1.0.1-oscal-cli.zip
+
+      - name: Import NIST OSCAL Release Engineering Key
+        working-directory: /opt/oscal-cli
+        run: gpg --keyserver hkps://pgp.mit.edu:443 --recv-keys 6387E83B4828A504
+          
+      - name: Verify Release Key Signature
+        working-directory: /opt/oscal-cli
+        run: gpg --verify cli-core-1.0.1-oscal-cli.zip.asc
+
+      - name: Extract CLI 
+        working-directory: /opt/oscal-cli
+        run: unzip cli-core-1.0.1-oscal-cli.zip
+
+      - name: Add CLI to Path
+        working-directory: /opt/oscal-cli
+        run: PATH=$PATH:/opt/oscal-cli/bin
+
+      - name: Add CLI to Environment
+        working-directory: /opt/oscal-cli
+        run: export PATH=$PATH:/opt/oscal-cli/bin
+
+      - name: Test CLI
+        run: oscal-cli --help
