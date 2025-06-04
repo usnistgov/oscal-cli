@@ -53,23 +53,29 @@ cd target/cli-core-[VERSION]-oscal-cli/bin
 ./oscal-cli --version
 ```
 
+## (Alternative) Installing pre-built Java package - if you don't wish to build
+
+1. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release on the Maven Central repository](https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/). You may also download [development snapshots](https://oss.sonatype.org/content/repositories/snapshots/gov/nist/secauto/oscal/tools/oscal-cli/) to evaluate new features or bug fixes merged into develop before they are finalized in a published release.
+
+```
+wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/1.0.3/cli-core-1.0.3-oscal-cli.zip.asc # download the release signature
+wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/1.0.3/cli-core-1.0.3-oscal-cli.zip # download the release archive
+gpg --keyserver hkps://pgp.mit.edu:443 --recv-keys 6387E83B4828A504 # import or re-import the NIST OSCAL Release Engineering Key
+gpg --verify cli-core-1.0.3-oscal-cli.zip.asc # verify the signature for the release with signing key
+```
+
 ## (Recommended) Installing outside of oscal-cli repository and adding to PATH
 
-1.  Make a directory to install oscal-cli. The example below uses the directory `/opt/oscal-cli`. Use your preferred directory.
+1.  Make a directory to install oscal-cli and cd into it. The example below uses the directory `/opt/oscal-cli`. Use your preferred directory.
 ```
-mkdir -p /opt/oscal-cli
+mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
 ```
 
-2. Copy zipped oscal-cli package from `oscal-cli/target` into `/opt/oscal-cli`
-
-```
-cp target/cli-core-[VERSION]-oscal-cli.zip /opt/oscal-cli/
-```
+2. Copy zipped oscal-cli package from `oscal-cli/target` (if you ran `mvn install`) or from where you downloaded the zipped package from Maven Central, into `/opt/oscal-cli/`
 
 3. Extract oscal-cli into the directory.
 ```
-cd /opt/oscal-cli/
-unzip cli-core-[VERSION]-oscal-cli.zip
+unzip cli-core-1.0.3-oscal-cli.zip
 ```
 
 4. (Recommended) Add oscal-cli's directory to your path.
