@@ -64,7 +64,7 @@ gpg --keyserver hkps://pgp.mit.edu:443 --recv-keys 6387E83B4828A504 # import or 
 gpg --verify cli-core-1.0.3-oscal-cli.zip.asc # verify the signature for the release with signing key
 ```
 
-## (Recommended) Installing outside of oscal-cli repository and adding to PATH
+## (Recommended) Installing outside of oscal-cli repository
 
 1.  Make a directory to install oscal-cli and cd into it. The example below uses the directory `/opt/oscal-cli`. Use your preferred directory.
 ```
@@ -78,15 +78,18 @@ mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
 unzip cli-core-1.0.3-oscal-cli.zip
 ```
 
-4. (Recommended) Add oscal-cli's directory to your path.
+## (Recommended) Add oscal-cli's directory to your PATH.
+This allows you to run oscal-cli without having to go to the oscal-cli directory.
 ```
 # temporarily add oscal-cli to your terminal's instance path
 PATH=$PATH:/opt/oscal-cli/bin
 
+# You can also add oscal-cli's directory to your path in shell profile to make oscal-cli permamently available.
 # add oscal-cli to your environment (e.g., all terminals)
-export PATH=$PATH:/opt/oscal-cli/bin
+
+echo 'export PATH=$PATH:/opt/oscal-cli/bin' >>~/.bash_profile
 ```
-NOTE: You can also add oscal-cli's directory to your path in shell profile to make oscal-cli permamently available.
+
 
 ## Running 
 
