@@ -80,13 +80,15 @@ unzip cli-core-1.0.3-oscal-cli.zip
 
 ## (Recommended) Add oscal-cli's directory to your PATH.
 This allows you to run oscal-cli without having to go to the oscal-cli directory.
+
+Temporarily add oscal-cli to your terminal's instance path:
 ```
-# temporarily add oscal-cli to your terminal's instance path
 PATH=$PATH:/opt/oscal-cli/bin
+```
 
-# You can also add oscal-cli's directory to your path in shell profile to make oscal-cli permamently available.
-# add oscal-cli to your environment (e.g., all terminals)
-
+You can also add oscal-cli's directory to your path in shell profile to add oscal-cli to your environment (e.g., all terminals)
+If not using bash, replace `.bash_profile` with the profile of your shell.
+```
 echo 'export PATH=$PATH:/opt/oscal-cli/bin' >>~/.bash_profile
 ```
 
