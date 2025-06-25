@@ -31,6 +31,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import net.sf.saxon.TransformerFactoryImpl;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -52,11 +53,11 @@ public class PrettyPrinter {
 
   public static void prettyPrintXml(File file) throws Exception {
     Document doc = DocumentBuilderFactory.newInstance()
-        .newDocumentBuilder().parse(file);
+            .newDocumentBuilder().parse(file);
 
-    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    TransformerFactory transformerFactory = new TransformerFactoryImpl();
+    Transformer transformer = transformerFactory.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
     try (OutputStream out = Files.newOutputStream(file.toPath())) {
       transformer.transform(new DOMSource(doc), new StreamResult(out));
