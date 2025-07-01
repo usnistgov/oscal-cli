@@ -27,7 +27,7 @@
 package gov.nist.secauto.oscal.tools.cli.core.commands.ssp;
 
 import gov.nist.secauto.oscal.lib.model.SystemSecurityPlan;
-import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractOscalConvertSubcommand;
 
 public class ConvertSubcommand
     extends AbstractOscalConvertSubcommand {

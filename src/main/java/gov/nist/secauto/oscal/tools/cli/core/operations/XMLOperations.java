@@ -26,7 +26,8 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.operations;
 
-import gov.nist.secauto.metaschema.binding.io.xml.XmlUtil;
+import gov.nist.secauto.metaschema.core.model.util.XmlUtil;
+import gov.nist.secauto.metaschema.core.util.ObjectUtils;
 
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
@@ -52,7 +53,8 @@ public final class XMLOperations {
 
   public static void renderCatalogHTML(File input, File result) throws IOException, TransformerException {
     render(input, result,
-        XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
+        XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
+            XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl"))));
   }
 
   public static void renderProfileHTML(File input, File result) throws IOException, TransformerException {
@@ -63,12 +65,14 @@ public final class XMLOperations {
     File temp = File.createTempFile("resolved-profile", ".xml");
 
     try {
-      Transformer transformer = transfomerFactory
-          .newTransformer(XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/profile-resolver.xsl")));
+      Transformer transformer = transfomerFactory.newTransformer(
+          XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
+              XMLOperations.class.getResource("/xsl/profile-resolver.xsl"))));
       transformer.transform(new StreamSource(input), new StreamResult(temp));
 
       transformer = transfomerFactory.newTransformer(
-          XmlUtil.getStreamSource(XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl")));
+          XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
+              XMLOperations.class.getResource("/xsl/oscal-for-bootstrap-html.xsl"))));
       transformer.transform(new StreamSource(temp), new StreamResult(result));
     } finally {
       if (!temp.delete()) {
@@ -76,8 +80,10 @@ public final class XMLOperations {
       }
     }
 
-    // TransformerHandler resolverHandler = transfomerFactory.newTransformerHandler(resolver);
-    // TransformerHandler rendererHandler = transfomerFactory.newTransformerHandler(renderer);
+    // TransformerHandler resolverHandler =
+    // transfomerFactory.newTransformerHandler(resolver);
+    // TransformerHandler rendererHandler =
+    // transfomerFactory.newTransformerHandler(renderer);
     //
     // resolverHandler.setResult(new SAXResult(rendererHandler));
     // rendererHandler.setResult(new StreamResult(result));

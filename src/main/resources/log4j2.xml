@@ -2,12 +2,17 @@
 <!DOCTYPE Configuration>
 <Configuration verbose="true">
 	<Appenders>
-		<Console name="console-trace" target="SYSTEM_ERR" immediateFlush="true">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />
+		<Console name="console-trace" target="SYSTEM_OUT" immediateFlush="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %highlight{%m}{DEBUG=green, TRACE=blue}%n" charset="UTF-8" />
 			<ThresholdFilter level="INFO" onMatch="DENY" onMismatch="ACCEPT" />
 		</Console>
-		<Console name="console-info" target="SYSTEM_ERR" immediateFlush="true">
-			<PatternLayout pattern="%m%n" charset="UTF-8" />
+		<Console name="console-info" target="SYSTEM_OUT" immediateFlush="true">
+<!-- 			<PatternLayout pattern="%highlight{%m}{WARN=yellow bold, INFO=magenta}%n" charset="UTF-8" />-->
+			<PatternLayout charset="UTF-8">
+				<LevelPatternSelector defaultPattern="%m%n">
+					<PatternMatch key="WARN" pattern="%style{%m}{bright yellow}%n"/>
+				</LevelPatternSelector>
+			</PatternLayout>
 			<Filters>
 				<ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT" />
 				<ThresholdFilter level="DEBUG" onMatch="DENY" onMismatch="NEUTRAL" />
@@ -16,7 +21,12 @@
 		</Console>
 		<Console name="console-error" target="SYSTEM_ERR" immediateFlush="true">
 <!--			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" charset="UTF-8" />-->
-			<PatternLayout pattern="%m%n" charset="UTF-8" />
+			<PatternLayout charset="UTF-8">
+				<LevelPatternSelector defaultPattern="%style{%m}{bright red}%n">
+					<PatternMatch key="FATAL" pattern="%style{%-5level: %m}{bright magenta}%n"/>
+				</LevelPatternSelector>
+			</PatternLayout>
+<!--			<PatternLayout pattern="%highlight{%m%n}{FATAL=red blink, ERROR=red bold}" charset="UTF-8" />-->
 			<ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
 		</Console>
 	</Appenders>

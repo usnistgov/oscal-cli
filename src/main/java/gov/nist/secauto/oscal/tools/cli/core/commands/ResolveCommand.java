@@ -24,46 +24,18 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
-
-import gov.nist.secauto.metaschema.binding.IBindingContext;
-import gov.nist.secauto.metaschema.cli.commands.AbstractConvertSubcommand;
-import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
-import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
-
-import org.apache.commons.cli.CommandLine;
+package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-public abstract class AbstractOscalConvertSubcommand
-    extends AbstractConvertSubcommand {
+public class ResolveCommand
+    extends AbstractResolveCommand {
 
   @NonNull
-  public abstract Class<?> getOscalClass();
+  private static final String COMMAND = "resolve-profile";
 
   @Override
-  public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine commandLine) {
-    return new OscalCommandExecutor(callingContext, commandLine);
-  }
-
-  private class OscalCommandExecutor
-      extends AbstractConversionCommandExecutor {
-
-    private OscalCommandExecutor(
-        @NonNull CallingContext callingContext,
-        @NonNull CommandLine commandLine) {
-      super(callingContext, commandLine);
-    }
-
-    @Override
-    protected IBindingContext getBindingContext() {
-      return OscalBindingContext.instance();
-    }
-
-    @Override
-    protected Class<?> getLoadedClass() {
-      return getOscalClass();
-    }
+  public String getName() {
+    return COMMAND;
   }
 }
