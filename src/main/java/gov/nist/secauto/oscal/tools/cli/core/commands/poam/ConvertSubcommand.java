@@ -26,8 +26,9 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.poam;
 
+import gov.nist.secauto.metaschema.core.model.IBoundObject;
 import gov.nist.secauto.oscal.lib.model.PlanOfActionAndMilestones;
-import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractOscalConvertSubcommand;
 
 public class ConvertSubcommand
     extends AbstractOscalConvertSubcommand {
@@ -37,7 +38,7 @@ public class ConvertSubcommand
   }
 
   @Override
-  public Class<?> getOscalClass() {
+  public Class<? extends IBoundObject> getOscalClass() {
     return PlanOfActionAndMilestones.class;
   }
 }

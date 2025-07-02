@@ -26,62 +26,40 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 
-import gov.nist.secauto.metaschema.binding.IBindingContext;
-import gov.nist.secauto.metaschema.cli.commands.AbstractValidateContentCommand;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
+import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
-import gov.nist.secauto.metaschema.model.common.constraint.IConstraintSet;
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
+import gov.nist.secauto.oscal.tools.cli.core.commands.AbstractOscalValidationSubcommand;
 
 import org.apache.commons.cli.CommandLine;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.transform.Source;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-public abstract class AbstractOscalValidationSubcommand
-    extends AbstractValidateContentCommand {
-
-  @NonNull
-  protected abstract List<Source> getOscalXmlSchemas() throws IOException;
-
-  @NonNull
-  protected abstract JSONObject getOscalJsonSchema();
+public abstract class AbstractDeprecatedOscalValidationSubcommand
+    extends AbstractOscalValidationSubcommand {
+  private static final Logger LOGGER = LogManager.getLogger(AbstractDeprecatedOscalValidationSubcommand.class);
 
   @Override
   public ICommandExecutor newExecutor(CallingContext callingContext, CommandLine commandLine) {
-    return new OscalCommandExecutor(callingContext, commandLine);
+    return new DeprecatedOscalCommandExecutor(callingContext, commandLine);
   }
 
-  private class OscalCommandExecutor
-      extends AbstractValidationCommandExecutor {
+  protected final class DeprecatedOscalCommandExecutor
+      extends AbstractOscalValidationSubcommand.OscalCommandExecutor {
 
-    private OscalCommandExecutor(
+    private DeprecatedOscalCommandExecutor(
         @NonNull CallingContext callingContext,
         @NonNull CommandLine commandLine) {
       super(callingContext, commandLine);
     }
 
     @Override
-    protected IBindingContext getBindingContext(@NonNull Set<IConstraintSet> constraintSets) {
-      return constraintSets.isEmpty() ? OscalBindingContext.instance() : new OscalBindingContext(constraintSets);
-    }
+    public ExitStatus execute() {
+      LOGGER.atWarn().log("This command path is deprecated. Please use 'validate'.");
 
-    @Override
-    @NonNull
-    public List<Source> getXmlSchemas() throws IOException {
-      return getOscalXmlSchemas();
-    }
-
-    @Override
-    @NonNull
-    public JSONObject getJsonSchema() {
-      return getOscalJsonSchema();
+      return super.execute();
     }
   }
 }

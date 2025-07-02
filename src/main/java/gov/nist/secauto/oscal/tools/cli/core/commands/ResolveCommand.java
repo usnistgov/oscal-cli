@@ -24,45 +24,18 @@
  * OF THE RESULTS OF, OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
  */
 
-package gov.nist.secauto.oscal.tools.cli.core.commands.catalog;
+package gov.nist.secauto.oscal.tools.cli.core.commands;
 
-import gov.nist.secauto.metaschema.core.model.util.JsonUtil;
-import gov.nist.secauto.metaschema.core.model.util.XmlUtil;
-import gov.nist.secauto.metaschema.core.util.CollectionUtil;
-import gov.nist.secauto.metaschema.core.util.ObjectUtils;
-import gov.nist.secauto.oscal.lib.OscalBindingContext;
-import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractDeprecatedOscalValidationSubcommand;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
-import org.json.JSONObject;
+public class ResolveCommand
+    extends AbstractResolveCommand {
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.transform.Source;
-
-public class ValidateSubcommand
-    extends AbstractDeprecatedOscalValidationSubcommand {
-  @Override
-  public String getDescription() {
-    return "Check that the specified OSCAL instance is well-formed and valid to the Catalog model.";
-  }
+  @NonNull
+  private static final String COMMAND = "resolve-profile";
 
   @Override
-  protected List<Source> getOscalXmlSchemas() throws IOException {
-    List<Source> retval = new LinkedList<>();
-    retval.add(
-        XmlUtil.getStreamSource(ObjectUtils.requireNonNull(
-            OscalBindingContext.class.getResource("/schema/xml/oscal-catalog_schema.xsd"))));
-    return CollectionUtil.unmodifiableList(retval);
-  }
-
-  @Override
-  protected JSONObject getOscalJsonSchema() throws IOException {
-    try (InputStream is = ObjectUtils.requireNonNull(
-        OscalBindingContext.class.getResourceAsStream("/schema/json/oscal-catalog_schema.json"))) {
-      return JsonUtil.toJsonObject(is);
-    }
+  public String getName() {
+    return COMMAND;
   }
 }

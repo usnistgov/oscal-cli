@@ -28,14 +28,12 @@ package gov.nist.secauto.oscal.tools.cli.core.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import gov.nist.secauto.oscal.tools.cli.core.commands.oscal.AbstractOscalConvertSubcommand;
-
 import org.junit.jupiter.api.Test;
 
 class Issue96ClassLoaderTest {
   /**
-   * Regression tests for usnistgov/oscal-cli#96. See information at this URL for more details.
-   * https://github.com/usnistgov/oscal-cli/issues/96
+   * Regression tests for usnistgov/oscal-cli#96. See information at this URL for
+   * more details. https://github.com/usnistgov/oscal-cli/issues/96
    */
   @Test
   void testAssessmentPlanClassLoader() {
