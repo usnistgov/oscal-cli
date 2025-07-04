@@ -65,7 +65,7 @@ jobs:
       run: |
         mvn -B -e -Prelease -Preporting install
     - name: Build, Test and DEPLOY SNAPSHOT Code
-      if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'develop'
+      if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       run: |
         mvn -B -e -Pgpg -Prelease -Preporting deploy -Dmaven.deploy.skip=releases
       env:
