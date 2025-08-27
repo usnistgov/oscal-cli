@@ -1,0 +1,5 @@
+# To list all file extensions:
+# git ls-files | awk -F . {'print $NF'}|sort -u
+#
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto

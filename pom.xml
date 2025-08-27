@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.secauto</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>27</version>
+		<version>28-SNAPSHOT</version>
 	</parent>
 	<groupId>gov.nist.secauto.oscal.tools.oscal-cli</groupId>
 	<artifactId>cli-core</artifactId>
@@ -78,8 +80,8 @@
 	</mailingLists>
 	<properties>
 		<!-- metaschema dependencies -->
-		<dependency.metaschema-framework.version>0.12.2</dependency.metaschema-framework.version>
-		<dependency.liboscal-java.version>3.0.3</dependency.liboscal-java.version>
+		<dependency.metaschema-framework.version>1.0.0-M2-SNAPSHOT</dependency.metaschema-framework.version>
+		<dependency.liboscal-java.version>3.0.4-SNAPSHOT</dependency.liboscal-java.version>
 
 		<!-- site configuration -->
 		<site.url>https://pages.nist.gov/metaschema-java/</site.url>
@@ -109,16 +111,23 @@
 
 		<!-- other dependencies -->
 		<dependency.auto-service.version>1.1.1</dependency.auto-service.version>
-		<dependency.commons-cli.version>1.5.0</dependency.commons-cli.version>
-		<dependency.commons-io.version>2.15.1</dependency.commons-io.version>
+		<dependency.commons-cli.version>1.7.0</dependency.commons-cli.version>
+		<dependency.commons-io.version>2.16.1</dependency.commons-io.version>
 		<dependency.everit-json.version>1.14.4</dependency.everit-json.version>
+		<dependency.jansi.version>2.4.1</dependency.jansi.version>
 		<dependency.jline.version>3.21.0</dependency.jline.version>
-		<dependency.log4j2.version>2.20.0</dependency.log4j2.version>
-		<dependency.spotbugs-annotations.version>4.7.3</dependency.spotbugs-annotations.version>
+		<dependency.json.version>20240303</dependency.json.version>
+		<dependency.log4j2.version>2.23.1</dependency.log4j2.version>
+		<dependency.pmd.version>7.1.0</dependency.pmd.version>
+		<dependency.spotbugs-annotations.version>4.8.3</dependency.spotbugs-annotations.version>
 		<dependency.saxon-he.version>12.4</dependency.saxon-he.version>
-		<dependency.xmlresolver.version>6.0.2</dependency.xmlresolver.version>
+		<dependency.xmlbeans.version>5.2.0</dependency.xmlbeans.version>
+		<dependency.xmlresolver.version>5.2.2</dependency.xmlresolver.version>
 
 		<plugin.license.version>4.2</plugin.license.version>
+		<plugin.maven-toolchains.version>3.1.0</plugin.maven-toolchains.version>
+		<plugin.pmd.version>3.22.0</plugin.pmd.version>
+		<plugin.spotbugs.version>4.8.4.0</plugin.spotbugs.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -216,9 +225,20 @@
 			<version>${dependency.xmlresolver.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>${dependency.xmlbeans.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.erosb</groupId>
 			<artifactId>everit-json-schema</artifactId>
 			<version>${dependency.everit-json.version}</version>
+		</dependency>
+		<dependency>
+			<!-- for dependency convergence -->
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${dependency.json.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.spotbugs</groupId>
@@ -228,12 +248,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -262,6 +277,27 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-toolchains-plugin</artifactId>
+					<version>${plugin.maven-toolchains.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>toolchain</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<toolchains>
+							<jdk>
+								<version>11</version>
+								<vendor>temurin</vendor>
+							</jdk>
+						</toolchains>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<configuration>
 						<topSiteURL>${site.url}</topSiteURL>
@@ -282,13 +318,50 @@
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${plugin.spotbugs.version}</version>
 					<configuration>
 						<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>${plugin.pmd.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-core</artifactId>
+							<version>${dependency.pmd.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-java</artifactId>
+							<version>${dependency.pmd.version}</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>pmd-verify</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<configuration>
+								<failurePriority>2</failurePriority>
+								<!-- fail on error for all builds -->
+								<failOnViolation>true</failOnViolation>
+								<printFailingErrors>true</printFailingErrors>
+								<format>sarif</format>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-toolchains-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>io.github.git-commit-id</groupId>
 				<artifactId>git-commit-id-maven-plugin</artifactId>
@@ -428,9 +501,8 @@
 							<thirdPartyFilename>LICENSE-THIRD-PARTY.txt</thirdPartyFilename>
 							<licenseMerges>
 								<licenseMerge>The Apache Software License,
-									Version 2.0|Apache
-									License, Version 2.0|Apache Public License
-									2.0</licenseMerge>
+									Version 2.0|Apache License, Version
+									2.0|Apache Public License 2.0</licenseMerge>
 							</licenseMerges>
 						</configuration>
 					</execution>

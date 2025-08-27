@@ -30,15 +30,18 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import gov.nist.secauto.metaschema.binding.io.Format;
 import gov.nist.secauto.metaschema.cli.processor.ExitCode;
 import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
+import gov.nist.secauto.metaschema.core.util.ObjectUtils;
+import gov.nist.secauto.metaschema.databind.io.Format;
 import gov.nist.secauto.oscal.lib.profile.resolver.ProfileResolutionException;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -61,13 +64,26 @@ public class CLITest {
       @NonNull Class<? extends Throwable> thrownClass) {
     status.generateMessage(true);
     Throwable thrown = status.getThrowable();
-    assert thrown != null;
     assertAll(
         () -> assertEquals(expectedCode, status.getExitCode(), "exit code mismatch"),
-        () -> assertEquals(thrownClass, thrown.getClass(), "expected Throwable mismatch"));
+        () -> assertEquals(
+            thrownClass,
+            thrown == null ? null : thrown.getClass(),
+            "Throwable mismatch"));
   }
 
-  private static Stream<Arguments> providesValues() {
+  private static String generateOutputPath(@NonNull Path source, @NonNull Format targetFormat) throws IOException {
+    String filename = ObjectUtils.notNull(source.getFileName()).toString();
+
+    int pos = filename.lastIndexOf('.');
+    filename = filename.substring(0, pos) + "_converted" + targetFormat.getDefaultExtension();
+
+    Path dir = Files.createDirectories(Path.of("target/oscal-cli-convert"));
+
+    return dir.resolve(filename).toString();
+  }
+
+  private static Stream<Arguments> providesValues() throws IOException {
     final String[] commands = { "ap", "ar", "catalog", "component-definition", "profile", "poam", "ssp" };
     final Map<Format, List<Format>> formatEntries = Map.of(
         Format.XML, Arrays.asList(Format.JSON, Format.YAML),
@@ -76,42 +92,83 @@ public class CLITest {
     List<Arguments> values = new ArrayList<>();
 
     values.add(Arguments.of(new String[] { "--version" }, ExitCode.OK, null));
-    // TODO: Test all data formats once usnistgov/oscal-cli#216 fix merged.
-    Path path = Paths.get("src/test/resources/cli/example_profile_invalid" + Format.XML.getDefaultExtension());
-    values.add(
-        Arguments.of(new String[] { "profile", "resolve", "--to=" + Format.XML.name().toLowerCase(), path.toString() },
-            ExitCode.PROCESSING_ERROR, ProfileResolutionException.class));
-
     for (String cmd : commands) {
+      // test helps
       values.add(Arguments.of(new String[] { cmd, "validate", "-h" }, ExitCode.OK, null));
-      // TODO: Update when usnistgov/oscal-cli#210 fix merged.
-      values.add(Arguments.of(new String[] { cmd, "convert", "-h" }, ExitCode.INVALID_COMMAND, null));
+      values.add(Arguments.of(new String[] { cmd, "convert", "-h" }, ExitCode.OK, null));
 
       for (Format format : Format.values()) {
-        path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
-        values.add(Arguments.of(new String[] { cmd, "validate", path.toString() }, ExitCode.FAIL, null));
-        path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
-        values.add(Arguments.of(new String[] { cmd, "validate", path.toString() }, ExitCode.OK, null));
-        path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
-        List<Format> targetFormats = formatEntries.get(format);
-        for (Format targetFormat : targetFormats) {
-          path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + format.getDefaultExtension());
-          String outputPath = path.toString().replace(format.getDefaultExtension(),
-              "_converted" + targetFormat.getDefaultExtension());
-          values.add(Arguments.of(new String[] { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(),
-              path.toString(), outputPath, "--overwrite" }, ExitCode.OK, null));
+        String sourceExtension = format.getDefaultExtension();
+        values.add(
+            Arguments.of(
+                new String[] {
+                    cmd,
+                    "validate",
+                    Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + sourceExtension).toString()
+                },
+                ExitCode.FAIL,
+                null));
+        values.add(
+            Arguments.of(
+                new String[] {
+                    cmd,
+                    "validate",
+                    Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + sourceExtension).toString()
+                },
+                ExitCode.OK,
+                null));
+
+        for (Format targetFormat : formatEntries.get(format)) {
+          Path path = Paths.get("src/test/resources/cli/example_" + cmd + "_valid" + sourceExtension);
+          values.add(
+              Arguments.of(
+                  new String[] {
+                      cmd,
+                      "convert",
+                      "--to=" + targetFormat.name().toLowerCase(),
+                      path.toString(),
+                      generateOutputPath(path, targetFormat),
+                      "--overwrite"
+                  },
+                  ExitCode.OK,
+                  null));
+
           // TODO: Update when usnistgov/oscal#217 fix merged.
-          path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
-          outputPath = path.toString().replace(format.getDefaultExtension(),
-              "_converted" + targetFormat.getDefaultExtension());
-          values.add(Arguments.of(new String[] { cmd, "convert", "--to=" + targetFormat.name().toLowerCase(),
-              path.toString(), outputPath, "--overwrite" }, ExitCode.OK, null));
+          path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + sourceExtension);
+          values.add(
+              Arguments.of(
+                  new String[] {
+                      cmd,
+                      "convert",
+                      "--to=" + targetFormat.name().toLowerCase(),
+                      path.toString(),
+                      generateOutputPath(path, targetFormat),
+                      "--overwrite"
+                  },
+                  ExitCode.OK,
+                  null));
         }
         if (cmd == "profile") {
-          path = Paths.get("src/test/resources/cli/example_profile_valid" + format.getDefaultExtension());
-          values
-              .add(Arguments.of(new String[] { cmd, "resolve", "--to=" + format.name().toLowerCase(), path.toString() },
-                  ExitCode.OK, null));
+          values.add(
+              Arguments.of(
+                  new String[] {
+                      cmd,
+                      "resolve",
+                      "--to=" + format.name().toLowerCase(),
+                      Paths.get("src/test/resources/cli/example_profile_valid" + sourceExtension).toString()
+                  },
+                  ExitCode.OK,
+                  null));
+          values.add(
+              Arguments.of(
+                  new String[] {
+                      "profile",
+                      "resolve",
+                      "--to=" + format.name().toLowerCase(),
+                      Paths.get("src/test/resources/cli/example_profile_invalid" + sourceExtension).toString()
+                  },
+                  ExitCode.PROCESSING_ERROR,
+                  ProfileResolutionException.class));
         }
       }
     }

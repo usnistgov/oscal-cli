@@ -26,10 +26,6 @@
 
 package gov.nist.secauto.oscal.tools.cli.core.commands.profile;
 
-import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
-import gov.nist.secauto.metaschema.binding.io.Format;
-import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
-import gov.nist.secauto.metaschema.binding.io.ISerializer;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
 import gov.nist.secauto.metaschema.cli.processor.ExitCode;
 import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
@@ -39,11 +35,17 @@ import gov.nist.secauto.metaschema.cli.processor.command.AbstractTerminalCommand
 import gov.nist.secauto.metaschema.cli.processor.command.DefaultExtraArgument;
 import gov.nist.secauto.metaschema.cli.processor.command.ExtraArgument;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
-import gov.nist.secauto.metaschema.model.common.metapath.DynamicContext;
-import gov.nist.secauto.metaschema.model.common.metapath.StaticContext;
-import gov.nist.secauto.metaschema.model.common.metapath.item.IDocumentNodeItem;
-import gov.nist.secauto.metaschema.model.common.util.CustomCollectors;
-import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
+import gov.nist.secauto.metaschema.core.metapath.DynamicContext;
+import gov.nist.secauto.metaschema.core.metapath.StaticContext;
+import gov.nist.secauto.metaschema.core.metapath.item.node.IDocumentNodeItem;
+import gov.nist.secauto.metaschema.core.metapath.item.node.INodeItem;
+import gov.nist.secauto.metaschema.core.util.CustomCollectors;
+import gov.nist.secauto.metaschema.core.util.ObjectUtils;
+import gov.nist.secauto.metaschema.databind.io.DeserializationFeature;
+import gov.nist.secauto.metaschema.databind.io.Format;
+import gov.nist.secauto.metaschema.databind.io.FormatDetector;
+import gov.nist.secauto.metaschema.databind.io.IBoundLoader;
+import gov.nist.secauto.metaschema.databind.io.ISerializer;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 import gov.nist.secauto.oscal.lib.model.Catalog;
 import gov.nist.secauto.oscal.lib.model.Profile;
@@ -56,6 +58,7 @@ import org.apache.commons.cli.Option;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -211,7 +214,8 @@ public class ResolveSubcommand
     } else {
       // attempt to determine the format
       try {
-        asFormat = loader.detectFormat(ObjectUtils.notNull(source));
+        FormatDetector.Result result = loader.detectFormat(ObjectUtils.notNull(source));
+        asFormat = result.getFormat();
       } catch (FileNotFoundException ex) {
         // this case was already checked for
         return ExitCode.IO_ERROR.exitMessage("The provided source file '" + source + "' does not exist.");
@@ -227,6 +231,7 @@ public class ResolveSubcommand
     }
 
     source = source.toAbsolutePath();
+    assert source != null;
 
     Format toFormat;
     if (cmdLine.hasOption(TO_OPTION)) {
@@ -264,49 +269,63 @@ public class ResolveSubcommand
 
     IDocumentNodeItem document;
     try {
-      document = loader.loadAsNodeItem(asFormat, loader.toInputSource(ObjectUtils.notNull(source.toUri())));
+      document = loader.loadAsNodeItem(asFormat, source);
     } catch (IOException ex) {
       return ExitCode.IO_ERROR.exit().withThrowable(ex);
     }
     Object object = document.getValue();
+    if (object == null) {
+      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target profile contained no data");
+    }
+
     if (object instanceof Catalog) {
       // this is a catalog
-      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target file is already a catalog");
-    } else if (object instanceof Profile) {
-      // this is a profile
-      StaticContext staticContext = new StaticContext();
-      URI sourceUri = ObjectUtils.notNull(source.toUri());
-      staticContext.setBaseUri(sourceUri);
-      DynamicContext dynamicContext = staticContext.newDynamicContext();
-      dynamicContext.setDocumentLoader(loader);
-      ProfileResolver resolver = new ProfileResolver();
-      resolver.setDynamicContext(dynamicContext);
+      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target is already a catalog");
+    }
 
-      IDocumentNodeItem resolvedProfile;
-      try {
-        resolvedProfile = resolver.resolve(document);
-      } catch (IOException | ProfileResolutionException ex) {
-        return ExitCode.PROCESSING_ERROR
-            .exitMessage(
-                String.format("Unable to resolve profile '%s'. %s", document.getDocumentUri(), ex.getMessage()))
-            .withThrowable(ex);
+    if (!(object instanceof Profile)) {
+      // this is something else
+      return ExitCode.INVALID_ARGUMENTS.exitMessage("The target is not a profile");
+    }
+
+    // this is a profile
+    URI sourceUri = ObjectUtils.notNull(source.toUri());
+
+    DynamicContext dynamicContext = new DynamicContext(
+        StaticContext.builder()
+            .baseUri(sourceUri)
+            .defaultModelNamespace(document.getNamespace())
+            .build());
+    dynamicContext.setDocumentLoader(loader);
+    ProfileResolver resolver = new ProfileResolver();
+    resolver.setDynamicContext(dynamicContext);
+
+    IDocumentNodeItem resolvedProfile;
+    try {
+      resolvedProfile = resolver.resolve(document);
+    } catch (IOException | ProfileResolutionException ex) {
+      return ExitCode.PROCESSING_ERROR
+          .exitMessage(
+              String.format("Unable to resolve profile '%s'. %s", document.getDocumentUri(), ex.getMessage()))
+          .withThrowable(ex);
+    }
+
+    // DefaultConstraintValidator validator = new
+    // DefaultConstraintValidator(dynamicContext);
+    // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);
+    // validator.finalizeValidation();
+
+    ISerializer<Catalog> serializer
+        = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
+    try {
+      if (destination == null) {
+        @SuppressWarnings({ "resource", "PMD.CloseResource" }) PrintStream stdOut = ObjectUtils.notNull(System.out);
+        serializer.serialize((Catalog) INodeItem.toValue(resolvedProfile), stdOut);
+      } else {
+        serializer.serialize((Catalog) INodeItem.toValue(resolvedProfile), destination);
       }
-
-      // DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);
-      // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);
-      // validator.finalizeValidation();
-
-      ISerializer<Catalog> serializer
-          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
-      try {
-        if (destination == null) {
-          serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));
-        } else {
-          serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
-        }
-      } catch (IOException ex) {
-        return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
-      }
+    } catch (IOException ex) {
+      return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
     }
     return ExitCode.OK.exit();
   }
