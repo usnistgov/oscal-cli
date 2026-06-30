@@ -31,7 +31,9 @@ This project can be built with [Apache Maven](https://maven.apache.org/) version
 
 The following instructions can be used to clone and build this project.
 
-1. Clone the GitHub repository.
+1. Please refer to this wiki page for installing other projects that oscal-cli requires: [oscal-cli local setup](https://github.com/usnistgov/oscal-cli/wiki/oscal%E2%80%90cli-local-setup)
+
+2. Clone the GitHub repository.
 
 ```bash
 git clone --recurse-submodules https://github.com/usnistgov/oscal-cli.git 
@@ -53,9 +55,11 @@ cd target/cli-core-[VERSION]-oscal-cli/bin
 ./oscal-cli --version
 ```
 
-## (Alternative) Installing pre-built Java package - if you don't wish to build
+## (Alternative) Installing pre-built Java package (only up to version 1.0.3) - if you don't wish to build
 
-1. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release on the Maven Central repository](https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/). You may also download [development snapshots](https://oss.sonatype.org/content/repositories/snapshots/gov/nist/secauto/oscal/tools/oscal-cli/) to evaluate new features or bug fixes merged into develop before they are finalized in a published release.
+1. Download the zipped oscal-cli Java package. Download your preferred version, but we recommend [the latest stable release (1.0.3) on the Maven Central repository](https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/). You may also download [development snapshots](https://oss.sonatype.org/content/repositories/snapshots/gov/nist/secauto/oscal/tools/oscal-cli/) to evaluate new features or bug fixes merged into develop before they are finalized in a published release.
+
+For the foreseeable future, the Maven Central repository will not be maintained. New releases will be through GitHub.
 
 ```
 wget -q https://repo1.maven.org/maven2/gov/nist/secauto/oscal/tools/oscal-cli/cli-core/1.0.3/cli-core-1.0.3-oscal-cli.zip.asc # download the release signature
@@ -75,7 +79,7 @@ mkdir -p /opt/oscal-cli && cd /opt/oscal-cli
 
 3. Extract oscal-cli into the directory.
 ```
-unzip cli-core-1.0.3-oscal-cli.zip
+unzip cli-core-1.0.4-oscal-cli.zip
 ```
 
 ## (Recommended) Add oscal-cli's directory to your PATH.
