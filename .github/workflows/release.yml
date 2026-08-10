@@ -21,7 +21,7 @@ jobs:
     # Java
     # -------------------------
     - name: Set up Maven
-      uses: stCarolas/setup-maven@07fbbe97d97ef44336b7382563d66743297e442f
+      uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0
       with:
         maven-version: 3.9.3
     - name: Set up JDK 11
