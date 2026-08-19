@@ -30,6 +30,7 @@ import gov.nist.secauto.metaschema.binding.io.DeserializationFeature;
 import gov.nist.secauto.metaschema.binding.io.Format;
 import gov.nist.secauto.metaschema.binding.io.IBoundLoader;
 import gov.nist.secauto.metaschema.binding.io.ISerializer;
+import gov.nist.secauto.metaschema.binding.io.SerializationFeature;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
 import gov.nist.secauto.metaschema.cli.processor.ExitCode;
 import gov.nist.secauto.metaschema.cli.processor.ExitStatus;
@@ -99,11 +100,19 @@ public class ResolveSubcommand
           .desc("overwrite the destination if it exists")
           .build());
   @NonNull
+  private static final Option PRETTY_PRINT_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("pretty-print")
+          .desc("Enable pretty-printing of the output for better readability.")
+          .build());
+
+  @NonNull
   private static final List<Option> OPTIONS = ObjectUtils.notNull(
       List.of(
           AS_OPTION,
           TO_OPTION,
-          OVERWRITE_OPTION));
+          OVERWRITE_OPTION,
+          PRETTY_PRINT_OPTION));
 
   @Override
   public String getName() {
@@ -153,8 +162,8 @@ public class ResolveSubcommand
         String toFormatText = cmdLine.getOptionValue(TO_OPTION);
         Format.valueOf(toFormatText.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException ex) {
-        InvalidArgumentException newEx
-            = new InvalidArgumentException("Invalid '--to' argument. The format must be one of: "
+        InvalidArgumentException newEx = new InvalidArgumentException(
+            "Invalid '--to' argument. The format must be one of: "
                 + Arrays.asList(Format.values()).stream()
                     .map(format -> format.name())
                     .collect(CustomCollectors.joiningWithOxfordComma("and")));
@@ -197,6 +206,7 @@ public class ResolveSubcommand
     loader.disableFeature(DeserializationFeature.DESERIALIZE_VALIDATE_CONSTRAINTS);
 
     Format asFormat;
+    boolean prettyPrint = cmdLine.hasOption(PRETTY_PRINT_OPTION);
     // attempt to determine the format
     if (cmdLine.hasOption(AS_OPTION)) {
       try {
@@ -292,22 +302,51 @@ public class ResolveSubcommand
             .withThrowable(ex);
       }
 
-      // DefaultConstraintValidator validator = new DefaultConstraintValidator(dynamicContext);
+      // DefaultConstraintValidator validator = new
+      // DefaultConstraintValidator(dynamicContext);
       // ((IBoundXdmNodeItem)resolvedProfile).validate(validator);
       // validator.finalizeValidation();
 
-      ISerializer<Catalog> serializer
-          = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
+      ISerializer<Catalog> serializer = OscalBindingContext.instance().newSerializer(toFormat, Catalog.class);
       try {
         if (destination == null) {
           serializer.serialize((Catalog) resolvedProfile.getValue(), ObjectUtils.notNull(System.out));
         } else {
           serializer.serialize((Catalog) resolvedProfile.getValue(), destination);
         }
+        if (prettyPrint && destination != null) {
+
+          ExitStatus prettyPrintStatus = prettyPrintOutput(destination, toFormat);
+          if (prettyPrintStatus != null) {
+            return prettyPrintStatus;
+          }
+        }
       } catch (IOException ex) {
         return ExitCode.PROCESSING_ERROR.exit().withThrowable(ex);
       }
     }
     return ExitCode.OK.exit();
+  }
+
+  ExitStatus prettyPrintOutput(Path destination, Format toFormat) {
+    File outputFile = destination.toFile();
+    try {
+      switch (toFormat) {
+      case JSON:
+        gov.nist.secauto.oscal.tools.cli.core.utils.PrettyPrinter.prettyPrintJson(outputFile);
+        break;
+      case YAML:
+        gov.nist.secauto.oscal.tools.cli.core.utils.PrettyPrinter.prettyPrintYaml(outputFile);
+        break;
+      case XML:
+        gov.nist.secauto.oscal.tools.cli.core.utils.PrettyPrinter.prettyPrintXml(outputFile);
+        break;
+      default:
+        // do nothing
+      }
+    } catch (Exception e) {
+      return ExitCode.PROCESSING_ERROR.exitMessage("Pretty-printing failed: " + e.getMessage()).withThrowable(e);
+    }
+    return null;
   }
 }
