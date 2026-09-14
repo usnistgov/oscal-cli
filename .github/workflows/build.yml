@@ -35,14 +35,14 @@ jobs:
         maven-version: 3.9.3
     - name: Set up JDK 11 (build only)
       if: ${{ !((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'develop') }}
-      uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: 11
         distribution: 'temurin'
         cache: 'maven'
     - name: Set up JDK 11 (deploy)
       if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'develop'
-      uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: 11
         distribution: 'temurin'
