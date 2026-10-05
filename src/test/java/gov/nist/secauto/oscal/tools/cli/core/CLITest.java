@@ -84,8 +84,7 @@ public class CLITest {
 
     for (String cmd : commands) {
       values.add(Arguments.of(new String[] { cmd, "validate", "-h" }, ExitCode.OK, null));
-      // TODO: Update when usnistgov/oscal-cli#210 fix merged.
-      values.add(Arguments.of(new String[] { cmd, "convert", "-h" }, ExitCode.INVALID_COMMAND, null));
+      values.add(Arguments.of(new String[] { cmd, "convert", "-h" }, ExitCode.OK, null));
 
       for (Format format : Format.values()) {
         path = Paths.get("src/test/resources/cli/example_" + cmd + "_invalid" + format.getDefaultExtension());
