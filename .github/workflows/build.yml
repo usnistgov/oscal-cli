@@ -54,7 +54,7 @@ jobs:
         gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
     - name: Initialize CodeQL
       if: github.event_name == 'push'
-      uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d
+      uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee
       with:
         languages: java
     # -------------------------
