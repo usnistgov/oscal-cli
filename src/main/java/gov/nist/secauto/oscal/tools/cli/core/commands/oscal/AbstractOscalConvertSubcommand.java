@@ -29,15 +29,55 @@ package gov.nist.secauto.oscal.tools.cli.core.commands.oscal;
 import gov.nist.secauto.metaschema.binding.IBindingContext;
 import gov.nist.secauto.metaschema.cli.commands.AbstractConvertSubcommand;
 import gov.nist.secauto.metaschema.cli.processor.CLIProcessor.CallingContext;
+import gov.nist.secauto.metaschema.cli.processor.InvalidArgumentException;
 import gov.nist.secauto.metaschema.cli.processor.command.ICommandExecutor;
+import gov.nist.secauto.metaschema.model.common.util.ObjectUtils;
 import gov.nist.secauto.oscal.lib.OscalBindingContext;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+
+import java.util.Collection;
+import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 public abstract class AbstractOscalConvertSubcommand
     extends AbstractConvertSubcommand {
+
+  @NonNull
+  private static final Option OVERWRITE_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("overwrite")
+          .desc("overwrite the destination if it exists")
+          .build());
+
+  @NonNull
+  private static final Option TO_OPTION = ObjectUtils.notNull(
+      Option.builder()
+          .longOpt("to")
+          .hasArg().argName("FORMAT")
+          .desc("convert to format: xml, json, or yaml")
+          .build());
+
+  @Override
+  public Collection<? extends Option> gatherOptions() {
+    return ObjectUtils.notNull(List.of(
+        OVERWRITE_OPTION,
+        TO_OPTION));
+  }
+
+  @Override
+  public void validateOptions(CallingContext callingContext, CommandLine cmdLine)
+      throws InvalidArgumentException {
+    if (cmdLine.hasOption("help") || cmdLine.hasOption("version")) {
+      return;
+    }
+
+    if (!cmdLine.hasOption("to")) {
+      throw new InvalidArgumentException("Missing required option: to");
+    }
+  }
 
   @NonNull
   public abstract Class<?> getOscalClass();
