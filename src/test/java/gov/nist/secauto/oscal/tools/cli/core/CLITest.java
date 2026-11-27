@@ -29,6 +29,7 @@ package gov.nist.secauto.oscal.tools.cli.core;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.secauto.metaschema.binding.io.Format;
 import gov.nist.secauto.metaschema.cli.processor.ExitCode;
@@ -39,6 +40,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import java.nio.file.Files;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -112,6 +116,17 @@ public class CLITest {
           values
               .add(Arguments.of(new String[] { cmd, "resolve", "--to=" + format.name().toLowerCase(), path.toString() },
                   ExitCode.OK, null));
+
+          // Pretty-print support test
+          String prettyPrintOutput = "target/resolved_pretty_print" + format.getDefaultExtension();
+          values.add(Arguments.of(new String[] {
+              cmd, "resolve",
+              "--to=" + format.name().toLowerCase(),
+              "--pretty-print",
+              path.toString(),
+              prettyPrintOutput,
+              "--overwrite"
+          }, ExitCode.OK, null));
         }
       }
     }
@@ -119,14 +134,45 @@ public class CLITest {
     return values.stream();
   }
 
+  private void assertPrettyPrintedOutput(Path outputPath, Format format) throws IOException {
+    String content = Files.readString(outputPath, StandardCharsets.UTF_8);
+    assertAll(
+        () -> assertTrue(content != null && !content.isBlank()),
+        () -> {
+          // Naive pretty-print assertion: check for line breaks and indentation
+          long lineCount = content.lines().count();
+          boolean hasIndentedLines = content.lines().anyMatch(line -> line.startsWith("  ") || line.startsWith("    "));
+
+          assertTrue(lineCount > 5, "Expected multiple lines for pretty-printed output");
+          assertTrue(hasIndentedLines, "Expected indented lines in pretty-printed output");
+        });
+  }
+
   @ParameterizedTest
   @MethodSource("providesValues")
   void testAllSubCommands(@NonNull String[] args, @NonNull ExitCode expectedExitCode,
-      Class<? extends Throwable> expectedThrownClass) {
+      Class<? extends Throwable> expectedThrownClass) throws IOException {
     if (expectedThrownClass == null) {
       evaluateResult(CLI.runCli(args), expectedExitCode);
     } else {
       evaluateResult(CLI.runCli(args), expectedExitCode, expectedThrownClass);
     }
+
+    // Check pretty-print output content if applicable
+    if (expectedExitCode == ExitCode.OK
+        && List.of(args).contains("--pretty-print")
+        && args.length >= 6) { // Ensure output path exists in args
+      String outputPathStr
+          = args[args.length - 2].endsWith("--overwrite") ? args[args.length - 3] : args[args.length - 2];
+      Path outputPath = Paths.get(outputPathStr);
+      String formatStr = Arrays.stream(args)
+          .filter(arg -> arg.startsWith("--to="))
+          .findFirst()
+          .map(arg -> arg.substring("--to=".length()))
+          .orElse("json");
+      Format format = Format.valueOf(formatStr.toUpperCase());
+      assertPrettyPrintedOutput(outputPath, format);
+    }
+
   }
 }
